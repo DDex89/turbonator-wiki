@@ -1,25 +1,43 @@
-====== How To ======
+====== How-To Guides ======
 
-This page will be used for navigation to the various How-To articles contained in this wiki.
+Browse the guides by controller family or topic. FCC and SBEC3 reverse-engineering references are grouped separately from legacy Turbonator tuning guides.
 
-=== How To... ===
-  * [[planning|...figure out what you'll need to log/flash/burn/tune]] 
-  * [[cable_setup|...get your laptop talking to the Chrysler ECU]] 
-  * [[ecu_socketing|...socket your ECU]]
-  * [[chip_burning_basics|...burn chips]] 
-  * [[use-the-ostrich|...use the Ostrich with an LM, SMEC, or SBEC]]
-  * [[add_a_pin|...add a pin to the SMEC or SBEC 60-way connector]] 
-  * [[install_flash_module|...install a BB flash module into your SMEC or SBEC]]
-  * [[how_to_flash_a_cal|...flash a suitably modified SMEC or SBEC]] 
-  * [[flash_an_FCC|...flash a '95 Neon FCC]]
-  * [[fcc_overview|...read the '95 Neon FCC firmware source code]]
-  * [[sbec3_overview|...read the SBEC3 firmware source code (1996+ Neon / 2G Eclipse-Talon)]]
-  * [[sbec3_reflash|...read or reflash an SBEC3 over the diagnostic line]]
-  * [[base_cal_setup|...setup a base Turbonator cal using MP Tune]]
-  * [[mask_err_codes|...mask error codes]]
-  * [[setup datalogging|...setup MP Scan for datalogging]]  
-  * [[setup turbonator features|...setup the Turbonator features]] 
-  * [[MAP_Sensor_Xfer_Func|...make a precise MAP transfer function]]
-  * [[afr-peftbl tuning|...use logged AFR data to re-tune the PefTbl in MP Tune]] 
-  * [[boost control tuning|...fine tune the computer controlled boost]] 
-  * [[det can setup|...setup a detonation listening device]] 
+===== Getting started and ECU communication =====
+
+  * [[planning|Choose tools for flashing, logging and tuning]]
+  * [[cable_setup|Set up the USB-to-SCI cable and COM port]]
+  * [[sci_tech_info|Understand Chrysler SCI communication]]
+
+===== Legacy Chrysler LM / SMEC / SBEC =====
+
+  * [[ecu_socketing|Socket an ECU]]
+  * [[chip_burning_basics|Program EPROM chips]]
+  * [[use-the-ostrich|Use an Ostrich emulator with LM, SMEC or SBEC]]
+  * [[add_a_pin|Add a pin to the SMEC/SBEC 60-way connector]]
+  * [[install_flash_module|Install a BoostButton flash module]]
+  * [[how_to_flash_a_cal|Flash a modified SMEC or SBEC]]
+
+===== 1995 Neon FCC (68HC11) =====
+
+  * [[flash_an_fcc|Flash the 1995 Neon FCC using FCCFlash]]
+  * [[fcc_overview|FCC hardware and firmware overview]]
+  * [[fcc_calibration|FCC calibration variants and tables]]
+  * [[fcc_sci|FCC SCI/DRB diagnostics and communication]]
+  * [[fcc_fault_codes|FCC fault code reference]]
+  * [[fcc_tuning_notes|FCC fuel, ignition and tuning notes]]
+
+===== SBEC3 (1996+ Neon / 2G Eclipse-Talon) =====
+
+  * [[sbec3_overview|SBEC3 hardware and firmware overview]]
+  * [[sbec3_calibration|SBEC3 calibration tables and constants]]
+  * [[sbec3_tuning|SBEC3 tuning and TunerPro/XDF notes]]
+  * [[sbec3_reflash|Read and reflash SBEC3 over SCI]]
+
+===== Calibration, datalogging and diagnostics =====
+
+  * [[base_cal_setup|Create a base Turbonator calibration in MP Tune]]
+  * [[mask_err_codes|Mask diagnostic trouble codes]]
+  * [[setup_datalogging|Configure MP Scan datalogging]]
+  * [[setup_turbonator_features|Configure Turbonator features]]
+  * [[afr-peftbl_tuning|Tune the PefTbl using logged AFR data]]
+  * [[det_can_setup|Set up a detonation listening device]]
