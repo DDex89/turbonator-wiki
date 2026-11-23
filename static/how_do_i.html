@@ -53,58 +53,62 @@
 
 <div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
 <div class="page" role="main">
-
-<h1 class="sectionedit1" id="how_to">How To</h1>
+<h1 class="sectionedit1" id="how_to_guides">How-To Guides</h1>
 <div class="level1">
-<p>
-This page will be used for navigation to the various How-To articles contained in this wiki.
-</p>
+<p>Browse the guides by controller family or topic. FCC and SBEC3 reverse-engineering references are grouped separately from legacy Turbonator tuning guides.</p>
 </div>
-<h4 id="how_to1">How To...</h4>
-<div class="level4">
+<h2 class="sectionedit2" id="getting_started_and_ecu_communication">Getting started and ECU communication</h2>
+<div class="level2">
 <ul>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="planning" href="planning.html" title="planning">...figure out what you'll need to log/flash/burn/tune</a> </div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="cable_setup" href="cable_setup.html" title="cable_setup">...get your laptop talking to the Chrysler ECU</a> </div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="ecu_socketing" href="ecu_socketing.html" title="ecu_socketing">...socket your ECU</a></div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="chip_burning_basics" href="chip_burning_basics.html" title="chip_burning_basics">...burn chips</a> </div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="use-the-ostrich" href="use-the-ostrich.html" title="use-the-ostrich">...use the Ostrich with an LM, SMEC, or SBEC</a></div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="add_a_pin" href="add_a_pin.html" title="add_a_pin">...add a pin to the SMEC or SBEC 60-way connector</a> </div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="install_flash_module" href="install_flash_module.html" title="install_flash_module">...install a BB flash module into your SMEC or SBEC</a></div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_to_flash_a_cal" href="how_to_flash_a_cal.html" title="how_to_flash_a_cal">...flash a suitably modified SMEC or SBEC</a> </div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="flash_an_fcc" href="flash_an_fcc.html" title="flash_an_fcc">...flash a '95 Neon FCC</a></div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="fcc_overview" href="fcc_overview.html" title="fcc_overview">...read the '95 Neon FCC firmware source code</a></div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="sbec3_overview" href="sbec3_overview.html" title="sbec3_overview">...read the SBEC3 firmware source code (1996+ Neon / 2G Eclipse-Talon)</a></div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="sbec3_reflash" href="sbec3_reflash.html" title="sbec3_reflash">...read or reflash an SBEC3 over the diagnostic line</a></div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="base_cal_setup" href="base_cal_setup.html" title="base_cal_setup">...setup a base Turbonator cal using MP Tune</a></div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="mask_err_codes" href="mask_err_codes.html" title="mask_err_codes">...mask error codes</a></div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="setup_datalogging" href="setup_datalogging.html" title="setup_datalogging">...setup MP Scan for datalogging</a> </div>
-</li>
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="setup_turbonator_features" href="setup_turbonator_features.html" title="setup_turbonator_features">...setup the Turbonator features</a> </div>
-</li>
-
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="afr-peftbl_tuning" href="afr-peftbl_tuning.html" title="afr-peftbl_tuning">...use logged AFR data to re-tune the PefTbl in MP Tune</a> </div>
-</li>
-
-<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="det_can_setup" href="det_can_setup.html" title="det_can_setup">...setup a detonation listening device</a> </div>
-</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="planning" href="planning.html" title="planning">Choose tools for flashing, logging and tuning</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="cable_setup" href="cable_setup.html" title="cable_setup">Set up the USB-to-SCI cable and COM port</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="sci_tech_info" href="sci_tech_info.html" title="sci_tech_info">Understand Chrysler SCI communication</a></div></li>
 </ul>
 </div>
-
+<h2 class="sectionedit3" id="legacy_chrysler_lm_smec_sbec">Legacy Chrysler LM / SMEC / SBEC</h2>
+<div class="level2">
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="ecu_socketing" href="ecu_socketing.html" title="ecu_socketing">Socket an ECU</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="chip_burning_basics" href="chip_burning_basics.html" title="chip_burning_basics">Program EPROM chips</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="use-the-ostrich" href="use-the-ostrich.html" title="use-the-ostrich">Use an Ostrich emulator with LM, SMEC or SBEC</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="add_a_pin" href="add_a_pin.html" title="add_a_pin">Add a pin to the SMEC/SBEC 60-way connector</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="install_flash_module" href="install_flash_module.html" title="install_flash_module">Install a BoostButton flash module</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_to_flash_a_cal" href="how_to_flash_a_cal.html" title="how_to_flash_a_cal">Flash a modified SMEC or SBEC</a></div></li>
+</ul>
 </div>
+<h2 class="sectionedit4" id="1995_neon_fcc_68hc11">1995 Neon FCC (68HC11)</h2>
+<div class="level2">
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="flash_an_fcc" href="flash_an_fcc.html" title="flash_an_fcc">Flash the 1995 Neon FCC using FCCFlash</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="fcc_overview" href="fcc_overview.html" title="fcc_overview">FCC hardware and firmware overview</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="fcc_calibration" href="fcc_calibration.html" title="fcc_calibration">FCC calibration variants and tables</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="fcc_sci" href="fcc_sci.html" title="fcc_sci">FCC SCI/DRB diagnostics and communication</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="fcc_fault_codes" href="fcc_fault_codes.html" title="fcc_fault_codes">FCC fault code reference</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="fcc_tuning_notes" href="fcc_tuning_notes.html" title="fcc_tuning_notes">FCC fuel, ignition and tuning notes</a></div></li>
+</ul>
+</div>
+<h2 class="sectionedit5" id="sbec3_1996_neon_2g_eclipse-talon">SBEC3 (1996+ Neon / 2G Eclipse-Talon)</h2>
+<div class="level2">
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="sbec3_overview" href="sbec3_overview.html" title="sbec3_overview">SBEC3 hardware and firmware overview</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="sbec3_calibration" href="sbec3_calibration.html" title="sbec3_calibration">SBEC3 calibration tables and constants</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="sbec3_tuning" href="sbec3_tuning.html" title="sbec3_tuning">SBEC3 tuning and TunerPro/XDF notes</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="sbec3_reflash" href="sbec3_reflash.html" title="sbec3_reflash">Read and reflash SBEC3 over SCI</a></div></li>
+</ul>
+</div>
+<h2 class="sectionedit6" id="calibration_datalogging_and_diagnostics">Calibration, datalogging and diagnostics</h2>
+<div class="level2">
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="base_cal_setup" href="base_cal_setup.html" title="base_cal_setup">Create a base Turbonator calibration in MP Tune</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="mask_err_codes" href="mask_err_codes.html" title="mask_err_codes">Mask diagnostic trouble codes</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="setup_datalogging" href="setup_datalogging.html" title="setup_datalogging">Configure MP Scan datalogging</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="setup_turbonator_features" href="setup_turbonator_features.html" title="setup_turbonator_features">Configure Turbonator features</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="afr-peftbl_tuning" href="afr-peftbl_tuning.html" title="afr-peftbl_tuning">Tune the PefTbl using logged AFR data</a></div></li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="det_can_setup" href="det_can_setup.html" title="det_can_setup">Set up a detonation listening device</a></div></li>
+</ul>
+</div>
+</div>
+
 <div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
 Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
 </div>
