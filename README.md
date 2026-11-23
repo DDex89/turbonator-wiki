@@ -1,119 +1,96 @@
-# Turbonator Tuning Wiki — перенос на современную DokuWiki
+# Turbonator Wiki — Modernized BoostButton Tuning Wiki
 
-Архивная вики BoostButton (снимок 2017 года, DokuWiki 2014-09-29b "Hrun"), перенесённая на
-DokuWiki 2026-07-14c "Mort" (PHP 8.2+), плюс статическая копия без PHP.
+**An archival restoration of the BoostButton / Turbonator tuning wiki**, updated for modern hosting and preserved as a self-contained static website.
 
-| Папка | Что это |
-|---|---|
-| `wiki/` | Живая вики для хостинга с PHP: правка, история, поиск, вход |
-| `static/` | Статический сайт: открывается с диска (`index.html`) или с любого хостинга |
-| `tools/export_static.py` | Пересобирает `static/` из `wiki/` после правок |
+The project retains the original community's technical information and adds new documentation for the **Chrysler FCC (1995 Neon)** and **SBEC3 (1996+ Neon / related applications)** engine controllers, based on ongoing firmware reverse-engineering work.
 
-## Что перенесено и что изменилось
+**Language:** English documentation first; a Russian overview is available [below](#на-русском).
 
-- **Контент целиком:** исходные страницы архива BoostButton, картинки и вся история правок с
-  2015 года (583 версии).
-- **Добавлены 9 новых страниц** по прошивкам Chrysler, написанные по репозиториям
-  [neon-fcc-firmware](https://github.com/DDex89/neon-fcc-firmware) и
-  [neon-sbec3-firmware](https://github.com/DDex89/neon-sbec3-firmware) — см. раздел
-  «[FCC и SBEC3: справочник по прошивкам](#fcc-и-sbec3-справочник-по-прошивкам)» ниже. Всего в вики
-  сейчас 61 страница и 53 файла в `data/media/`.
-- **Шаблон** — тот же starterbootstrap, с тремя исправлениями под PHP 8.
-- **Плагины.** wrap и captcha обновлены до текущих версий. howhard (значок сложности
-  `{{howhard>N}}`) переписан под текущий API DokuWiki.
-- **Убрано:**
-  - Google Analytics BoostButton и их адреса почты;
-  - старые страницы `wiki:syntax`, `wiki:dokuwiki` и `wiki:welcome`, вместо них текущие из DokuWiki;
-  - плагины box, button, googleanalytics и safefnrecode: в страницах они не используются;
-  - плагин dw2pdf (экспорт в PDF, 100 МБ шрифтов): при желании ставится из «Управления
-    расширениями» в админке.
-- **Ссылка «Login»** в боковом меню вела на мёртвый boostbutton.com, теперь ведёт на вход в этой вики.
-- **Пользователи 2014 года не перенесены.** Это 65 аккаунтов с чужими адресами почты и старыми
-  хешами паролей. Если они нужны, файл `conf/users.auth.php` лежит в исходном архиве.
-- **Внизу каждой страницы** — пометка, что это архивная копия, с указанием авторов.
+## What is included
 
-## Живая вики (`wiki/`)
+| Path | Purpose |
+| --- | --- |
+| `wiki/` | Full DokuWiki site for PHP hosting: editing, search, login, and revision history |
+| `static/` | Read-only HTML mirror; works on static hosting and offline in a browser |
+| `tools/export_static.py` | Rebuilds the static mirror from the DokuWiki source |
+| `.github/workflows/pages.yml` | GitHub Pages deployment workflow |
+| `publish-to-github.ps1` | Optional Windows helper for initial Git publication |
 
-Нужен хостинг с **PHP 8.2+**. База данных не нужна.
+The original archive used **DokuWiki 2014-09-29b “Hrun”**. The live version has been migrated to **DokuWiki 2026-07-14c “Mort” (PHP 8.2+)**. Original pages, media, and revision history are preserved; the historical user database was **not** transferred.
 
-1. Залейте содержимое `wiki/` в папку сайта.
-2. Дайте веб-серверу право записи в `data/` и `conf/`.
-3. **Apache:** переименуйте `.htaccess.dist` в `.htaccess`. Папки `data/` и `conf/` уже закрыты
-   своими `.htaccess`.
-   **nginx:** закройте доступ к `/(data|conf|bin|inc|vendor)/`, правила есть на
-   dokuwiki.org/install:nginx.
-   Проверка: адрес `ваш-сайт/data/pages/start.txt` должен отдавать ошибку 403 или 404, а не текст.
-4. **Создайте администратора.**
-   - С SSH: `php bin/plugin.php usermanager add <логин> <email> "<Имя>" admin,user <пароль>`
-   - Без SSH: зарегистрируйтесь на сайте (кнопка Register, капча — вопрос про Shelby). Потом
-     в файле `conf/users.auth.php` в своей строке замените последнее поле `user` на `admin,user`.
-5. **Решите, нужна ли открытая регистрация.** Как и в оригинале, регистрироваться может кто
-   угодно, а правка доступна любому зарегистрированному. Ответ на капчу легко найти, так что
-   от спама она почти не защищает. Если пускать посторонних не нужно, выключите регистрацию:
-   «Админ → Настройки → Отключить действия DokuWiki → Register».
+The `starterbootstrap` template was adapted for newer PHP. The `wrap` and `captcha` plugins were updated, and the `howhard` plugin was ported to the modern DokuWiki API. Obsolete BoostButton analytics and contact links were removed.
 
-Стартовая страница по-прежнему говорит, что логин выдаётся в магазине BoostButton. Это текст
-самой вики, его стоит поправить после входа.
+## FCC and SBEC3 firmware documentation
 
-## Статический сайт (`static/`)
+The wiki includes nine additional reference pages based on these open-source projects:
 
-- **С диска:** двойной щелчок по `static/index.html`. Поиск работает и так.
-- **На хостинге:** залейте папку `static/` как есть.
-- **На GitHub Pages:** положите содержимое в репозиторий (корень или папку `docs/`) и включите
-  Pages. Файл `.nojekyll` уже лежит в папке, без него GitHub не отдаёт папки на `_`.
+- **[neon-fcc-firmware](https://github.com/DDex89/neon-fcc-firmware)** — 1995 Neon FCC (68HC11): architecture, calibration variants, SCI/DRB communication, fault codes, and tuning notes.
+- **[neon-sbec3-firmware](https://github.com/DDex89/neon-sbec3-firmware)** — SBEC3 (68HC16): memory layout, calibration formats, tuning resources, and reflashing background.
 
-Это копия только для чтения: в ней нет входа, правки и истории.
+The original **FCCFlash** flashing instructions have also been added to the wiki's `flash_an_fcc` page, with references to the existing USB-to-SCI cable setup documentation (`cable_setup` and `manual_ftdi_setup`).
 
-## Пересборка статики после правок
+The firmware repositories remain the primary source for detailed, evolving data such as generated address tables, RAM maps, and disassembly annotations. Wiki content is not automatically synchronized with them.
 
-Нужны Python 3.8+, PHP 8.2+ и пакет `beautifulsoup4` (`pip install beautifulsoup4`).
+## Running the live wiki
 
-```
+A server with **PHP 8.2+** is required. No database server is needed.
+
+1. Upload the *contents* of `wiki/` to your website directory.
+2. Grant the web server write access to `data/` and `conf/`.
+3. **Protect sensitive directories from HTTP access.** With Apache, activate the supplied `.htaccess.dist` where appropriate; with nginx, add equivalent access restrictions. Verify that `/data/pages/start.txt` returns HTTP 403 or 404.
+4. Create your own administrator account. Do not reuse historical accounts.
+5. Review registration and editing permissions before making the site public.
+
+The original wiki's landing-page text may still refer to the now-defunct BoostButton store; update it in the live wiki if appropriate.
+
+For more information on server setup, consult the official [DokuWiki installation documentation](https://www.dokuwiki.org/install).
+
+## Static website and GitHub Pages
+
+The `static/` directory contains an HTML mirror, including assets and local search. Open `static/index.html` to browse it offline, or publish the contents of `static/` on any static web host.
+
+For this repository, the included GitHub Actions workflow can publish the static website using **Settings → Pages → Build and deployment → GitHub Actions**. GitHub Pages does **not** run PHP or support editing the live wiki.
+
+### Rebuild the static copy
+
+Requires Python 3.8+, PHP 8.2+, and Beautiful Soup:
+
+```bash
+python -m pip install beautifulsoup4
 python tools/export_static.py --wiki wiki --out static
 ```
 
-Скрипт работает на временной копии вики, саму вики не трогает. Он рендерит каждую страницу
-настоящей DokuWiki, так что вид совпадает с живой вики. Страницы `playground` в статику не
-попадают.
+The exporter works from a temporary copy of the wiki. After making changes to the live wiki, copy the updated `data/` directory back to `wiki/data/` before regenerating the mirror.
 
-Если вики уже работает на хостинге, сначала скачайте с сервера папку `data/` (страницы и
-картинки), положите её поверх `wiki/data/` и потом запускайте скрипт.
+## Contributing
 
-## FCC и SBEC3: справочник по прошивкам
+Corrections, missing technical information, restored historical material, and new FCC/SBEC3 pages are welcome. DokuWiki page sources are stored under `wiki/data/pages/`, with images and other media in `wiki/data/media/`.
 
-Девять новых страниц написаны по содержимому двух открытых репозиториев с реверс-инжинирингом
-прошивок Chrysler (оба — проекты владельца этой вики):
+This is an **archival community project**. Original material remains attributed to its respective authors; modernization and new contributions should not be mistaken for original authorship of the archived content. No license was specified in the original wiki configuration.
 
-- **[[fcc_overview]], [[fcc_calibration]], [[fcc_sci]], [[fcc_fault_codes]], [[fcc_tuning_notes]]**
-  — '95 Neon FCC (68HC11), по [neon-fcc-firmware](https://github.com/DDex89/neon-fcc-firmware).
-- **[[sbec3_overview]], [[sbec3_calibration]], [[sbec3_tuning]], [[sbec3_reflash]]** — SBEC3
-  (68HC16) для Neon 1996+ и 2G Eclipse/Talon, по
-  [neon-sbec3-firmware](https://github.com/DDex89/neon-sbec3-firmware).
+---
 
-Ссылки на них добавлены в «Other Info» и «How Do I». Страница `flash_an_fcc` дополнена разделом о
-контрольной сумме и совместимости калибровок (процедура FCCFlash добавлена по архивным инструкциям автора утилиты; приведены ссылки на настройку USB-to-SCI). Оба репозитория развиваются, поэтому часть материала (большие
-сгенерированные таблицы — калибровочные адреса, RAM-карта, открытые вопросы) оставлена в виде
-ссылок на репозиторий, а не продублирована построчно: если там что-то уточнится или добавится,
-страницы придётся поправить вручную — автогенерации из репозитория в вики нет.
+## На русском
 
-## Как добавить ещё страницы
+**Turbonator Wiki** — восстановленная и обновлённая техническая вики бывшего сообщества BoostButton. Она посвящена настройке и диагностике автомобилей Chrysler/Dodge/Plymouth, прежде всего Dodge/Plymouth Neon.
 
-Положите новые `.txt` в `wiki/data/pages/` (и картинки в `wiki/data/media/`), добавьте ссылки на
-них где нужно (например, в `other_info.txt` или `how_do_i.txt`), очистите `wiki/data/cache/`, кроме
-файла `_dummy`, и пересоберите статику командой выше.
+Проект состоит из двух версий:
 
-## Публикация на GitHub
+- `wiki/` — полноценная DokuWiki для сервера с PHP 8.2+, с поиском, редактированием и историей изменений.
+- `static/` — статическая HTML-копия, работающая без PHP, в том числе локально на компьютере и через GitHub Pages.
 
-Репозиторий: https://github.com/DDex89/turbonator-wiki
+Оригинальные страницы, изображения и история правок сохранены. Устаревшие компоненты адаптированы для современных серверов; старые учётные записи пользователей не переносились.
 
-Для первой загрузки **пустого** репозитория из распакованной папки на Windows:
+### Новые материалы по ЭБУ
 
-```powershell
-.\publish-to-github.ps1
-```
+Добавлены разделы по **FCC (1995 Neon, 68HC11)** и **SBEC3 (1996+ Neon, 68HC16)**: архитектура прошивок, калибровки, диагностика, настройка и перепрошивка. Основа этих разделов — репозитории [neon-fcc-firmware](https://github.com/DDex89/neon-fcc-firmware) и [neon-sbec3-firmware](https://github.com/DDex89/neon-sbec3-firmware).
 
-Необходимы Git for Windows, настроенная учётная запись GitHub и имя/email для Git-коммитов.
-Файл `.github/workflows/pages.yml` размещает статическую версию через GitHub Actions
-после включения **Settings → Pages → Build and deployment → GitHub Actions**.
-При развёртывании живой вики не публикуйте пароли/ключи из `conf/` и защищайте
-`data/` и `conf/` от HTTP-доступа.
+В частности, страница `flash_an_fcc` дополнена инструкцией по FCCFlash и ссылками на настройку кабеля USB-to-SCI.
+
+### Развёртывание
+
+Для живой вики нужен сервер с PHP 8.2+; отдельная база данных не требуется. Для статической копии достаточно открыть `static/index.html` или опубликовать папку `static/` на хостинге. Динамическая версия требует защиты каталогов `data/` и `conf/` от доступа по HTTP.
+
+Английские разделы выше содержат полную инструкцию по установке, экспорту статической копии и GitHub Pages. Исправления и дополнения приветствуются.
+
+**Репозиторий:** https://github.com/DDex89/turbonator-wiki
