@@ -1,0 +1,23 @@
+{{howhard>3}}
+-----
+===== Setting up the Ostrich for the LM, SMEC, or SBEC =====
+-----
+
+The Ostrich is an eprom emulator. That is, it's a device that appears to the ECU as an eprom, but can be programmed by an outside PC.
+
+For more info on the Ostrich, see Moates.net
+
+
+==== Hooking the Ostrich up to the SMEC/SBEC ====
+
+To hook the Ostrich up you will want to find a place to put the ostrich (close to the computer case). I put it to the rear of my SMEC against the body of my engine bay. You will have a 28pin ribbon cable, one of the wires will have a red tracer that indicates pin-1. Put the end of the ribbon cable into the socket as you would with an EPROM. Installed correctly, the ribbon should extend towards the 60-pin connector on the SMEC. I filed off the ridge at the edge of my SMEC case to allow the ribbon cable to exit between the two halves of the SMEC case. Then just plug the other end into the ostrich. Now you need to connect the USB cable to the ostrich and run it up towards the firewall, you will need to buy a USB cable extender which is basically a USB cable with a female end and a male end. Connect the extender and run that into the passenger compartment. Now you can just hook the USB cable into your laptop and pretty much tune as you drive.
+
+The SBEC will require a latch adapter board be installed into the socket before the Ostrich.
+
+This pretty much turns an SMEC/SBEC into a full standalone engine management system. With the availability of the relocatable codes you can pretty much reprogram any aspect of the computer.
+
+==== Updating from MP Tune ====
+
+In the past, you had to run a program EmUtility to monitor your cal file for changes, and then it would upload them directly to the Ostrich. 
+
+MP Tune allows you to update the ostrich without using the EmUtility software. When you make changes to a bin you should click on the Ostrich button and it should update the Ostrich immediately. Also there is a setting in the program settings menu that will auto update the ostrich when a change is made. Finally, you can flash the entire bin to the Ostrich from within MP Tune; similar to a flashable ecu.

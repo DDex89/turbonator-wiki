@@ -1,0 +1,13 @@
+----
+==== Configure the BoostButton USB to SCI cable ====
+----
+
+  - Plug the USB to SCI cable into your laptop. 
+  - Windows will automatically install drivers for it with the 'found new hardware' wizard.
+  - Open Windows Device manager, and find the cable in the USB devices folder.
+    - {{findusbdev.jpg}}
+  - Open the settings panel for the cable driver.
+  - Check the box for 'Load VCP Driver' on the 'Advanced' tab.
+    - {{loadvcp.jpg}}
+  - Save the settings, then unplug, and re-plug the FTDI cable.
+  - Windows will re-load the cable and set it up as a COM port.

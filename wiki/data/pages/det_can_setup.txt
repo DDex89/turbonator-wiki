@@ -1,0 +1,29 @@
+-----
+**Detonation Listening Device**
+-----
+
+A handy tool for tuning ignition timing is a Det Can - A detonation listening device.
+
+When tuning our ECU's for ignition timing, a common problem is setting up the knock threshold so that it detects knock accurately. When the engine and/or calibration is significantly modified, the factory knock threshold may no longer be accurate for detecting knock. A Det Can allows you to actually hear the sounds of combustion. When knock is happening, it is a very clear 'bad' sound. And, as a result, the knock threshold can be adjusted accordingly.
+
+This writeup will focus on a DIY Det Can using a Bosch/VW Wideband knock sensor and a simple microphone amplifier from Radio Shack.
+
+Parts you'll need:
+  * Bosch/VW Wideband Knock Sensor (Bosch PN 0261231036)
+  * [[http://www.radioshack.com/radioshack-mini-audio-amplifier/2771008.html#.VRGvAvldU3k|Microphone Amp 277-1008]]
+  * [[http://www.radioshack.com/1-8-stereo-phone-plug-2-pack/2740284.html#.VRGykvldU3k|1/8" Microphone jack]]
+  * Ear buds or headphones
+  * A laptop, if you want to record the engine sounds for later analysis
+
+The VW/Bosch wideband knock sensor has an output that is compatible with microphone voltage levels. So, it's output can be directly sent to any microphone level input. I would caution against using the signal directly into a PC microphone port as there is a possibility to damage the port input. Instead, use a microphone amplifier with a volume control on the output (such as the suggested Radio Shack unit).
+
+First, you'll want to add length to the wires coming out of the knock sensor, and install the microphone jack onto them. You'll want the wires to be long enough to reach the drivers seat, where the amplifier will be located. This will allow you to listen for knock while driving.
+
+Next, mount the Bosch knock sensor to the cylinder head. It's a through hole for a 6mm bolt. So, mounting locations on the head are limited. I mounted mine to the thermostat housing on the front of the head for convenience. Others have mounted it to the fuel rail mounting bolt. You can also mount it in the stock location, but keep in mind that if you do this, you will not have knock detection in the ECU while you are testing.
+
+{{::img_20140419_201909.jpg?300|}}
+{{:img_20140419_201810.jpg?300|}}
+
+Finally, connect your headphones (or PC microphone input) to the headphone output on the microphone amp. Now you're ready to listen for knock.
+
+

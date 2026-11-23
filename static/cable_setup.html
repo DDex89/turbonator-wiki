@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>Get your laptop to communicate with the Chrysler ECU [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="cable_setup" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body"><li class="level2"><a href="#get_your_laptop_to_communicate_with_the_chrysler_ecu">Get your laptop to communicate with the Chrysler ECU</a>
+<ul class="">
+<li class="level3"><a href="#selecting_a_laptop_and_making_sure_it_will_work">Selecting a laptop and making sure it will work.</a></li>
+<li class="level3"><a href="#sci_interface">SCI interface</a></li>
+<li class="level3"><a href="#non-boostbutton_usb_to_sci_cables">NON-BoostButton USB to SCI cables</a></li>
+<li class="level3"><a href="#setup_the_usb_to_sci_cable">Setup the USB to SCI cable</a></li>
+<li class="level3"><a href="#download_mpscan">Download MPSCAN</a></li>
+<li class="level3"><a href="#installing_mpscan">Installing MPSCAN</a></li>
+</ul></li>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Easy" src="_static/lib/plugins/howhard/images/style1/2.png"/></div><div class="howhard_txt">Easy</div></div><hr/>
+<h2 class="sectionedit1" id="get_your_laptop_to_communicate_with_the_chrysler_ecu">Get your laptop to communicate with the Chrysler ECU</h2>
+<div class="level2">
+<hr/>
+<hr/>
+</div>
+<h3 class="sectionedit2" id="selecting_a_laptop_and_making_sure_it_will_work">Selecting a laptop and making sure it will work.</h3>
+<div class="level3">
+<hr/>
+</div>
+<h4 id="things_to_look_out_for_with_cheap_older_laptops">Things to look out for with cheap, older laptops.</h4>
+<div class="level4">
+<ul>
+<li class="level1"><div class="li"> The battery might be trash. You can probably buy a replacement on ebay, or, buy an AC/DC inverter, which can be about $15. Make sure it can handle the wattage of your laptop power supply.</div>
+</li>
+<li class="level1"><div class="li"> USB 1.1 ports might work, but it hasn't be tested yet. USB 2.0 ports are known to work.</div>
+</li>
+<li class="level1"><div class="li"> Older laptops may have a dual-scan display instead of TFT, or their display backlight may be dim from age. This can make them extremely hard to use, especially in sunlight.</div>
+</li>
+<li class="level1"><div class="li"> USB support before Windows 2000 was not very good. Get a laptop that has at least Windows 2000.</div>
+</li>
+<li class="level1"><div class="li"> Network support, especially WiFi, can be useful. But a simple flash drive could probably get the job done as far as transferring files.</div>
+</li>
+<li class="level1"><div class="li"> <abbr title="Operating System">OS</abbr> updates like service packs and frameworks may be required for MPSCAN to run. These can be very large files and may be difficult to transfer to an older laptop if it does not have a network connection or if you try to use a flash drive to transfer several hundred megabytes over USB 1.1. If possible, see if you can install MPSCAN on a laptop you are thinking of buying. Perhaps bring it with you on a flash drive. </div>
+</li>
+</ul>
+</div>
+<h4 id="known_working_combos">Known working combos:</h4>
+<div class="level4">
+<ul>
+<li class="level1"><div class="li"> Thinkpad T60p w/ WinXP sp3 w/ custom FTDI USB to SCI cable</div>
+</li>
+<li class="level1"><div class="li"> Samsung Galaxy S5 (MPSCANDROID)</div>
+</li>
+</ul>
+<hr/>
+</div>
+<h3 class="sectionedit3" id="sci_interface">SCI interface</h3>
+<div class="level3">
+<hr/>
+<p>
+The Chrysler ECU diagnostic connector (located in the engine compartment) communicates with diagnostic tools like the Chrysler DRB-II, OTC series, and, hopefully, your laptop, via a bus called the “SCI” bus. 
+</p>
+<p>
+This is Chryslers' proprietary serial communications interface to allow the outside world to talk to the ECU.
+</p>
+<div class="table sectionedit4"><table class="inline">
+<tr class="row0">
+<th class="col0">For detailed technical information on the Chrysler SCI bus, see here: <a class="wikilink1" data-wiki-id="sci_tech_info" href="sci_tech_info.html" title="sci_tech_info"> SCI technical info</a></th>
+</tr>
+</table></div>
+<p>
+<a class="media" href="_media/chrysler_ecu_comm_diagram.jpg" rel="noopener" target="_blank" title="chrysler_ecu_comm_diagram.jpg"><img alt="" class="mediacenter" loading="lazy" src="_media/chrysler_ecu_comm_diagram.jpg"/></a>
+</p>
+<p>
+The SCI connector is located in the engine compartment, usually near the ECU.
+</p>
+<p>
+<a class="media" href="_media/sci_conn_loc.jpg" rel="noopener" target="_blank" title="sci_conn_loc.jpg"><img alt="" class="media" loading="lazy" src="_media/sci_conn_loc_300x.jpg" width="300"/></a>
+</p>
+<p>
+And, it looks like this.
+</p>
+<p>
+<a class="media" href="_media/sci_connector_pic.jpg" rel="noopener" target="_blank" title="sci_connector_pic.jpg"><img alt="" class="media" loading="lazy" src="_media/sci_connector_pic_300x.jpg" width="300"/></a>
+</p>
+<hr/>
+</div>
+<h3 class="sectionedit5" id="non-boostbutton_usb_to_sci_cables">NON-BoostButton USB to SCI cables</h3>
+<div class="level3">
+<hr/>
+<p>
+Non-BoostButton USB to SCI cables based on the FTDI chipset likely need a few things done to them:
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="manual_ftdi_setup" href="manual_ftdi_setup.html" title="manual_ftdi_setup">Manual configuration of the FTDI chip in the USB to SCI cable</a>. </div>
+</li>
+<li class="level1"><div class="li"> Protecting the FTDI chip from the 12V voltage seen during flashing on the SCI bus. (put link to more info here)</div>
+</li>
+</ul>
+<p>
+USB to SCI cables from BoostButton already have these settings and features out of the box and no changes are required.
+</p>
+<hr/>
+</div>
+<h3 class="sectionedit6" id="setup_the_usb_to_sci_cable">Setup the USB to SCI cable</h3>
+<div class="level3">
+<hr/>
+<ol>
+<li class="level1"><div class="li"> Plug the USB to SCI cable into your laptop. </div>
+</li>
+<li class="level1"><div class="li"> Windows will automatically install drivers for it with the 'found new hardware' wizard.</div>
+</li>
+<li class="level1 node"><div class="li"> Open Windows Device manager, and find the cable in the USB devices folder.</div>
+<ol>
+<li class="level2"><div class="li"> <a class="media" href="_media/findusbdev.jpg" rel="noopener" target="_blank" title="findusbdev.jpg"><img alt="findusbdev.jpg" class="media" loading="lazy" src="_media/findusbdev.jpg" title="findusbdev.jpg"/></a></div>
+</li>
+</ol>
+</li>
+<li class="level1"><div class="li"> Open the settings panel for the cable driver.</div>
+</li>
+<li class="level1 node"><div class="li"> Check the box for 'Load VCP Driver' on the 'Advanced' tab.</div>
+<ol>
+<li class="level2"><div class="li"> <a class="media" href="_media/loadvcp.jpg" rel="noopener" target="_blank" title="loadvcp.jpg"><img alt="loadvcp.jpg" class="media" loading="lazy" src="_media/loadvcp.jpg" title="loadvcp.jpg"/></a></div>
+</li>
+</ol>
+</li>
+<li class="level1"><div class="li"> Save the settings, then unplug, and re-plug the FTDI cable.</div>
+</li>
+<li class="level1"><div class="li"> Windows will re-load the cable and set it up as a COM port.</div>
+</li>
+</ol>
+<p>
+If you are running Win 7 for MP Scan, there may be an issue loading the SCI-USB cable drivers. Apparently, MS now has thier own driver download for the cable, and it must be based on an older FTDI driver - because it doesn't work in VCP mode.
+</p>
+<p>
+When you plug in a cable to a PC the first time, it will load as a 'USB Serial Device'; in device manager under the 'USB Devices'. If you open the properties, you can enable it to load the 'VCP' (Virtual COM Port) driver. You need to check this box. Then, unplug and re-plug the cable. Windows should now re-load the VCP drivers for the cable. If it doesn't load right as indicated above, you will get a yellow exclamation point in the Windows device manager.
+</p>
+<p>
+If that happens, you will need to manually install the FDTI-sourced driver from <a class="urlextern" href="http://www.ftdichip.com/Drivers/CDM/...ied.exe" rel="ugc nofollow noopener" target="_blank" title="http://www.ftdichip.com/Drivers/CDM/...ied.exe">here</a>. Simply run the .exe from the download, and the FTDI cable should appear as a COM port.
+</p>
+<p>
+Not sure if this happens in other versions of Windows. I know it happens in Win 7, and I assume 8, 8.1. Not sure about XP.
+</p>
+<hr/>
+</div>
+<h3 class="sectionedit7" id="download_mpscan">Download MPSCAN</h3>
+<div class="level3">
+<hr/>
+<p>
+The latest version of MPSCAN can be downloaded here:
+</p>
+<p>
+<a class="urlextern" href="https://dl.dropboxusercontent.com/u/65623639/mpsuite/MPScanSetup/MPScan.zip" rel="ugc nofollow noopener" target="_blank" title="https://dl.dropboxusercontent.com/u/65623639/mpsuite/MPScanSetup/MPScan.zip">https://dl.dropboxusercontent.com/u/65623639/mpsuite/MPScanSetup/MPScan.zip</a>
+</p>
+<hr/>
+</div>
+<h3 class="sectionedit8" id="installing_mpscan">Installing MPSCAN</h3>
+<div class="level3">
+<hr/>
+<p>
+Unzip the MPSCAN.zip file. It contains 2 files, an mpscan.msi file and a setup.exe file. This is a standard installation convention. You should always execute the .exe file which is basically a wrapper around the .msi file and will do additional file checking for any program prerequisites.
+</p>
+<p>
+Instructions needed:
+</p>
+<ul>
+<li class="level1"><div class="li"> <del>connecting cable to vehicle</del></div>
+</li>
+<li class="level1"><div class="li"> <del>downloading and installing MPSCAN</del></div>
+</li>
+<li class="level1"><div class="li"> opening MPSCAN and confirming the correct port is selected</div>
+</li>
+<li class="level1"><div class="li"> getting vehicle ready for communication (key on/off)</div>
+</li>
+<li class="level1"><div class="li"> attempting to communicate with the vehicle in MPSCAN (sensor/fault code reading is simplest/fastest to do?)</div>
+</li>
+<li class="level1"><div class="li"> creating vehicle profile, gauge layout, and logging live data at a standstill</div>
+</li>
+</ul>
+<p>
+Additional info needed:
+</p>
+<ul>
+<li class="level1"><div class="li"> System requirements for MPSCAN/MPTUNE/BoostButton SCI (<abbr title="Operating System">OS</abbr>, frameworks/other packages, USB port type)</div>
+</li>
+<li class="level1"><div class="li"> Specifically: how old and cheap of a laptop can I buy off craigslist that will work with MPSCAN/MPTUNE for logging/flashing/tuning?</div>
+</li>
+<li class="level1"><div class="li"> Dealing with multiple COM ports (common on laptops with bluetooth and other serial devices)</div>
+</li>
+<li class="level1"><div class="li"> What to do if all the above doesnt work (What else can go wrong?)</div>
+</li>
+</ul>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>cable_setup.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

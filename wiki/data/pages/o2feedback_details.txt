@@ -1,0 +1,51 @@
+-----
+===== Chrysler O2 Feedback System =====
+-----
+
+==== O2 Controller Ramp Calibration ====
+
+The O2 sensor is monitored ONLY for "rich/lean". A change from one to the other is a "toggle". The system constantly toggles between rich and lean so that the overall average is around stoichiometric.
+
+This system divides a range of RPMs and MAP readings into "cells". The number of "kicks", or increases/decreases in fuel required to toggle the O2 reading, is different for each of these cells. This allows some fairly powerful flexibility in tuning. The only time you might want to adjust these values is to speed or slow the adjustment being performed.
+
+Each cell has a 'kick' value. This is the amount of change applied to the running fuel until a rich/lean toggle occurs. The net result is the familiar rich/lean flashing that your O2 sensor gauge shows you.
+
+The 'limits' are the maximum number of kicks that may be applied to each cell. If the O2 sensor fails to toggle after reaching the limit for more than a few sec, either the AutoCal cell gets changed (in the case of the secondary ramp) or a code for the O2 Sensor is stored (in the case of the primary ramp).
+
+Primary Ramp vs. Secondary Ramp: 
+The Primary ramp is responsible only for the normal O2 controller feedback and setting the O2 sensor codes. The Secondary ramp is also responsible for O2 feedback, and also for updating the adaptive memory cells.
+
+O2 Controller Cells
+For each cell, there are 2 numbers. The first number is "rich" value, the second is "lean" value. If the O2 sensor is returning a lean value, "rich" kicks are added. If the O2 sensor is returning a rich value, "lean" kicks are added.
+
+In this chart, MAP is shown absolute (ie, 0 MAP is pure vacuum).
+
+^RPM AXIS| 8160| 2 | 5 | 8 |
+^::::|RPM2| 1 | 4 | 7 |
+^::::|RPM1| 0 | 3 | 6 |
+^::::|  0 |MAP1|MAP2|MaxMAP|
+^::::|MAP AXIS ||||
+
+Cell 9 is used only for idle.
+
+KICK = (factor * 512) - 512
+example: 5%  ->   1.05  * 512  - 512 = 25.6 (dec)  = 0x19 ; each bit is ~ 0.2%
+
+The cells shown above differ from the adaptive memory cells. These 'kicks' for each cell are editable in MP Tune. The MAP axis constants are scaled automatically by MP Tune. //pic showing kick values in MPT //
+
+
+==== P/T Tuning Notes ====
+
+=== Turning Off AutoCal  (Adaptive memory): ===
+
+For the SMEC and SBEC, set 'NoCellUpdateAboveFromMAP’ to a high value. This will essentially force the O2 control to work the same as if you were at full throttle. The other ‘NoCellUpdate***’ constants will have a similar effect. 
+
+For the LM, only setting 'PWMIN_NoCellUpdateBelow_PWMIN_Pulsewidth' to a high value can disable the O2 feedback. The others will only affect the adaptive cell updates.
+
+This is useful when tuning the part throttle fuel table.
+
+
+=== Tuning  for lean cruise: ===
+Add this sub-section…
+
+  

@@ -1,0 +1,9 @@
+a:2:{s:7:"current";a:9:{s:4:"date";a:2:{s:7:"created";i:1422718901;s:8:"modified";i:1426002906;}s:7:"creator";s:9:"Rob Lloyd";s:4:"user";s:8:"shelgame";s:11:"last_change";a:7:{s:4:"date";i:1426002906;s:2:"ip";s:15:"205.144.100.200";s:4:"type";s:1:"E";s:2:"id";s:17:"afr-peftbl_tuning";s:4:"user";s:8:"shelgame";s:3:"sum";s:0:"";s:5:"extra";s:0:"";}s:11:"contributor";a:1:{s:8:"shelgame";s:9:"Rob Lloyd";}s:5:"title";s:18:"PefTbl Fine Tuning";s:11:"description";a:2:{s:15:"tableofcontents";a:1:{i:0;a:4:{s:3:"hid";s:18:"peftbl_fine_tuning";s:5:"title";s:18:"PefTbl Fine Tuning";s:4:"type";s:2:"ul";s:5:"level";i:2;}}s:8:"abstract";s:480:"----------
+
+PefTbl Fine Tuning
+
+----------
+
+MP Tune has a feature to assist you in the fine tuning of the PefTbl.
+
+Basically, this feature takes in detailed AFR log data with corresponding MAP and RPM data (required); compares that data to the AFR that you should have based on the WOT fuel table; calculates the error; and shows you a guideline for correction on the PefTbl table display. You can then decide how to adjust the PefTbl to best fit the 'corrected' PefTbl guideline.";}s:8:"relation";a:2:{s:5:"media";a:6:{s:19:"peftbl_tuning_1.jpg";b:1;s:19:"peftbl_tuning_2.jpg";b:1;s:19:"peftbl_tuning_3.jpg";b:1;s:19:"peftbl_tuning_4.jpg";b:1;s:19:"peftbl_tuning_5.jpg";b:1;s:19:"peftbl_tuning_6.jpg";b:1;}s:10:"firstimage";s:19:"peftbl_tuning_1.jpg";}s:8:"internal";a:2:{s:5:"cache";b:1;s:3:"toc";b:1;}}s:10:"persistent";a:5:{s:4:"date";a:2:{s:7:"created";i:1422718901;s:8:"modified";i:1426002906;}s:7:"creator";s:9:"Rob Lloyd";s:4:"user";s:8:"shelgame";s:11:"last_change";a:7:{s:4:"date";i:1426002906;s:2:"ip";s:15:"205.144.100.200";s:4:"type";s:1:"E";s:2:"id";s:17:"afr-peftbl_tuning";s:4:"user";s:8:"shelgame";s:3:"sum";s:0:"";s:5:"extra";s:0:"";}s:11:"contributor";a:1:{s:8:"shelgame";s:9:"Rob Lloyd";}}}

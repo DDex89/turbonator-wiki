@@ -1,0 +1,255 @@
+{{howhard>4}}
+
+----
+====== '95 Neon FCC: diagnostics and communication ======
+----
+
+This complements [[sci_tech_info|SCI bus technical info]] with the FCC side of the protocol: the DRB commands, the actuator tests, the OBD-II monitors, ISO 9141 / J1979, and the separate link to the I/O companion chip and the CCD bus. Source: [[https://github.com/DDex89/neon-fcc-firmware|neon-fcc-firmware]].
+
+The controller has two diagnostic links on the same SCI port (connector pins 9 receive and 30
+transmit). One is the Chrysler DRB protocol, used by the DRB II/III scan tool, MP Scan-type loggers
+and code download. The other is ISO 9141 for generic OBD-II scan tools. The fault codes themselves are
+listed in [[fcc_fault_codes|fault_codes.md]].
+
+Confidence: **[code]** = follows directly from the code, **[inferred]** = likely, not yet confirmed.
+
+===== Serial settings =====
+^ Mode ^ ''BAUD'' ^ Rate (8 MHz crystal, E = 2 MHz) ^  ^
+| DRB normal | ''$22'' | 7812.5 baud | [code] |
+| DRB high speed (command ''$12'') | ''$01'' | 62500 baud | [code] |
+| ISO 9141 | ''$12'' | 10417 baud (10.4 kbaud) | [code] |
+
+The rates match the known Chrysler SCI and ISO 9141-2 rates, which also confirms the 8 MHz crystal.
+
+===== DRB protocol =====
+''DRBIISerialCommunications_MM'' ($4FDB) runs from the main loop. It echoes every received byte. A
+command byte from ''$10'' to ''$25'' is kept in ''DRBPointer1''. ''DRBSerialToggles'' says how many parameter
+bytes follow (one or two), and these go to ''DRBPointer2'' and ''DRBPointer3''. ''DRBIIOuput_MM'' ($5061) then
+calls ''DRBFunctionTable[command - $10]''.
+
+^ Cmd ^ Handler ^ Function ^  ^
+| ''$10'' | ''OutputErrorCodes'' | Sends the stored fault list (''$001B''-''$0022'', flash codes), ''$FE'' marks the end | [code] |
+| ''$11'' | ''OutputErrorBits'' | Sends fault bitmap bytes | [inferred] |
+| ''$12'' | ''SetupHiSpeedDataTransfer'' | Switches the SCI to 62500 baud for fast logging | [code] |
+| ''$13'' | ''SetupATM'' | Starts actuator test //n// (parameter, up to ''$40''); refused while the engine runs | [code] |
+| ''$14'' | ''SendDiagnosticDataToSCI'' | Sends a live data value by ID (parameter below ''$40'') | [code] |
+| ''$15'' | ''SendECUIDToSCI'' | Reads an EEPROM byte (address from the two parameters) | [code] |
+| ''$16'' | ''SendConstValues'' | Constant / EEPROM values; parameter ''$80'' checks ''PPROG'' | [inferred] |
+| ''$17'' | ''ClearErrorCodes'' | Clears the stored faults and the freeze frame | [code] |
+| ''$18'', ''$19'', ''$24'' | ''DRB_Return'' | No function | [code] |
+| ''$1A'' | ''SwitchTest'' | Sends one of six input or output bytes: switch inputs, ''OutputDriverBits'', ''$00EE'', … | [code] |
+| ''$1B'' | ''InitByteModeDownload'' | Enters byte-mode code download | [code] |
+| ''$1C'' | ''DRB_ResetEMR'' | Stores an address for a later write (answers ''$E2''); the original name says emission maintenance reminder reset | [inferred] |
+| ''$1D'', ''$1E'' | ''DRB_UseRAM…SpecialProgramRoutine'' | Writes a byte into RAM at an offset from ''$0000'' or ''$0438'' (answers ''$E5'') | [code] |
+| ''$1F'', ''$20'' | ''L52E9'', ''L5312'' | Builds and checks a block at ''$021C'' (''DrbRamBuffer'', ''$021E'' in B559) with a sum; part of the RAM program loader | [inferred] |
+| ''$21'', ''$22'' | ''DRB_Special1'', ''DRB_Special2'' | Requests a special mode; ''$21'' answers ''$02'' (refused) with the throttle open, ''$03'' when ''BitFlags_AIS'' bit 3 is set, otherwise ''$01'' | [code] |
+| ''$23'' | ''L53AB'' | Sub-commands ''$01''-''$04'', ''$0B'', engine stopped only; function not decoded |  |
+| ''$25'' | ''L54E4'' | Output override: target 1-4 in ''DrbOverrideTarget'', state in ''DrbOverrideState''. Target 1 is the output in ''$00EE'' bit 7, target 3 is the purge solenoid | [code] |
+
+===== Actuator tests (command $13) =====
+The test number is the parameter of command ''$13''. ''ActuatorTestMode_MM'' ($552D) uses entry //n − 1//
+of ''ATMFunctionTable'' and toggles the output at a few hertz until the test times out. The output bits
+are listed in the [[fcc_overview|input / output map]].
+
+^ Test ^ Output ^  ^
+| ''$01'' | Ignition coil on OC5 (PA3), single spark | [code] |
+| ''$02'' | Ignition coil on OC3 (PA5), single spark | [code] |
+| ''$04'', ''$05'', ''$06'', ''$1D'' | Injector cylinder 4, 3, 2, 1 (500 µs pulse) | [code] |
+| ''$07'' | AIS motor, open / close | [code] |
+| ''$08'' | Radiator fan relay | [code] |
+| ''$09'' | A/C clutch relay | [code] |
+| ''$0A'' | ASD relay (coil outputs forced off) | [inferred] |
+| ''$0C'' | Speed control servo, vacuum and vent sequence | [code] |
+| ''$0D'' | Output on ''$0400'' bit 2, latched by a pulse on ''$0402'' bit 2 | [code], output unknown |
+| ''$0E'' | Tachometer | [code] |
+| ''$0F'', ''$17'' | TCC / PTU solenoid (''$00EE'' bit 5) | [code] |
+| ''$10'' | EGR solenoid | [code] |
+| ''$14'' | All solenoids and relays together | [code] |
+| ''$15'' | Purge solenoid | [inferred] |
+| ''$1A'', ''$1B'' | Speed control solenoids, one at a time | [code] |
+| ''$1C'' | Clears ''OutputDriverBits'' bit 4 (fuel pump relay) | [inferred] |
+| other | No output | [code] |
+
+===== OBD-II monitors (dormant in the two calibrations in this repository) =====
+The code contains a complete set of OBD-II monitors driven from a table, ''ObdMonitorTable'' at $E939: ten
+records of 14 bytes. Each record holds the monitor routine, its status byte in RAM, a scheduling mask, the
+fault descriptor it reports and three calibration pointers for its enable conditions. ''ObdMonitorScheduler''
+($E9C5) walks the table, checks the enable conditions and calls each monitor whose status byte allows it.
+''ObdMonitorInit'' ($E8EA) prepares the status bytes; it is called (from ''StoreMAPVoltsAndCalcMAPValue''). [code]
+
+**Nothing calls ''ObdMonitorScheduler'' in B4CC.** There is no JSR, JMP or pointer to $E9C5 anywhere
+in the ROM, so in 5269718 and 5007033 none of these monitors runs, although most of their fault descriptors
+are enabled. [code] The factory code bases B559, B4F3 and B4C2 call it from MainSubLoop on every pass, so in the
+factory 1995 calibrations the monitors do run; see [[fcc_calibration|code_bases.md]]. [code] The one exception is the O2 heater test, which runs from the key-off sequence;
+its result is stored but never processed into a code. This is the main piece of work for an OBD-II "Enhanced Edition": the monitors exist,
+they only need to be scheduled, checked against the calibration and tested.
+
+^ # ^ Routine ^ Address ^ Monitor ^ Fault ^ Status byte ^
+| 0 | ''MonitorO2HeaterUp'' | $9449 | Upstream O2 heater | P0135 | ''$0113'' |
+| 1 | ''MonitorO2HeaterDown'' | $945E | Downstream O2 heater | P0141 | ''$0114'' |
+| 2 | ''MonitorO2Response'' | $9881 | Upstream O2 response | P0133 | ''$010E'' |
+| 3 | ''MonitorSecondaryAir'' | $2F58 | Secondary air | P0411 | ''$0112'' |
+| 4 | ''MonitorEvapPurgeFlow'' | $A118 | EVAP purge flow | P0441 | ''$0116'' |
+| 5 | ''MonitorCatalyst'' | $428A | Catalyst efficiency | P0422 | ''$0111'' |
+| 6 | ''MonitorEgrFlow'' | $6A22 | EGR flow | P0401 | ''$0115'' |
+| 7 | ''MonitorFuelSystemRich'' | $A337 | Fuel system rich | P0172 | ''$0117'' |
+| 8 | ''MonitorFuelSystemLean'' | $A55F | Fuel system lean | P0171 | ''$0118'' |
+| 9 | ''MonitorMisfire'' | $AE3F | Misfire | P0300-P0304 | ''$0119'' |
+
+=== How the OBD-II executive works ===
+
+Each monitor's status byte uses the same bits: 7 enabled this trip, 6 completed, 4 failed once
+(pending), 5 confirmed, 3 failed this trip, 2 test running, 0 fault to report. [code]
+
+  * **Scheduling.** ''ObdMonitorScheduler'' runs a monitor when its status bit 7 is set and its mask at
+''$E931'' allows this main-loop pass. Before each monitor it evaluates three condition lists from the
+calibration (''EvalConditionList''): the first suspends the monitor while the MIL is on, the other
+two set ''ObdStatusFlags'' bits 0 and 1 for the monitor to use.
+  * **Two-trip confirmation** (''ObdProcessMonitorResult''). A first failure sets the pending bit and
+stores a freeze frame with priority 1 (2 for misfire and fuel system). A second failure on a later
+trip turns the MIL on (''ObdStatusFlags'' bit 7), stores the code through ''ThrowNonCriticalError'' and
+a freeze frame with priority 3 (4).
+  * **Similar conditions.** Misfire and fuel system faults keep the RPM, MAP and closed-loop state of
+the failure (records at ''$0129'' and ''$012D''). They heal only when the engine runs under similar
+conditions again (''ObdSimilarConditions'': MAP within ''$18'', RPM within ''$0C'').
+  * **Warm-up cycles.** A trip counts as a warm-up cycle when coolant has risen by ''$16'' from the start
+value and reached ''$C7'' (''ObdWarmupCycleCheck''). After 40 warm-up cycles without the MIL the codes
+are erased (''ObdAutoClearCodes'').
+  * **MIL off.** After 3 good trips without a pending misfire or fuel system fault, the MIL goes off
+(''ObdMisfireMilLogic''). A catalyst-damaging misfire sets ''ObdStatusFlags'' bit 3 (blink).
+  * **Readiness.** ''ObdUpdateReadiness'' keeps ''ObdMonitorsComplete'' in J1979 PID ''$01'' order and clears
+a bit when its monitor completes.
+
+=== The monitors ===
+
+^ Monitor ^ Runs when ^ Method ^ Verdict ^
+| O2 heaters (P0135, P0141) | After key-off, power held (''ShutDownSubroutineA'') | ASD on to heat the sensors; samples both sensors with and without a load switched onto the lines (''O2LoadTestSample'') | Passes when the readings rise by ''LCCA0''/''LCCA1''. This test **does run** at each key-off; in B4CC its result is never reported because the scheduler is dormant |
+| O2 response (P0133) | Warm engine, time at speed, adaptive cell ''LCCB4'', closed loop, steady state, RPM window | Counts large voltage steps (''LCCC1'') and lean/rich switches | Pass on ''LCCC2'' steps or ''LCCC4'' switches; fail when ''LCCC5'' elapses first |
+| Catalyst (P0422) | Warm engine, catalyst warm estimate (driving above ''LCB6E''), MAP/RPM windows, closed loop | Purge forced off, settle ''LCB6C'', measure ''LCB74'' | Result against ''LCB76'' (stricter after earlier fails) |
+| EGR flow (P0401) | Warm engine, speed, closed loop, steady state, vacuum and MAP/TPS/RPM windows | Short-term fuel trim averaged with EGR normal, then with EGR switched | Difference inside the window at ''$CB59/$CB5A'' = flow; fault after ''LCB5B'' fails |
+| EVAP purge flow (P0441) | Idle in adaptive cell ''LCD39'', stable battery and AIS loads | Purge duty ramped up from closed | Change in AIS position, O2 trim or RPM = flow; no change by duty ''LCD35'' = fail |
+| Fuel system rich / lean (P0172, P0171) | Closed loop, steady state | (short-term + adaptive trim) / 2 against coolant-dependent limits ''TABLEcd00'' / ''TABLEcd1e''; per-cylinder trims | Fail after ''LCD2A'' / ''LCD28'' passes beyond the limit; heals under similar conditions |
+| Misfire (P0300-P0304) | Not during a cold start | Crank-synchronous code counts misfires per 100 crank events | More than ''LCBD2'' per 100 = catalyst damaging (blink); more than ''LCBD3'' per 500 = emission failure |
+| Secondary air (P0411) | CONFIG2 bit 7 clear | State machine at ''POINTER2f3a'' | Descriptor disabled on the Neon |
+
+The variables of each monitor are named in the [[https://github.com/DDex89/neon-fcc-firmware/blob/main/docs/en/ram_map.md|RAM map]] (''Cat…'', ''Evap…'', ''Egr…'',
+''O2Resp…'', ''FuelSys…'', ''Misfire…''). Thresholds are calibration bytes in the ''$CB44''-''$CD41'' range;
+most have no MP Tune name yet.
+
+===== ISO 9141 / SAE J1979 (generic OBD-II) =====
+''HanldeISODiagnosticComs'' ($1ABA) is a state machine of 20 steps (''DiagnosticRoutineTable''). At the
+start of a session it sets the SCI to 10.4 kbaud, forces OC4 (PA4) high and sends ''$55'', the
+ISO 9141-2 sync byte. Requests are collected in a buffer at ''$048E''. [code]
+
+''IsoValidateRequest'' ($1E18) accepts a request only with the J1979 header ''$68 $6A $Fx'', a correct
+sum checksum and the right length for the service. ''IsoBuildResponse'' ($1EEB) answers with the header
+''$48 $6B $40''. [code]
+
+^ Service ^ Function ^ Conditions ^
+| ''$01'' | Current data, PID table at ''$1AEA'' | PID ''$12'' only with CONFIG2 bit 5 |
+| ''$02'' | Freeze frame, PID table at ''$1B16'' | Frame 0 only |
+| ''$03'' | Stored emission codes | Only when ''ObdDtcCount'' is not zero |
+| ''$04'' | Clear codes (''EraseErrorCodes'') | Engine stopped only |
+| ''$05'' | O2 sensor test results | O2 sensor 1 or 2 |
+
+Service ''$01'' PIDs (handlers ''ObdPid…''):
+
+^ PID ^ Value ^ Source ^
+| ''$00'' | Supported PIDs ''$BE $3E $B8 $00'' (''$F8'' in the third byte with CONFIG2 bit 5) | constant |
+| ''$01'' | Code count and MIL bit; supported and completed monitors | ''ObdDtcCount'', ''ObdStatusFlags'' bit 7, calibration ''$B81F''/''$B820'', RAM ''$0100'' |
+| ''$03'' | Fuel system status | ''FuelSystemStatus'' ($043B) |
+| ''$04'' | Calculated load | ''MaxRPMxMaxMAPFraction'' |
+| ''$05'' | Coolant temperature | ''CoolantTempUnfiltered'' − ''$58'' |
+| ''$06'' | Short-term fuel trim | O2 feedback counter |
+| ''$07'' | Long-term fuel trim | ''ValueFromAdaptiveMemory'' |
+| ''$0B'' | MAP | ''$0219'' × ''$69'' / 256 |
+| ''$0C'' | Engine RPM | ''EngineRpm_HB'' |
+| ''$0D'' | Vehicle speed | ''VehicleSpeed_HB'' |
+| ''$0E'' | Spark advance | ''AdvanceTemporary'' + ''$80'' |
+| ''$0F'' | Intake air temperature | ''ChargeTempUnfiltered'' − ''$58'' |
+| ''$11'' | Throttle position | ''LastTpsVolts'' |
+| ''$12'' | Secondary air status | ''OutputDriverBits'' bit 5 |
+| ''$13'' | O2 sensors present | ''$03'' (bank 1, sensors 1 and 2) |
+| ''$14'', ''$15'' | O2 sensor 1 / 2 voltage | ''O2SensorVolts'', ''DownstreamO2Volts'' |
+
+Service ''$02'' (freeze frame) supports PIDs ''$00'', ''$02'' (code that stored the frame), ''$03''-''$07'',
+''$0B'' and ''$0C'', read from the frame that ''CaptureFreezeFrame'' keeps at ''$011E''. [code]
+
+The calibration declares which monitors PID ''$01'' reports as supported: ''$B81F'' = ''$07'' (misfire,
+fuel system, components) and ''$B820'' = ''$61'' (catalyst, O2 sensor, O2 heater) in 5269718; ''$00'' and
+''$E1'' (adds EGR) in 5007033. In B4CC the monitors themselves are dormant (see above), so a scan tool would
+never see them complete. [code]
+
+===== Lamps =====
+The check-engine lamp (pin 36) and the charge indicator lamp (pin 37) are controlled through bits 6
+and 4 of ''$00EE'' (''OutputBits2'', called ''StartupSwitchMirror2'' in the original disassembly). Flash codes are
+blinked by toggling bit 6, so bit 6 is the check-engine lamp. [inferred] Bit 4 is set from ''$0070'' bit 7,
+which only charging-system faults set (flag bit 5), so bit 4 is most likely the charge lamp.
+[inferred] ''$00EE'' is sent to the I/O companion chip in the register frame with header ''$50''; see
+ccd_and_link.md.
+
+===== Companion chip link and CCD bus =====
+
+Besides the SPI output driver, the HC11 talks over SPI to an **I/O companion chip**. That chip
+handles the CCD bus to the instrument cluster and body modules, drives the idle air stepper, the
+lamps and the TCC solenoid, and returns the switch inputs. The chip itself is not identified; all of
+this is reconstructed from the HC11 side. Confidence: **[code]** = follows directly from the code,
+**[inferred]** = likely.
+
+==== Frame types ====
+^ Frame ^ Sent when ^ Bytes out ^ Bytes back ^
+| Command (1 byte) | Default, every tick | ''LinkCommandByte'': stepper phase ''$B1'', ''$AA'', ''$A3'', ''$9C'' (field 6, 5, 4, 3), hold ''$B8'' (field 7), ''$95'' once after start | Status in bits 2-0: 6 sets ''BitFlags69'' bit 1 (battery volts OK), 5 or 7 set ''BitFlags69'' bit 4 |
+| CCD (5 bytes) | ''LinkRequestFlags'' bit 7 (''PrepareCCDDataForXmit_MM_1'') | ''$D0'' (send) or ''$D8'' (nothing), message ID, 2 data bytes, check | The last received CCD message: ID, 2 data bytes, check |
+| Register (4 bytes) | ''LinkRequestFlags'' bit 6 (''LinkRegisterUpdate'') | ''$48'', ''$50'' or ''$58'', 16-bit value, check | 16-bit value of the register |
+| Frame C (4 bytes) | ''LinkRequestFlags'' bit 5 (''CODE1265'') | ''LinkFrameCHeader'', 2 data bytes, check | 2 bytes; purpose not decoded |
+
+The check byte is the complement of the sum of the bytes before it; the reply is checked the same
+way. After ten failed exchanges in a row ''LinkError'' pulses ''$0409'' bit 3, which most likely resets
+the chip. [code]
+
+=== Register frames ===
+
+''LinkRegisterUpdate'' cycles the header through ''$50'', ''$58'' and ''$48''. The data sent with each header
+and the use of each reply:
+
+^ Header ^ Data sent ^ Reply used as ^
+| ''$50'' | ''OutputBits2'' and ''$00EF'': lamps, TCC solenoid, O2 heater test switches ([[fcc_overview|io_map.md]]) | ''LinkInputWordHi/Lo'' ($00F0/$00F1) |
+| ''$58'' | ''$0176''/''$0177'' | not used |
+| ''$48'' | ''$00EC'', ''$00'' | ''SwitchInputs'' ($00ED) |
+
+A reply is decoded against ''LinkRegLastAddress'', the header of the frame before, so the chip answers
+one frame late (a pipelined SPI read). Which header means "write" and which register is read is
+therefore not certain; the table shows how the code pairs them. [code]
+
+==== CCD messages sent ====
+''PrepareCCDDataForXmit_MM_1'' walks a 128-slot schedule (''CCDDataStream_1'', index ''CcdTxSlot''). Each
+slot routine returns the message ID and two data bytes; the first message after start is ''$E0'' with
+zero data. [code]
+
+^ ID ^ Slots of 128 ^ Routine ^ Data byte 1 ^ Data byte 2 ^
+| ''$E4'' | 32 | ''CCD_EngineRPM'' | Engine RPM (''EngineRpm_HB'') | MAP (''MapValue'') |
+| ''$24'' | 8 | ''CCD_VehicleSpeed'' | Vehicle speed | Vehicle speed, second scaling |
+| ''$42'' | 8 | ''CCD_ThrottlePos'' | Throttle (''TPSOverMINTHR'') | Cruise set speed / 2 |
+| ''$A4'' | 8 | ''CCD_SwitchState'' | Status bits: cruise, P/N (''SwitchInputs'' bit 6), A/C clutch, check-engine lamp | Speed control state bits |
+| ''$D4'' | 2 | ''CCD_BatVolts'' | Battery voltage | Target charging voltage |
+| ''$8C'' | 2 | ''CCD_CoolantTemp'' | Coolant temperature | Ambient / battery temperature (''AmbientAirTemp'') |
+| ''$54'' | 1 | ''CCD_Baro'' | Barometric pressure | Intake air temperature |
+| ''$EC'' | 1 | ''CCD_ToggleFlags'' | Warning flags from the fault state | Calibration bits (''CCDCF3'') |
+| ''$CC'' | 1 | ''CCD_EEPromData'' | EEPROM word 1 × 4 | Target idle speed × 4 |
+| ''$AC'' | 1 | ''CCD_ConfigConst1'' | Calibration word ''CCDCFG'' (vehicle configuration) |  |
+| — | 64 | ''CCD_Blank'' | Empty slot (''$D8'') |  |
+
+==== CCD messages received ====
+''PrepareCCDDataForXmit_MM_2'' calls a handler by the **low nibble** of the received ID
+(''CCDDataStream_2[CcdRxId & $0F]''). [code]
+
+^ ID low nibble ^ Handler ^ Action ^
+| 1 | ''CcdRx_1'' | Theft alarm input (sets ''CCDFlags5'' bit 6, ''CCDFlags4'' bit 4) |
+| 4 | ''CcdRx_4'' | Stores data byte 1 in ''CcdRxValueA'', restarts the CCD time-out |
+| 8 | ''CcdRx_8'' | Stores data byte 1 in ''CcdRxValueB'' |
+| other | — | Ignored |
+
+If no message with low nibble 4 arrives, ''CcdRxTimeout'' counts up and at ''$75'' fault code 66 ("no
+CCD messages") is reported. ''CCD_HandleAlarm'' keeps the theft alarm state in EEPROM4 bits 0-1 and
+is skipped when CONFIG bit 2 (alarm disable) is set. Which module sends IDs ending in 4 and 8, and what
+''CcdRxValueA/B'' mean, is not decoded yet. [code] / [inferred]

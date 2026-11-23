@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>Socketing the ECU [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="ecu_socketing" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body"><li class="level2"><a href="#socketing_the_ecu">Socketing the ECU</a>
+<ul class="">
+<li class="level3"><a href="#getting_at_the_chip">Getting at the chip:</a></li>
+<li class="level3"><a href="#removing_the_chip">Removing the chip:</a></li>
+<li class="level3"><a href="#adding_the_socket">Adding the socket:</a></li>
+</ul></li>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Hard" src="_static/lib/plugins/howhard/images/style1/4.png"/></div><div class="howhard_txt">Hard</div></div><hr/>
+<h2 class="sectionedit1" id="socketing_the_ecu">Socketing the ECU</h2>
+<div class="level2">
+<hr/>
+<p>
+Overall, socketing your own ECU is not an easy task. If you have some experience soldering, it can be done. The LM's are easier than the SMEC/SBEC due to the latter having the board and components fully sealed in a potting compound. If this will be your first attempt at soldering anything, it's recommended that you get help or at least practice on something other than your main computer.
+</p>
+<hr/>
+</div>
+<h3 class="sectionedit2" id="getting_at_the_chip">Getting at the chip:</h3>
+<div class="level3">
+<hr/>
+<p>
+<strong>Required tools/materials:</strong>
+</p>
+<ul>
+<li class="level1"><div class="li"> Exacto knife or razor blade</div>
+</li>
+<li class="level1"><div class="li"> Small nylon/plastic scraper (SMEC or SBEC only)</div>
+</li>
+</ul>
+<p>
+LM - In the case of the LM, the modifications are limited and relatively simple. The LM has no potting compound and the EPROM is exposed. But, you still must remove the EPROM and replace it with a socket. If you have an LM, you can skip below to 'Removing the chip:'.
+</p>
+<p>
+For both the SMEC and SBEC, the potting compound will need to be cut away from the EPROM so that it can be de-soldered and removed. Be sure to remove the potting from both sides of the board. Use an Exacto knife or razor blade to carefully cut an outline of the chip about 1/8“ larger than the pin footprint. The potting compound is relatively soft and easy to remove. I use a small screwdriver and a nylon scraper to carefully remove the potting compound from the chip and board (both sides). Then, I cut the chip leads with the Dremel and remove it. If you are very careful, you can remove the chip intact. But, I find it faster to simply cut the leads.
+</p>
+<hr/>
+</div>
+<h3 class="sectionedit3" id="removing_the_chip">Removing the chip:</h3>
+<div class="level3">
+<hr/>
+<p>
+<strong>Required tools/materials:</strong>
+</p>
+<ul>
+<li class="level1"><div class="li"> Soldering Iron </div>
+</li>
+<li class="level1"><div class="li"> Solder sucker or solder wick </div>
+</li>
+<li class="level1"><div class="li"> Dremel (optional) with cutoff wheel</div>
+</li>
+<li class="level1"><div class="li"> Small pliers or hemostat </div>
+</li>
+</ul>
+<p>
+Now, you can remove the chip. The simplest method is to cut the EPROM leads with a Dremel cutoff wheel (being careful not to damage the computer board, which may render it useless), remove the chip from the board, and then de-solder the individual pins. You will need to use a solder sucker or solder wick to remove all of the solder from the thru holes. The 2nd option is to carefully de-solder the pins while still attached to the EPROM. Again, you will need to use a solder sucker or wick. The 2nd method is slightly more difficult and time-consuming simply because it is more difficult to remove the solder with the chip in the way. With either method, be careful not to overheat the ECU board. Otherwise you could risk damaging the solder pads and/or traces - meaning at best a difficult repair; at worst a useless LM.
+</p>
+<p>
+Personally, after cutting the pins with the Dremel and removing the chip, I clamp a hemostat to the pin, and hit it with the soldering iron. When the solder gets soft, I pull the pin out. After removing all of the pins, I go back and heat up the thru holes and suck the solder out from the opposite side with the solder sucker.
+</p>
+<p>
+Once you have the chip removed, make sure to clean up any remaining potting compound and/or solder rosin/debris. I use a plastic brush attached to my Dremel, on the low speed setting. It removes the potting compound very nicely and cleans everything up.
+</p>
+<hr/>
+</div>
+<h3 class="sectionedit4" id="adding_the_socket">Adding the socket:</h3>
+<div class="level3">
+<hr/>
+<p>
+<strong>Required tools/materials:</strong>
+</p>
+<ul>
+<li class="level1"><div class="li"> Soldering iron</div>
+</li>
+<li class="level1"><div class="li"> Solder</div>
+</li>
+<li class="level1"><div class="li"> 28-pin socket</div>
+</li>
+</ul>
+<p>
+First, let's start with socket choice. There socket needed is a 28-pin DIP. You can get a socket at Radio Shack, but these sockets are typically not suitable for high-vibration environments. The risk is that the chip will vibrate loose while going down the road causing the engine to misfire or stall; possibly damaging the chip in the process. But, they have been used with success. A better choice would be a machine-pin socket. These are available from every electronics supply (Mouser.com and Digi-key.com likely being the least expensive). These have a more precise fit to the pins on the 28-pin chip and will not vibrate loose. On the other hand, the socket or pins can wear out if you plan to insert/remove the chip many times. If you think you will be swapping chips regularly, then I'd suggest a ZIF (Zero-Insertion-Force) socket. These are more expensive than the Radio Shack or machine-pin sockets, but they will allow you to install the chip as many times as you want without damaging the socket or chip, and they hold the chip very securely.
+</p>
+<p>
+Ok, now that you have the socket, you simply need to install it and solder it onto the board. The thru holes in the board should be clean and clear and the socket should drop right in. If it doesn't - don't force it; go back over the holes with the soldering iron and sucker. There is usually a notch in the socket to denote which pin is #1. There should be a '1' printed onto the ECU circuit board. Align the socket to the '1' to avoid future confusion.
+</p>
+<p>
+OK, now you have a socketed computer. What to do with it? Well, it's kind of useless without a chip in it.
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>ecu_socketing.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+
+----
+====Manual configuration of the FTDI chip in the USB to SCI cable====
+----
+
+**When this is required:**
+
+USB to SCI cables purchased from BoostButton have already had these steps performed for your convenience, so you should not need to do them.
+
+If you are using another FTDI based USB to SCI cable, you will need to make sure these steps are performed. For advanced users only.
+
+  - Plug the FTDI cable into your PC and let Windows run the 'found new hardware' deal.
+  - Once Windows has installed the cable, DL and run FTProg from FTDI. [[http://www.ftdichip.com/Support/Utilities.htm|FTProg]]
+  - Hit 'Scan and Parse' to find the cable.
+    - {{scandevices.jpg}}
+  - Go to the IO settings and change the Rx and Tx to invert.
+    - {{inverttxdrxd.jpg}}
+  - Next you need to configure the cable to load the D2xx driver.
+    - {{loadd2xx.jpg}}
+  - Press 'Program' to update the settings to the cable.
+  - Unplug the cable and re-insert it; let Windows re-run the 'found new hardware' deal again.

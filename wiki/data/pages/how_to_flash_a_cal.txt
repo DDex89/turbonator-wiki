@@ -1,0 +1,57 @@
+{{howhard>2}}
+-----
+===== How to flash the BoostButton flash module installed in a SMEC or SBEC. =====
+-----
+==== Overview ====
+  * Make sure your car is setup to bootstrap the ECU. For the SMEC, you will need to [[add_a_pin|add a wire to pin#11]] of the 60-way connector.
+  * You will also need to add a switch (for the SMEC) or pushbutton (for the SBEC) to apply power to the bootstrap wire. See the bottom of the page for more details on setting up the wire/switch for flashing.
+  * Configuring the interface cable in Windows for the [[cable_setup|cable]] you are using. 
+  * Once the serial port is configured, start the flash process in MP Tuner, select the file you wish to flash and bootstrap the ECU. The flashing process is automatic from this point.   
+
+=== Detailed Instructions ===
+  - For a single cal flashable SMEC or SBEC, skip to step 3.
+  - For the flashable FourPlay SMEC and SBEC, select the slot (by switch position) you wish to flash a new cal to (1-4), then continue as below.
+  - Start MP Tuner. 
+  - Check that MP Tune found the correct COM port in the bottom LH corner of the screen
+  - If it shows the correct port and settings, skip to step 11 below.
+  - Select ‘Setup’; ‘Com Port’, 'Settings'.
+    *{{::mpt_com_settings.jpg|}}  
+  - Select the port number that represents your interface cable. This is usually port 5 or higher. 
+  - Select the ECU and Boot Baud Rates (recommended settings: Boot = 7812; ECU = 62500).   
+  - For the BoostButton SMEC and SBEC modules, use the appropriate bin size option (Turbonator cals are always 32k).
+  - Once finished, hit 'Save Port Settings' and close the coms form.  
+  - Select ‘Miscellaneous’, ‘Write Chip’
+    *{{:write_chip.jpg|}} 
+  - You’ll be prompted for the .bin to flash. Once loaded, MP Tune will confirm the flash chip type, and prompt you to press the boot switch and key-on, and the bootstrap + flash process will start automatically.
+  - The flashing progress will be displayed at the bottom of the MP Tune main window. 
+    *{{::flash_progress.jpg|}}  
+  - When flashing is complete, turn the key off when prompted.
+  - MP Tune will confirm if the flash completed OK or not. 
+  - For the SMEC, you can now also switch off the 12V to the boot pin (#11). 
+  - You can now start the car normally with your new binary loaded. 
+
+^TIP|I usually use 7812 for the ‘Boot’ baud rate and 62500 for the ‘ECU’ baud rate and I have no problems with coms. 125k would obviously be much faster for flash/verify. But, the reliability of the coms at this speed is a little iffy. The SMEC flashes and verifies in about 10 seconds at 62.5k.|   
+
+=== The Bootstrap Process === 
+
+The Bootstrap process is slightly different between the SMEC and SBEC.   
+
+For the BoostButton Flashable SMEC, you need to apply 12v to pin#11 of the 60-way connector for the duration of the flash process. 12v needs to be applied BEFORE turning the key to the ‘Run’ position. I use a toggle switch wired to the 12v power point (cigarette lighter) as this is a constant 12v supply (ie, not switched).   
+
+  - Turn the boot switch to ‘on’.
+  - Start the flash process in MP Tune; follow the prompts.
+  - Turn the key to ‘Run’ position (not accessory) - but do not crank it!
+  - The ECU is now ‘bootstrapped’ and flashing should start automatically.
+
+^TIP|You can also bootstrap a stock SMEC. You will only be able to read the cal, but if you want to save a copy of your stock cal, this can be done. To bootstrap a stock (IE, not flash modified) SMEC you will need to apply at least 21v to pin#11. A 9v battery in series with the 12v power point works well.|
+
+      
+For the BoostButton Flashable (or stock) SBEC, you need to momentarily apply 12v to the boot wire on the BoostButton SCI cable (that’s the ‘extra’ red wire coming off the SCI connector) as you key on the car to ‘Run’. Once in the ‘Run’ position, the 12v must be removed. I use a pushbutton, again to the 12v power point (cigarette lighter). 
+
+  - Start the flash process in MP Tune; follow the prompts.
+  - Press the boot pushbutton.
+  - Turn the key to ‘Run’ position (not accessory) - but do not crank it!
+  - Release the boot pushbutton within ~1 second of key-on.
+  - The ECU is now ‘bootstrapped’ and flashing will start automatically..
+
+^Note|that the fuel pump will NOT prime and the injectors will NOT fire the prime pulse during this boot procedure – this is normal. If the fuel pump DOES prime, then that is an indication that the ECU did not boot correctly for flashing.|

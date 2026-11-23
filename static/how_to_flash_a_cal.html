@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>How to flash the BoostButton flash module installed in a SMEC or SBEC. [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="how_to_flash_a_cal" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body"><li class="level2"><a href="#how_to_flash_the_boostbutton_flash_module_installed_in_a_smec_or_sbec">How to flash the BoostButton flash module installed in a SMEC or SBEC.</a>
+<ul class="">
+<li class="level3"><a href="#overview">Overview</a></li>
+</ul></li>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Easy" src="_static/lib/plugins/howhard/images/style1/2.png"/></div><div class="howhard_txt">Easy</div></div><hr/>
+<h2 class="sectionedit1" id="how_to_flash_the_boostbutton_flash_module_installed_in_a_smec_or_sbec">How to flash the BoostButton flash module installed in a SMEC or SBEC.</h2>
+<div class="level2">
+<hr/>
+</div>
+<h3 class="sectionedit2" id="overview">Overview</h3>
+<div class="level3">
+<ul>
+<li class="level1"><div class="li"> Make sure your car is setup to bootstrap the ECU. For the SMEC, you will need to <a class="wikilink1" data-wiki-id="add_a_pin" href="add_a_pin.html" title="add_a_pin">add a wire to pin#11</a> of the 60-way connector.</div>
+</li>
+<li class="level1"><div class="li"> You will also need to add a switch (for the SMEC) or pushbutton (for the SBEC) to apply power to the bootstrap wire. See the bottom of the page for more details on setting up the wire/switch for flashing.</div>
+</li>
+<li class="level1"><div class="li"> Configuring the interface cable in Windows for the <a class="wikilink1" data-wiki-id="cable_setup" href="cable_setup.html" title="cable_setup">cable</a> you are using. </div>
+</li>
+<li class="level1"><div class="li"> Once the serial port is configured, start the flash process in MP Tuner, select the file you wish to flash and bootstrap the ECU. The flashing process is automatic from this point.   </div>
+</li>
+</ul>
+</div>
+<h4 id="detailed_instructions">Detailed Instructions</h4>
+<div class="level4">
+<ol>
+<li class="level1"><div class="li"> For a single cal flashable SMEC or SBEC, skip to step 3.</div>
+</li>
+<li class="level1"><div class="li"> For the flashable FourPlay SMEC and SBEC, select the slot (by switch position) you wish to flash a new cal to (1-4), then continue as below.</div>
+</li>
+<li class="level1"><div class="li"> Start MP Tuner. </div>
+</li>
+<li class="level1"><div class="li"> Check that MP Tune found the correct COM port in the bottom LH corner of the screen</div>
+</li>
+<li class="level1"><div class="li"> If it shows the correct port and settings, skip to step 11 below.</div>
+</li>
+<li class="level1 node"><div class="li"> Select ‘Setup’; ‘Com Port’, 'Settings'.</div>
+<ul>
+<li class="level2"><div class="li"><a class="media" href="_media/mpt_com_settings.jpg" rel="noopener" target="_blank" title="mpt_com_settings.jpg"><img alt="" class="media" loading="lazy" src="_media/mpt_com_settings.jpg"/></a> </div>
+</li>
+</ul>
+</li>
+<li class="level1"><div class="li"> Select the port number that represents your interface cable. This is usually port 5 or higher. </div>
+</li>
+<li class="level1"><div class="li"> Select the ECU and Boot Baud Rates (recommended settings: Boot = 7812; ECU = 62500).   </div>
+</li>
+<li class="level1"><div class="li"> For the BoostButton SMEC and SBEC modules, use the appropriate bin size option (Turbonator cals are always 32k).</div>
+</li>
+<li class="level1"><div class="li"> Once finished, hit 'Save Port Settings' and close the coms form.  </div>
+</li>
+<li class="level1 node"><div class="li"> Select ‘Miscellaneous’, ‘Write Chip’</div>
+<ul>
+<li class="level2"><div class="li"><a class="media" href="_media/write_chip.jpg" rel="noopener" target="_blank" title="write_chip.jpg"><img alt="" class="media" loading="lazy" src="_media/write_chip.jpg"/></a> </div>
+</li>
+</ul>
+</li>
+<li class="level1"><div class="li"> You’ll be prompted for the .bin to flash. Once loaded, MP Tune will confirm the flash chip type, and prompt you to press the boot switch and key-on, and the bootstrap + flash process will start automatically.</div>
+</li>
+<li class="level1 node"><div class="li"> The flashing progress will be displayed at the bottom of the MP Tune main window. </div>
+<ul>
+<li class="level2"><div class="li"><a class="media" href="_media/flash_progress.jpg" rel="noopener" target="_blank" title="flash_progress.jpg"><img alt="" class="media" loading="lazy" src="_media/flash_progress.jpg"/></a> </div>
+</li>
+</ul>
+</li>
+<li class="level1"><div class="li"> When flashing is complete, turn the key off when prompted.</div>
+</li>
+<li class="level1"><div class="li"> MP Tune will confirm if the flash completed OK or not. </div>
+</li>
+<li class="level1"><div class="li"> For the SMEC, you can now also switch off the 12V to the boot pin (#11). </div>
+</li>
+<li class="level1"><div class="li"> You can now start the car normally with your new binary loaded. </div>
+</li>
+</ol>
+<div class="table sectionedit3"><table class="inline">
+<tr class="row0">
+<th class="col0">TIP</th><td class="col1">I usually use 7812 for the ‘Boot’ baud rate and 62500 for the ‘ECU’ baud rate and I have no problems with coms. 125k would obviously be much faster for flash/verify. But, the reliability of the coms at this speed is a little iffy. The SMEC flashes and verifies in about 10 seconds at 62.5k.</td>
+</tr>
+</table></div>
+</div>
+<h4 id="the_bootstrap_process">The Bootstrap Process</h4>
+<div class="level4">
+<p>
+The Bootstrap process is slightly different between the SMEC and SBEC.   
+</p>
+<p>
+For the BoostButton Flashable SMEC, you need to apply 12v to pin#11 of the 60-way connector for the duration of the flash process. 12v needs to be applied BEFORE turning the key to the ‘Run’ position. I use a toggle switch wired to the 12v power point (cigarette lighter) as this is a constant 12v supply (ie, not switched).
+</p>
+<ol>
+<li class="level1"><div class="li"> Turn the boot switch to ‘on’.</div>
+</li>
+<li class="level1"><div class="li"> Start the flash process in MP Tune; follow the prompts.</div>
+</li>
+<li class="level1"><div class="li"> Turn the key to ‘Run’ position (not accessory) - but do not crank it!</div>
+</li>
+<li class="level1"><div class="li"> The ECU is now ‘bootstrapped’ and flashing should start automatically.</div>
+</li>
+</ol>
+<div class="table sectionedit4"><table class="inline">
+<tr class="row0">
+<th class="col0">TIP</th><td class="col1">You can also bootstrap a stock SMEC. You will only be able to read the cal, but if you want to save a copy of your stock cal, this can be done. To bootstrap a stock (<abbr title="Internet Explorer">IE</abbr>, not flash modified) SMEC you will need to apply at least 21v to pin#11. A 9v battery in series with the 12v power point works well.</td>
+</tr>
+</table></div>
+<p>
+For the BoostButton Flashable (or stock) SBEC, you need to momentarily apply 12v to the boot wire on the BoostButton SCI cable (that’s the ‘extra’ red wire coming off the SCI connector) as you key on the car to ‘Run’. Once in the ‘Run’ position, the 12v must be removed. I use a pushbutton, again to the 12v power point (cigarette lighter).
+</p>
+<ol>
+<li class="level1"><div class="li"> Start the flash process in MP Tune; follow the prompts.</div>
+</li>
+<li class="level1"><div class="li"> Press the boot pushbutton.</div>
+</li>
+<li class="level1"><div class="li"> Turn the key to ‘Run’ position (not accessory) - but do not crank it!</div>
+</li>
+<li class="level1"><div class="li"> Release the boot pushbutton within ~1 second of key-on.</div>
+</li>
+<li class="level1"><div class="li"> The ECU is now ‘bootstrapped’ and flashing will start automatically..</div>
+</li>
+</ol>
+<div class="table sectionedit5"><table class="inline">
+<tr class="row0">
+<th class="col0">Note</th><td class="col1">that the fuel pump will NOT prime and the injectors will NOT fire the prime pulse during this boot procedure – this is normal. If the fuel pump DOES prime, then that is an indication that the ECU did not boot correctly for flashing.</td>
+</tr>
+</table></div>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>how_to_flash_a_cal.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

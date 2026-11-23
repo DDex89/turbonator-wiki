@@ -1,0 +1,7 @@
+**Switchable boost**
+
+This allows a ‘LOW’ boost setting to be used when a switch is applied. It must be one of the existing inputs to the SMEC (Cruise, A/C, P/N switch, etc.). But, these can be ‘doubled up’ – IE, you can have the cruise on/off switch work for both hi/lo boost as well as cruise. This is similar in operation to the S60 boost switch feature, though without the timing adjustment for low octane fuel.
+
+To enable this feature, go to 'Setup', 'Cal Configuration', 'CalCustomOptionsConfig1' in the MP Tune editor window. Check the box for 'Switchable Boost'. It's now turned on.
+
+The only config options for switchable boost are the 'Lo' boost setting - 'Boost Control', 'Target Lookup', 'AllowedBoostLo'. This is a constant value and is not dependent on any other factors. And, the boost switch - 'Boost Control', 'Target Lookup', 'HighBoostSwitchSelect'.

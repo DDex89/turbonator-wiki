@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>SBEC3: reading and reflashing over the SCI line [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="sbec3_reflash" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body">
+<ul class="">
+<li class="level1"><a href="#sbec3reading_and_reflashing_over_the_sci_line">SBEC3: reading and reflashing over the SCI line</a>
+<ul class="">
+<li class="level2"><a href="#wiring">Wiring</a></li>
+<li class="level2"><a href="#bootstrap_commands">Bootstrap commands</a>
+<ul class="">
+<li class="level3"><a href="#erase">Erase:</a></li>
+<li class="level3"><a href="#write">Write:</a></li>
+<li class="level3"><a href="#bulk_read">Bulk Read:</a></li>
+<li class="level3"><a href="#eeprom_read">EEPROM read:</a></li>
+<li class="level3"><a href="#eeprom_write">EEPROM write:</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#the_ecuwriterpy_script">The ecuwriter.py script</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#checksum_script">Checksum script</a></li>
+<li class="level1"><a href="#examples">Examples</a></li>
+</ul>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Very Hard" src="_static/lib/plugins/howhard/images/style1/5.png"/></div><div class="howhard_txt">Very Hard</div></div><hr/>
+<h1 class="sectionedit1" id="sbec3reading_and_reflashing_over_the_sci_line">SBEC3: reading and reflashing over the SCI line</h1>
+<div class="level1">
+<hr/>
+<div class="wrap_warning plugin_wrap">
+<p>
+This is experimental, bench-tested reflashing, not a commercial tool like the FCC's <a class="wikilink1" data-wiki-id="flash_an_fcc" href="flash_an_fcc.html" title="flash_an_fcc">FCCFlash</a>. It erases and rewrites the ECU's flash directly over the diagnostic line; a failed or interrupted write can leave the ECU unable to run. Keep a known-good dump of the original flash before erasing anything, and do not remove power or disconnect the cable mid-write.
+</p>
+</div>
+<p>
+The SBEC3 has no separate bootstrap connector: its own <em>diagnostic</em> SCI line both talks to scan tools (see <a class="wikilink1" data-wiki-id="sbec3_overview" href="sbec3_overview.html#diagnostics_over_the_sci_line" title="sbec3_overview">diagnostics</a>) and, with +20V applied to SCI RX, drops into a bootstrap mode that can erase and rewrite the program flash and read or write the EEPROM. The kernel and the host-side tooling used here are <strong><code>SBECBootLoader</code></strong> by Dino Yancey, reused by the neon-sbec3-firmware project under <code>third_party/</code>: <a class="urlextern" href="https://github.com/dino2gnt/SBECBootLoader" rel="ugc nofollow noopener" target="_blank" title="https://github.com/dino2gnt/SBECBootLoader">github.com/dino2gnt/SBECBootLoader</a>.
+</p>
+</div>
+<h2 class="sectionedit4" id="wiring">Wiring</h2>
+<div class="level2">
+<hr/>
+<p>
+I use this script with the embedded reflash kernels and a <a class="urlextern" href="https://www.amazon.com/gp/product/B07R3388DW" rel="ugc nofollow noopener" target="_blank" title="https://www.amazon.com/gp/product/B07R3388DW">CP2102</a> connected to ground, SCI TX (pin 6 in the OBD2 connector) and SCI RX (pin 25 in the 12-pin diag connector next to the OBD2 connector).  +20V programming voltage is supplied by a 24V PoE adapter I had laying around, turned down to 20V with a <a class="urlextern" href="https://www.amazon.com/dp/B07VVXF7YX" rel="ugc nofollow noopener" target="_blank" title="https://www.amazon.com/dp/B07VVXF7YX">buck converter</a> and switched on and off via the CP2102's RTS output and a cheapy mechanical <a class="urlextern" href="https://www.amazon.com/gp/product/B08C71QL65" rel="ugc nofollow noopener" target="_blank" title="https://www.amazon.com/gp/product/B08C71QL65">relay board</a>.  For the 2GNT (and probably Avenger, Sebring, Neon, Cloud cars) there is an <a class="urlextern" href="https://github.com/dino2gnt/SBECBootLoader/blob/master/connections.png" rel="ugc nofollow noopener" target="_blank" title="https://github.com/dino2gnt/SBECBootLoader/blob/master/connections.png">annotated excerpt from the FSM</a> illustrating these connections.  I run everything in Linux. It probably won't work under Windows (and I don't care).
+</p>
+<p>
+If you connect directly to the ECU on a bench, the pins you need are:
+</p>
+<ul>
+<li class="level1"><div class="li"> Pin 10: Ground</div>
+</li>
+<li class="level1"><div class="li"> Pin 20: Switched 12V+ (Run)</div>
+</li>
+<li class="level1"><div class="li"> Pin 46: Constant 12V+ (Battery)</div>
+</li>
+<li class="level1"><div class="li"> Pin 47: Ground</div>
+</li>
+<li class="level1"><div class="li"> Pin 65: SCI TX</div>
+</li>
+<li class="level1"><div class="li"> Pin 75: SCI RX</div>
+</li>
+</ul>
+<p>
+In my experience, these connections are universal across the entire SBEC3 family.  If you know of one that is different, please let me know.
+</p>
+<p>
+12V+ power is supplied by a 12V wall-wart from the box of random power supplies and cables in the back of the closet (you know the box I mean).
+</p>
+<p>
+For the CP2102:
+</p>
+<ul>
+<li class="level1"><div class="li"> Pin TX connects to Normally Open (NO) on the relay board</div>
+</li>
+<li class="level1"><div class="li"> Pin RX connects to Pin 65 on the ECU (SCI TX)</div>
+</li>
+<li class="level1"><div class="li"> Pin RTS connects to IN on the relay board</div>
+</li>
+<li class="level1"><div class="li"> Pin 5V+ connects to DC+ on the relay board</div>
+</li>
+<li class="level1"><div class="li"> Pin GND to DC- on the relay board</div>
+</li>
+<li class="level1"><div class="li"> Connect the other ground pin to a common ground shared by the ECU power supply</div>
+</li>
+</ul>
+<p>
+On the relay board:
+</p>
+<ul>
+<li class="level1"><div class="li"> Connect 20V+ to Normally Closed (NC)</div>
+</li>
+</ul>
+<p>
+The ecuwriter script toggles the CP2102's RTS pin in order to switch the 20V+ programming voltage on and off.
+</p>
+<p>
+NB: Different Linux kernel versions may have different defaults for the cp2102; I have had RTS default to high in some environments, and others default to RTS low.  Be aware you may need to swap the connections on NC and NO depending on what your system does with the UART.
+</p>
+</div>
+<h2 class="sectionedit5" id="bootstrap_commands">Bootstrap commands</h2>
+<div class="level2">
+<hr/>
+</div>
+<h3 class="sectionedit6" id="erase">Erase:</h3>
+<div class="level3">
+<hr/>
+<ul>
+<li class="level1 node"><div class="li"> Request: <code>20 0X XX XX</code></div>
+<ul>
+<li class="level2"><div class="li"> 0X XX XX can be any 20 bit address inside the target bank, e.g. Bank 0 is <code>04 00 00</code></div>
+</li>
+</ul>
+</li>
+<li class="level1 node"><div class="li"> Response: <code>21 0X XX XX</code></div>
+<ul>
+<li class="level2"><div class="li"> After the response, we enter a timer-loop that counts down approximately 15 seconds, attempting the block-erase command each iteration until time runs out or it succeeds.  SCI RX must be +20V for the delete to succeed.</div>
+</li>
+<li class="level2"><div class="li"> Success: <code>22</code></div>
+</li>
+<li class="level2"><div class="li"> Failure: The content of the flash chip's Command State Register containing error bit values</div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<h4 id="bank_base_addresses_for_m28f200_256kb_and_compatible_flash_chips">Bank base addresses for M28F200 (256KB) and compatible flash chips:</h4>
+<div class="level4">
+<hr/>
+<ul>
+<li class="level1"><div class="li"> Bank 0: <code>0x40000</code> (16K)</div>
+</li>
+<li class="level1"><div class="li"> Bank 1: <code>0x44000</code> (8k)</div>
+</li>
+<li class="level1"><div class="li"> Bank 2: <code>0x46000</code> (8K)</div>
+</li>
+<li class="level1"><div class="li"> Bank 3: <code>0x48000</code> (96K)</div>
+</li>
+<li class="level1"><div class="li"> Bank 4: <code>0x60000</code> (128K)</div>
+</li>
+</ul>
+</div>
+<h4 id="bank_addresses_for_tms28f210_128kb_and_compatible_flash_chips">Bank addresses for TMS28F210 (128KB) and compatible flash chips:</h4>
+<div class="level4">
+<hr/>
+<ul>
+<li class="level1"><div class="li"> Bank 0: <code>0x40000</code> (128K)</div>
+</li>
+<li class="level1"><div class="li"> These chips should be byte-addressable and do not require  (or provide) per-bank erasure capabilities</div>
+</li>
+<li class="level1"><div class="li"> Always specify <code>–erase 0</code> so the erase algorithm starts from address <code>0x40000</code></div>
+</li>
+</ul>
+</div>
+<h3 class="sectionedit7" id="write">Write:</h3>
+<div class="level3">
+<hr/>
+</div>
+<h4 id="write_to_buffer">Write to buffer:</h4>
+<div class="level4">
+<ul>
+<li class="level1 node"><div class="li"> Request: <code>30 0Y YY</code></div>
+<ul>
+<li class="level2"><div class="li"> <code>YY YY</code> is the count of bytes to write to RAM buffer, zero indexed, <code>0x0000</code> to <code>0xFFFF</code>. Writes from Command 30 populate a RAM buffer starting at approximately <code>0x00490</code>. This leaves about 800 bytes of RAM for write buffer on an ECU with 2KB ('96-'97).</div>
+</li>
+<li class="level2 node"><div class="li"> Response: <code>31 YY YY</code></div>
+<ul>
+<li class="level3"><div class="li"> Follow the response with <code>0xYYYY</code> bytes of data to be written to RAM buffer</div>
+</li>
+<li class="level3"><div class="li"> Bytes are not echoed</div>
+</li>
+<li class="level3"><div class="li"> SCI RX does NOT have to be +20V</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="level1"><div class="li"> Success: <code>22</code> is echoed when YYYY bytes have been received.</div>
+</li>
+<li class="level1"><div class="li"> <strong>Note</strong>: The RAM buffer size is limited to the amount of available RAM. I don't recommend greater than <code>0x0300</code> (768 bytes) unless you know what you're doing.  There is no range check and we will happily try to write off the end of RAM and crash if you ask us to.</div>
+</li>
+</ul>
+</div>
+<h4 id="write_to_flash">Write to flash:</h4>
+<div class="level4">
+<ul>
+<li class="level1 node"><div class="li"> Request: <code>40 0X XX XX 0Y YY</code></div>
+<ul>
+<li class="level3"><div class="li"> 0X XX XX is the starting address in flash memory for the write</div>
+</li>
+<li class="level3"><div class="li"> YYYY is the count of bytes to write from the RAM buffer to flash and should match the YYYY used to stage data to RAM.</div>
+</li>
+</ul>
+</li>
+<li class="level1 node"><div class="li"> Response: <code>41 0X XX XX YY YY</code></div>
+<ul>
+<li class="level3"><div class="li"> After sending the response, we enter a timer-loop that counts down approximately 15 seconds, attempting a write each iteration until time runs out or it succeeds. SCI RX must be +20V for the write to succeed.</div>
+</li>
+</ul>
+</li>
+<li class="level1"><div class="li"> Success: <code>22</code> is echoed when YY bytes have been successfully written to flash memory</div>
+</li>
+<li class="level1 node"><div class="li"> Failure:</div>
+<ul>
+<li class="level3"><div class="li"> Write error: <code>0x01</code></div>
+</li>
+<li class="level3"><div class="li"> Timeout: <code>0x80</code></div>
+</li>
+</ul>
+</li>
+<li class="level1"><div class="li"> <strong>Note</strong>:The expectation is a pattern of <code>30 0Y YY &lt;bytes&gt;</code> to stage data to RAM, followed by a <code>40 0X XX XX 0Y YY</code> and a switch to +20V on SCI RX (switched off on 22/success) to write staged data to flash, followed by another 30, then 40, etc, etc.</div>
+</li>
+</ul>
+</div>
+<h3 class="sectionedit8" id="bulk_read">Bulk Read:</h3>
+<div class="level3">
+<hr/>
+<ul>
+<li class="level1 node"><div class="li"> Request: <code>45 0X XX XX YY YY</code></div>
+<ul>
+<li class="level3"><div class="li"> 0X XX XX is a 20 bit address start address for the read</div>
+</li>
+<li class="level3"><div class="li"> YY YY is a 16 bit count of bytes to return</div>
+</li>
+</ul>
+</li>
+<li class="level1 node"><div class="li"> Response: <code>46 0X XX XX YY YY</code></div>
+<ul>
+<li class="level3"><div class="li"> Response will be followed by <code>YY YY</code> count of bytes starting from <code>0X XX XX</code></div>
+</li>
+</ul>
+</li>
+<li class="level1"><div class="li"> Success: <code>22</code></div>
+</li>
+<li class="level1"><div class="li"> <strong>Note</strong>: Too large of a <code>YY YY</code> value can cause unexpected problems on your receiving device.  Be cautious with large values. 00 40 (64 bytes) is generally safe.</div>
+</li>
+</ul>
+</div>
+<h3 class="sectionedit9" id="eeprom_read">EEPROM read:</h3>
+<div class="level3">
+<hr/>
+<ul>
+<li class="level1 node"><div class="li"> Request: <code>50 0X XX</code></div>
+<ul>
+<li class="level3"><div class="li"> 0X XX represents an EEPROM offset.  For example, the ECU part number is offset 0x01F0 to 0x01F2</div>
+</li>
+</ul>
+</li>
+<li class="level1 node"><div class="li"> Response: <code>51 0X XX YY YY</code></div>
+<ul>
+<li class="level3"><div class="li"> This command works in full word widths (16 bits) and thus always returns two bytes <code>YY YY</code>.</div>
+</li>
+</ul>
+</li>
+<li class="level1 node"><div class="li"> Failure:</div>
+<ul>
+<li class="level3"><div class="li"> <code>51 0X XX 01</code> if the EEPROM read fails.</div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<h3 class="sectionedit10" id="eeprom_write">EEPROM write:</h3>
+<div class="level3">
+<hr/>
+<ul>
+<li class="level1 node"><div class="li"> Request: <code>55 0X XX YY YY</code></div>
+<ul>
+<li class="level3"><div class="li"> 0X XX represents an EEPROM offset.</div>
+</li>
+<li class="level3"><div class="li"> YY YY is the 16 bit word to write starting at offset 0X XX</div>
+</li>
+<li class="level3"><div class="li"> SCI RX does _not_ have to be +20V.</div>
+</li>
+</ul>
+</li>
+<li class="level1 node"><div class="li"> Response: <code>56 0X XX YY YY YY YY</code></div>
+<ul>
+<li class="level3"><div class="li"> The complete command is echoed with a 56 acknowledge, with the addition of the contents of the EEPROM offset after writing.</div>
+</li>
+<li class="level3"><div class="li"> No error checking is done with these values in the reflash kernel. If they don't match, the write did not succeed.</div>
+</li>
+</ul>
+</li>
+<li class="level1 node"><div class="li"> Failure:</div>
+<ul>
+<li class="level3"><div class="li"> <code>56 0X XX YY YY 01</code> if the EEPROM write fails. (probably?)</div>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<h2 class="sectionedit11" id="the_ecuwriterpy_script">The ecuwriter.py script</h2>
+<div class="level2">
+<hr/>
+<p>
+Shows off the basic functions of the reflash kernel. I'm not fluent in Python, so be warned. Requires argparse, signal, time, and pyserial.
+</p>
+<pre class="code">$ ./ecuwriter.py --help
+usage: ecuwriter.py [-h] [--device SERIALDEVICE] [--baud BAUD] [--bootloader BOOTLOADER] [--skip-bootstrap] [--write BINFILE] [--writebuffer BUFFERSIZE] [--read DUMPFILE] [--read-partnum] [--write-partnum] [--read-vin] [--write-vin] [--flash-size {128,256}] [--erase {0,1,2,3,4,ALL}] [--read-serial READSERIAL]
+                    [--send-serial SENDSERIAL] [--invert-rts] [--debug]
+
+A basic ECU reader &amp; writer for the SBEC3
+
+options:
+  -h, --help            show this help message and exit
+  --device SERIALDEVICE, -d SERIALDEVICE
+                        The serial device to use (default: /dev/ttyUSB0)
+  --baud BAUD, -b BAUD  Connection baud rate (default: 62500)
+  --bootloader BOOTLOADER, -l BOOTLOADER
+                        Bootloader image to use (default: bootloader.bin)
+  --skip-bootstrap, -s  If the ECU is already in bootstrap with a running bootloader, use this to skip handshake and upload (default: False)
+  --write BINFILE, -w BINFILE
+                        The path and filename of the binary file to write to the ECU
+  --writebuffer BUFFERSIZE, -u BUFFERSIZE
+                        The amount of ECU RAM to use for write buffer. (default: 2048)
+  --read DUMPFILE, -r DUMPFILE
+                        Read the ECU flash and store it as DUMPFILE
+  --read-partnum, -p    Read and print the part number stored in the ECU EEPROM
+  --write-partnum, -n   Write a part number stored to the ECU EEPROM
+  --read-vin, -v        Read and print the VIN stored in the ECU EEPROM
+  --write-vin, -i       Write a VIN to the ECU EEPROM
+  --flash-size {128,256}, -f {128,256}
+                        Flash firmware image size. MOST SBEC3 ECUs are 256K (default: 256)
+  --erase {0,1,2,3,4,ALL}
+                        Erase Flash Bank [0,1,2,3,4|ALL], required prior to reprogramming (default: None)
+  --read-serial READSERIAL
+                        Read READSERIAL bytes of data from the buffer and exit, used to read the output of raw commands.
+  --send-serial SENDSERIAL
+                        Write serial data to the device. Used to send raw commands. Follow with --read-serial # to read # bytes of the response
+  --invert-rts          Swap RTS hi / low if you are defaulting to RTS hi for some reason (default: False)
+  --debug               Show lots of debug output</pre>
+</div>
+<h1 class="sectionedit12" id="checksum_script">Checksum script</h1>
+<div class="level1">
+<hr/>
+<p>
+For writing updated checksums to modified firmware images. Again, not fluent in Python, so Don't Blame Dino™. Requires argparse, signal.
+</p>
+<pre class="code">$ ./checksum.py --help
+usage: checksum.py [-h] --binfile BINFILE [--write-checksum WRITE] [--debug DEBUG]
+
+Calculate and optionally store checksum for an SBEC3 firmware image
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --binfile BINFILE, -b BINFILE
+                        The firmware image to work on
+  --write-checksum WRITE, -w WRITE
+                        Write the checksum to the firmware image. (default False)
+  --debug DEBUG         Show lots of debug output</pre>
+</div>
+<h1 class="sectionedit13" id="examples">Examples</h1>
+<div class="level1">
+<hr/>
+<pre class="code">(08:23PM) dino@yourmomshouse SBECBootLoader $ ./ecuwriter.py --flash-size 128 --bootloader bootloader-128K.bin --read-vin
+Using device /dev/ttyUSB0 at 62500 baud, 8N1
+Will apply 20V+ to SCI RX for bootstrap.  Ready? y/n/s(kip): y
+20V+ ON for 10 seconds. Turn key on now!
+20V+ OFF! Trying Magic Byte...
+06 Synced at 62500 baud
+Seed: 582d
+Solution: e57f
+26d067c21f Solution accepted!!!
+Uploading reflash kernel bootloader-128K.bin ...
+Booting reflash kernel...
+47010022  Kernel running!
+11  Kernel alive!
+Vehicle Identification Number from EEPROM:  4A3AK44Y0VE097567
+(08:23PM) dino@yourmomshouse SBECBootLoader $ ./ecuwriter.py --flash-size 128 --bootloader bootloader-128K.bin --read-partnum
+Using device /dev/ttyUSB0 at 62500 baud, 8N1
+Will apply 20V+ to SCI RX for bootstrap.  Ready? y/n/s(kip): s
+Skipping bootstrap!
+Part number from EEPROM:  05293014</pre>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>sbec3_reflash.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

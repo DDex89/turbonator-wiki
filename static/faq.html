@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>Frequently Asked Questions [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="faq" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body"><li class="level2"><a href="#frequently_asked_questions">Frequently Asked Questions</a></li>
+<li class="level2"><a href="#pumping_efficiency_questions">Pumping Efficiency Questions</a>
+<ul class="">
+<li class="level3"><a href="#q_-_which_way_do_you_go_w_pump_efficiency_to_make_it_richer">Q - Which way do you go w/ Pump Efficiency to make it richer?</a></li>
+<li class="level3"><a href="#q_-_isn_t_the_idea_basically_that_pumping_efficiency_is_base_fuel_and_then_you_have_idle_mid_wot_tables_to_fine_tune">Q - Isn't the idea basically that pumping efficiency is base fuel and then you have idle/mid/WOT tables to fine tune?</a></li>
+<li class="level3"><a href="#q_-_when_tuning_cals_1st_became_something_everyone_could_do_they_found_that_mopar_just_scaled_the_pe_table_for_the_s60_cal_at_that_time_everyone_was_told_that_is_the_wrong_way_to_do_it_and_not_to_touch_that_now_you_guys_have_reversed_your_tune_to_say_oh_yes_mess_with_the_pe_table_to_make_fueling_adjustments__so_which_is_it_and_why">Q - When tuning cals 1st became something everyone could do they found that Mopar just scaled the PE table for the S60 cal. At that time everyone was told that is the wrong way to do it and not to touch that. Now you guys have reversed your tune to say 'Oh yes mess with the PE table to make fueling adjustments'. So which is it? And WHY?</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#main_fuel_table_questions">3 Main Fuel Table Questions</a>
+<ul class="">
+<li class="level3"><a href="#q_-_i_was_wondering_why_the_fuel_full_throttle_has_so_few_data_points_to_adjust_and_the_part_throttle_has_so_many_it_makes_sense_that_you_could_tune_it_more_precisely_with_more_points_or_am_i_just_wrong">Q - I was wondering why the fuel full throttle has so few data points to adjust and the part throttle has so many. It makes sense that you could tune it more precisely with more points, or am I just wrong?</a></li>
+<li class="level3"><a href="#q_-_how_does_the_target_af_work_in_mp_tuner">Q - How does the target AF work in MP Tuner?</a></li>
+<li class="level3"><a href="#q_-_is_there_an_easy_way_to_switch_on_and_off_o2_feedback">Q - Is there an easy way to switch on and off O2 Feedback?</a></li>
+<li class="level3"><a href="#q_it_s_hard_to_adjust_fuel_spark_and_the_wastegate_with_the_computer_constantly_changing_them_how_do_i_disable_the_adaptives_for_tuning">Q – It’s hard to adjust fuel, spark, and the wastegate with the computer constantly changing them. How do I disable the adaptives for tuning?</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#accelerator_pump_questions">Accelerator Pump Questions</a>
+<ul class="">
+<li class="level3"><a href="#q_-_i_added_a_bigger_throttle_body_and_i_now_get_a_lean_tip-in_how_do_i_adjust_the_accel_pump_pump_shot">Q - I added a bigger throttle body and I now get a lean tip-in. How do I adjust the Accel Pump/Pump Shot?</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#other_fuelling_questions">Other Fuelling Questions</a>
+<ul class="">
+<li class="level3"><a href="#q_-_how_can_i_adjust_fuel_at_idle_coasting_down">Q - how can i adjust fuel at idle/ coasting down?</a></li>
+<li class="level3"><a href="#q_-_what_parameter_to_adjust_the_open_closed_loop_switch_point">Q - What parameter to adjust the open/closed loop switch point?</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#ignition_timing">Ignition Timing</a>
+<ul class="">
+<li class="level3"><a href="#q_-_how_is_the_total_timing_calculated_base_timing_advancefromrpm_advancefrommap">Q - How is the total timing calculated? Base timing + AdvancefromRPM + AdvancefromMap?</a></li>
+<li class="level3"><a href="#q_-_so_i_am_clear_on_this_the_timing_shown_in_the_cal_and_on_a_scan_tool_will_be_the_total_timing_this_number_assumes_the_base_timing_of_12_or_whatever_is_called_for_on_the_emissions_label_is_there_so_the_number_shown_in_a_cal_is_not_necessarily_the_number_used_in_a_calculation_correct">Q - So I am clear on this.... The timing shown in the cal, and on a Scan Tool, will be the total timing. This number assumes the base timing of 12* (or whatever is called for on the emissions label) is there. So the number shown in a cal is not necessarily the number used in a calculation, correct?</a></li>
+<li class="level3"><a href="#q_what_is_the_advancefromrpmmax_table_for">Q  What is the AdvanceFromRPMMax table for?</a></li>
+<li class="level3"><a href="#q_what_is_the_multiplieronmapadvancewhenretarding_table_used_for">Q  What is the MultiplierOnMAPAdvanceWhenRetarding table used for?</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#boost_control">Boost Control</a>
+<ul class="">
+<li class="level3"><a href="#q_-_how_do_you_raise_the_overboost_cutout_point_in_t-sbec_t-smec_and_t-lm">Q - How do you raise the overboost cutout point in T-SBEC, T-SMEC and T-LM?</a></li>
+<li class="level3"><a href="#q_-_i_only_have_full_boost_if_i_go_past_3_4_throttle_till_that_only_have_about_5_psi_why">Q - I only have full boost if I go past 3/4 throttle, till that only have about 5 psi. Why?</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#general">General</a>
+<ul class="">
+<li class="level3"><a href="#q_-_what_offset_do_i_use_to_burn_my_chip">Q - What 'offset' do I use to burn my chip?</a></li>
+</ul></li>
+</div></div></div>
+
+<div class="page" role="main">
+
+<h2 class="sectionedit1" id="frequently_asked_questions">Frequently Asked Questions</h2>
+<div class="level2">
+<p>
+This page will be for questions not answered in the tuning guide. When a question is answered, it will be incorporated into the main how-to, if possible, and linked from this page.
+</p>
+<p>
+Please use this example formatting for questions and answers:
+</p>
+</div>
+<h2 class="sectionedit2" id="pumping_efficiency_questions">Pumping Efficiency Questions</h2>
+<div class="level2">
+</div>
+<h3 class="sectionedit3" id="q_-_which_way_do_you_go_w_pump_efficiency_to_make_it_richer">Q - Which way do you go w/ Pump Efficiency to make it richer?</h3>
+<div class="level3">
+</div>
+<h5 id="answered">Answered</h5>
+<div class="level5">
+<p>
+Up on the PumpEff. More air = More fuel.
+</p>
+</div>
+<h3 class="sectionedit4" id="q_-_isn_t_the_idea_basically_that_pumping_efficiency_is_base_fuel_and_then_you_have_idle_mid_wot_tables_to_fine_tune">Q - Isn't the idea basically that pumping efficiency is base fuel and then you have idle/mid/WOT tables to fine tune?</h3>
+<div class="level3">
+</div>
+<h5 id="answered1">Answered</h5>
+<div class="level5">
+<p>
+Actually, no. There are 3 main 'ideal' PW tables. Which table is used is decided by throttle position - there is a table each for idle, part throttle, and wide-open throttle. The Pumping Efficiency table is a fraction of the 'ideal' fuel vs. RPM. Since the engine never flows it's full potential, you need to reduce the 'ideal' PW by this amount.
+</p>
+</div>
+<h3 class="sectionedit5" id="q_-_when_tuning_cals_1st_became_something_everyone_could_do_they_found_that_mopar_just_scaled_the_pe_table_for_the_s60_cal_at_that_time_everyone_was_told_that_is_the_wrong_way_to_do_it_and_not_to_touch_that_now_you_guys_have_reversed_your_tune_to_say_oh_yes_mess_with_the_pe_table_to_make_fueling_adjustments__so_which_is_it_and_why">Q - When tuning cals 1st became something everyone could do they found that Mopar just scaled the PE table for the S60 cal. At that time everyone was told that is the wrong way to do it and not to touch that. Now you guys have reversed your tune to say 'Oh yes mess with the PE table to make fueling adjustments'. So which is it? And WHY?</h3>
+<div class="level3">
+</div>
+<h5 id="answered2">Answered</h5>
+<div class="level5">
+<p>
+The problem with the S60 cal is that Mopar ONLY scaled the PeffTbl. They did not adjust the 3 main fuel tables for injectors, or fuel, or base charge temperature. They're just stock T2 fuel tables. The PefTbl is set to like 40% volumetric efficiency to compensate. Obviously, that's not right. The DC ported head that came with the S60 package would have flowed much better than that. I don't think it was said to NOT touch the PEfTbl, just to not do ALL of the fuel scaling with it.
+</p>
+</div>
+<h2 class="sectionedit6" id="main_fuel_table_questions">3 Main Fuel Table Questions</h2>
+<div class="level2">
+</div>
+<h3 class="sectionedit7" id="q_-_i_was_wondering_why_the_fuel_full_throttle_has_so_few_data_points_to_adjust_and_the_part_throttle_has_so_many_it_makes_sense_that_you_could_tune_it_more_precisely_with_more_points_or_am_i_just_wrong">Q - I was wondering why the fuel full throttle has so few data points to adjust and the part throttle has so many. It makes sense that you could tune it more precisely with more points, or am I just wrong?</h3>
+<div class="level3">
+</div>
+<h5 id="answered3">Answered</h5>
+<div class="level5">
+<p>
+The 3 main fuel tables are really just used to set a target A/F based on your injector size, engine displacement, fuel specific gravity, and an assumed intake air temp. There aren’t many points because the A/F doesn’t need too many changes. You’re probably used to seeing a fuel table where the RPM is included. We have the PumpEff table for that. It (usually) has many data points for accuracy.
+</p>
+</div>
+<h3 class="sectionedit8" id="q_-_how_does_the_target_af_work_in_mp_tuner">Q - How does the target AF work in MP Tuner?</h3>
+<div class="level3">
+</div>
+<h5 id="answered4">Answered</h5>
+<div class="level5">
+<p>
+The target A/F is just a tool for plotting a phantom line on the 3 main fuel tables to help you set those to your target A/F. It’s not used by the ECU at all. To adjust fueling you need to open up a template, select ‘miscellaneous’, then ‘fueling setup’. You will see 3 columns of AFRs for the 3 fueling tables. Enter your desired A/F based on the corresponding MAP. The A/F data is saved with the template so the next time you open up the template the data should be the same. In the 3 main fuel tables, the yellow phantom line represents the theoretical pulsewidth calculated based on the A/F and other info you entered in that screen above. So, if the yellow line is higher than the fuel graph line you will be running leaner than desired (pulsewidth is shorter than desired). You will see the data represented in A/F form on the bottom right of the fuel table window.
+</p>
+</div>
+<h3 class="sectionedit9" id="q_-_is_there_an_easy_way_to_switch_on_and_off_o2_feedback">Q - Is there an easy way to switch on and off O2 Feedback?</h3>
+<div class="level3">
+</div>
+<h5 id="answered5">Answered</h5>
+<div class="level5">
+<p>
+For the SMEC and SBEC, set 'NoCellUpdateAboveFromMAP’ to a high value. This will essentially force the O2 control to work the same as if you were at full throttle. The other ‘NoCellUpdate***’ constants will have a similar effect. For the LM, only setting 'PWMIN_NoCellUpdateBelow_PWMIN_Pulsewidth' to a high value can disable the O2 feedback. The others will only affect the adaptive cell updates.
+</p>
+<p>
+This is useful when tuning the part throttle fuel table.
+</p>
+</div>
+<h3 class="sectionedit10" id="q_it_s_hard_to_adjust_fuel_spark_and_the_wastegate_with_the_computer_constantly_changing_them_how_do_i_disable_the_adaptives_for_tuning">Q – It’s hard to adjust fuel, spark, and the wastegate with the computer constantly changing them. How do I disable the adaptives for tuning?</h3>
+<div class="level3">
+</div>
+<h5 id="answered6">Answered</h5>
+<div class="level5">
+<p>
+There are constants that can be used to dis-able the adaptives:
+</p>
+<p>
+'NoCellUpdateAboveThisMAP' for fuel,
+'AdaptiveRetard_MinMAPForAdjustment' for the adaptive retard, and
+'StopAdaptiveWGWhenMapIsThisCloseToBoostTar get' for the wastegate adaptives
+</p>
+<p>
+Basically, set them all to 0xff to disable (remember the stock settings, though, so you can change it back when you're done getting your base tune).
+</p>
+</div>
+<h2 class="sectionedit11" id="accelerator_pump_questions">Accelerator Pump Questions</h2>
+<div class="level2">
+</div>
+<h3 class="sectionedit12" id="q_-_i_added_a_bigger_throttle_body_and_i_now_get_a_lean_tip-in_how_do_i_adjust_the_accel_pump_pump_shot">Q - I added a bigger throttle body and I now get a lean tip-in. How do I adjust the Accel Pump/Pump Shot?</h3>
+<div class="level3">
+</div>
+<h5 id="answered7">Answered</h5>
+<div class="level5">
+<p>
+Here's the best description of the PumpShot calculation I can give. This is valid for T-LM/SMEC/SBEC; it's a little more complicated for the T3 stuff.
+</p>
+<p>
+There are 2 Pumpshot calculations: MAP-based and TPS-based.
+</p>
+<p>
+MAP-Based PumpShotPW:
+</p>
+<p>
+AvgMAP –&gt; AETIME is the time constant for the AvgMAP calculation. A higher time constant gives a longer-term average (and usually a higher DeltaMAP - see the next definition).
+DeltaMAP –&gt; DeltaMAP is the difference between the current MAP value and the calculated average MAP (AvgMAP). [DeltaMAP = MAP - AvgMAP]
+</p>
+<p>
+PumpShotPW Calculation:
+</p>
+<p>
+If DeltaMAP is less than MAPTRG then there is no MAP PumpShot;
+If DeltaMAP is greater than MAPTRG and lower than MAPMAX, then use DeltaMAP in the PW calculation;
+If DeltaMAP is greater than MAPMAX, then substitute MAPMAX for DeltaMAP in the PW calculation (DeltaMAP = MAPMAX);
+Lookup the value from the AESLOP table (from coolant temp);
+</p>
+<p>
+[PumpShotPW(MAP) = AESLOP_valule X DeltaMAP]
+</p>
+<p>
+TPS-Based PumpShotPW:
+</p>
+<p>
+AvgTPS –&gt; THRTCN is the time constant for the AvgTPS calculation. A higher time constant gives a longer-term average (and usually a higher DeltaTPS - see the next definition).
+DeltaTPS –&gt; DeltaTPS is the difference between the current TPS value and the calculated average TPS (AvgTPS). [DeltaTPS = TPS - AvgTPS]
+</p>
+<p>
+PumpShotPW Calculation:
+</p>
+<p>
+If DeltaTPS is less than POSTRG then there is no TPS PumpShot;
+If DeltaTPS is greater than POSTRG and lower than THRMAX, then use DeltaTPS in the PW calculation;
+If DeltaTPS is greater than THRMAX, then substitute THRMAX for DeltaTPS in the PW calculation (DeltaTPS = THRMAX);
+Lookup the value from the POSSLP table (from coolant temp);
+</p>
+<p>
+[PumpShotPW(TPS) = POSSLP_valule X DeltaTPS]
+</p>
+<p>
+I know it's still pretty complicated.
+</p>
+<p>
+For a bigger TB, I would actually start with the POSSLP table. Add PW in the operating temp range.
+</p>
+<p>
+Reducing THRTCN would actually have the effect of reducing the pumpshot, I think, because it would reduce the DeltaTPS value. Increasing THRTCN should also increase the PumpShot, as would increasing THRMAX.
+</p>
+<p>
+If increasing POSSLP doesn't seem to help, try increasing THRMAX, too.
+</p>
+<p>
+Similarly, for a heavily ported head, I would adjust the AESLOP table. Add PW in the operating temp range.
+</p>
+<p>
+Reducing AETIME would actually have the effect of reducing the pumpshot, because it would reduce the DeltaMAP value. Increasing AETIME should also increase the PumpShot, as would increasing MAPMAX.
+</p>
+</div>
+<h2 class="sectionedit13" id="other_fuelling_questions">Other Fuelling Questions</h2>
+<div class="level2">
+</div>
+<h3 class="sectionedit14" id="q_-_how_can_i_adjust_fuel_at_idle_coasting_down">Q - how can i adjust fuel at idle/ coasting down?</h3>
+<div class="level3">
+</div>
+<h5 id="answered8">Answered</h5>
+<div class="level5">
+<p>
+If you want to adjust the idle fuel, there are a few ways to do it. 
+</p>
+<p>
+1) Reduce the PumpEff at low RPM. For some reason, Chrysler left the PumpEff at like 60+% even at idle. When, in reality, this is probably not very realistic. So, reduce the PumpEff in maybe 5% increments below 1200rpm and see if that helps.
+</p>
+<p>
+2) Reduce the baseline/no throttle fuel table near idle vacuum. If you have a different cam or cam timing than stock, it's likely that you're operating in a different part of this table than stock and are calculating a richer mixture.
+</p>
+<p>
+3) Spark scatter fuel - Chrysler actually uses spark scatter and subtle fuel changes to control the idle speed primarily. The AIS motor is actually a last resort. This is because fuel and spark changes are much more responsive than the AIS motor. But, the constant changing spark and fuel make it hard to tune. Turn it off (temporarily) by setting the threshold temperature (TempAboveWhichSparkScatterIsActive) really high.
+</p>
+<p>
+4) Then, there is the adaptive fuel which also works at idle. You can also dis-able the adaptives for tuning purposes by…
+</p>
+</div>
+<h3 class="sectionedit15" id="q_-_what_parameter_to_adjust_the_open_closed_loop_switch_point">Q - What parameter to adjust the open/closed loop switch point?</h3>
+<div class="level3">
+</div>
+<h5 id="answered9">Answered</h5>
+<div class="level5">
+<p>
+Adjust the ‘NoCellUpdate*’ constants under the 'Adaptive Memory' group. These are the limits to force open-loop operation. ‘NoCellUpdateAboveThisMAP’ for example will force open-loop above the MAP setpoint.
+</p>
+</div>
+<h2 class="sectionedit16" id="ignition_timing">Ignition Timing</h2>
+<div class="level2">
+</div>
+<h3 class="sectionedit17" id="q_-_how_is_the_total_timing_calculated_base_timing_advancefromrpm_advancefrommap">Q - How is the total timing calculated? Base timing + AdvancefromRPM + AdvancefromMap?</h3>
+<div class="level3">
+</div>
+<h5 id="answered10">Answered</h5>
+<div class="level5">
+<p>
+There is no such thing as base timing. Total timing is pretty simple  Advance from RPM + Advance from MAP is the basic timing. The advance from MAP can be either the WOT or P/T table depending on TPS position. And, there is a WOT multiplier for the advance from MAP table for when the lookup value from that table is negative. There is also a maximum timing value.
+</p>
+</div>
+<h3 class="sectionedit18" id="q_-_so_i_am_clear_on_this_the_timing_shown_in_the_cal_and_on_a_scan_tool_will_be_the_total_timing_this_number_assumes_the_base_timing_of_12_or_whatever_is_called_for_on_the_emissions_label_is_there_so_the_number_shown_in_a_cal_is_not_necessarily_the_number_used_in_a_calculation_correct">Q - So I am clear on this.... The timing shown in the cal, and on a Scan Tool, will be the total timing. This number assumes the base timing of 12* (or whatever is called for on the emissions label) is there. So the number shown in a cal is not necessarily the number used in a calculation, correct?</h3>
+<div class="level3">
+</div>
+<h5 id="answered11">Answered</h5>
+<div class="level5">
+<p>
+There is no such thing as base timing. The 12* is just the fixed timing used to set the sync between the distributor and the crank. The reason they chose 12* is simply because an engine generally will not run well @ 0* advance. The 12* is not a 'base' timing at all. It's simply a reference point. It never gets 'added' to anything. All the timing figures in the cal are relative to TDC (0*).
+</p>
+<p>
+If the sync is in fact wrong (ie, you set the sync at 14* instead of 12*), then the actual timing will be off by the same amount (2* in this example). But, the ECU will not know about that difference and will not be able to report it to a scan tool.
+</p>
+</div>
+<h3 class="sectionedit19" id="q_what_is_the_advancefromrpmmax_table_for">Q  What is the AdvanceFromRPMMax table for?</h3>
+<div class="level3">
+</div>
+<h5 id="answered12">Answered</h5>
+<div class="level5">
+<p>
+It's the max cutoff point for advance. Any calculated advance over that lookup value will use the lookup value instead. For example, if your combined advance is 60* and the Max is 53*, you will get 53*.
+</p>
+</div>
+<h3 class="sectionedit20" id="q_what_is_the_multiplieronmapadvancewhenretarding_table_used_for">Q  What is the MultiplierOnMAPAdvanceWhenRetarding table used for?</h3>
+<div class="level3">
+</div>
+<h5 id="answered13">Answered</h5>
+<div class="level5">
+<p>
+MultiplierOnMAPAdvanceWhenRetarding basically multiplies the WOT advance from MAP value based on RPM when the WOT advance from MAP is negative. The table is scaled from 0 to 4. This table was used by Chrysler to remove more timing when in boost at higher RPM. Its the primary reason the WOT MAP advance table appears to have more timing than the P/T table in the T1 cals. In most of the T2 cals, this table is set to a multiplier of 1 (no effect).
+</p>
+</div>
+<h2 class="sectionedit21" id="boost_control">Boost Control</h2>
+<div class="level2">
+</div>
+<h3 class="sectionedit22" id="q_-_how_do_you_raise_the_overboost_cutout_point_in_t-sbec_t-smec_and_t-lm">Q - How do you raise the overboost cutout point in T-SBEC, T-SMEC and T-LM?</h3>
+<div class="level3">
+</div>
+<h5 id="answered14">Answered</h5>
+<div class="level5">
+<p>
+Look for the 4 overboost constants (OverboostFuelShutoff*) in the OB, Speed, and Rev Limiter section. Set them all to FF to completely disable overboost by either typing in the value or moving the slider all the way to the right.
+</p>
+</div>
+<h3 class="sectionedit23" id="q_-_i_only_have_full_boost_if_i_go_past_3_4_throttle_till_that_only_have_about_5_psi_why">Q - I only have full boost if I go past 3/4 throttle, till that only have about 5 psi. Why?</h3>
+<div class="level3">
+</div>
+<h5 id="answered15">Answered</h5>
+<div class="level5">
+<p>
+There is a boost target table for throttle position (AllowedBoostPartThrottle). Most likely, it is set for 5psi below 3.8V.
+</p>
+</div>
+<h2 class="sectionedit24" id="general">General</h2>
+<div class="level2">
+</div>
+<h3 class="sectionedit25" id="q_-_what_offset_do_i_use_to_burn_my_chip">Q - What 'offset' do I use to burn my chip?</h3>
+<div class="level3">
+</div>
+<h5 id="answered16">Answered</h5>
+<div class="level5">
+<p>
+The CPU in the SMEC or SBEC can access up to 64k of memory - total. The bottom 32k is mostly reserved for system memory - RAM, and input/ouput ports. The top 32k is used for the program and data storage (the EPROM). But, the entry point for the code is at the END of the memory space (the interrupt vectors). The #1 rule is that the very last byte of your file must match up with the very last byte of the memory space. The hardware ensures that the last byte of the chip itself is always at the end of the CPU's address space.
+</p>
+<p>
+16k .bin + 16k chip = No offset
+32k .bin + 32k chip = No Offset
+16k .bin + 32k chip = Offset of 4000h
+32k .bin + 64k chip = Offset of 8000h
+16k .bin + 64k chip = Offset of C000h
+</p>
+<p>
+27C128 = 16k
+27C256 (or 87C257, or any other chip ending in '256) = 32k
+27C512 (or 27SF512 or any other chip ending in '512) = 64k
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>faq.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

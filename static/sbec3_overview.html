@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>SBEC3 (1996+ Neon / 2G Eclipse-Talon): hardware and firmware overview [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="sbec3_overview" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body">
+<ul class="">
+<li class="level1"><a href="#sbec3_1996_neon_2g_eclipse-talonhardware_and_firmware_overview">SBEC3 (1996+ Neon / 2G Eclipse-Talon): hardware and firmware overview</a>
+<ul class="">
+<li class="level2"><a href="#images_collected_so_far">Images collected so far</a>
+<ul class="">
+<li class="level3"><a href="#images">Images</a></li>
+<li class="level3"><a href="#memory_layout_first_look">Memory layout (first look)</a></li>
+<li class="level3"><a href="#checksum">Checksum</a></li>
+<li class="level3"><a href="#next_steps">Next steps</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#memory_layout_first_look1">Memory layout (first look)</a></li>
+<li class="level2"><a href="#checksum1">Checksum</a></li>
+<li class="level2"><a href="#hardware_set-up_reset_code">Hardware set-up (reset code)</a></li>
+<li class="level2"><a href="#memory_map">Memory map</a></li>
+<li class="level2"><a href="#the_cs2_device_f9000">The CS2 device ($F9000)</a></li>
+<li class="level2"><a href="#interrupts">Interrupts</a></li>
+<li class="level2"><a href="#fast_schedulerthe_pit_interrupt">Fast scheduler: the PIT interrupt</a></li>
+<li class="level2"><a href="#background_schedulerthe_main_loop">Background scheduler: the main loop</a></li>
+<li class="level2"><a href="#two_communication_variants_ccd_or_pci_bus">Two communication variants (CCD or PCI bus)</a></li>
+<li class="level2"><a href="#diagnostics_over_the_sci_line">Diagnostics over the SCI line</a></li>
+<li class="level2"><a href="#unreached_code">Unreached code</a></li>
+</ul></li>
+</ul>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Very Hard" src="_static/lib/plugins/howhard/images/style1/5.png"/></div><div class="howhard_txt">Very Hard</div></div><hr/>
+<h1 class="sectionedit1" id="sbec3_1996_neon_2g_eclipse-talonhardware_and_firmware_overview">SBEC3 (1996+ Neon / 2G Eclipse-Talon): hardware and firmware overview</h1>
+<div class="level1">
+<hr/>
+<p>
+Since 1996 the Neon (and the second-generation Eagle Talon / Mitsubishi Eclipse 420A engine) use a different controller, the <strong>SBEC III</strong>, with a Motorola 68HC16 CPU in place of the FCC's 68HC11. It is a separate reverse-engineering project, a companion to <a class="wikilink1" data-wiki-id="fcc_overview" href="fcc_overview.html" title="fcc_overview">neon-fcc-firmware</a>: <a class="urlextern" href="https://github.com/DDex89/neon-sbec3-firmware" rel="ugc nofollow noopener" target="_blank" title="https://github.com/DDex89/neon-sbec3-firmware">github.com/DDex89/neon-sbec3-firmware</a>. The annotations are made on one reference image and carried over to the other ten by matching routines between programs (see <a class="wikilink1" data-wiki-id="sbec3_tuning" href="sbec3_tuning.html#porting_to_the_other_images" title="sbec3_tuning">porting</a>); where a routine or table has not been matched yet it keeps a numeric placeholder name. This page, <a class="wikilink1" data-wiki-id="sbec3_calibration" href="sbec3_calibration.html" title="sbec3_calibration">calibration</a>, <a class="wikilink1" data-wiki-id="sbec3_tuning" href="sbec3_tuning.html" title="sbec3_tuning">tuning notes</a> and <a class="wikilink1" data-wiki-id="sbec3_reflash" href="sbec3_reflash.html" title="sbec3_reflash">reflashing</a> cover it the same way the FCC pages cover the 1995 controller.
+</p>
+</div>
+<h2 class="sectionedit2" id="images_collected_so_far">Images collected so far</h2>
+<div class="level2">
+<p>
+First look at the images collected so far: what each file is, how the flash is laid out, the
+checksum, and which images share code. Everything here can be reproduced with
+<code>python3 tools/survey.py roms/*.bin</code>. Tags: <strong>[code]</strong> read from the images, <strong>[source]</strong> from a
+named outside source, <strong>[inferred]</strong> a conclusion that still needs confirming.
+</p>
+<p>
+First look at the images collected so far: what each file is, how the flash is laid out, the
+checksum, and which images share code. Everything here can be reproduced with
+<code>python3 tools/survey.py roms/*.bin</code>. Tags: <strong>[code]</strong> read from the images, <strong>[source]</strong> from a
+named outside source, <strong>[inferred]</strong> a conclusion that still needs confirming.
+</p>
+</div>
+<h3 class="sectionedit3" id="images">Images</h3>
+<div class="level3">
+<div class="table sectionedit4"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> File </th><th class="col1"> Flash </th><th class="col2"> RAM (stack top) </th><th class="col3"> Header </th><th class="col4"> Reset entry </th><th class="col5"> Family </th><th class="col6"> Build stamp </th><th class="col7"> Vehicle </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>04887050</code> </td><td class="col1"> 128 KB </td><td class="col2"> 2 KB ($F87FE) </td><td class="col3"> $03DDD </td><td class="col4"> $0C760 </td><td class="col5"> A </td><td class="col6 leftalign"> </td><td class="col7"> unknown; copyright 1995, so 1996 model year [inferred] </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>04887051</code> </td><td class="col1"> 128 KB </td><td class="col2"> 2 KB </td><td class="col3"> $03DDD </td><td class="col4"> $0C760 </td><td class="col5"> A </td><td class="col6 leftalign"> </td><td class="col7"> unknown, as above </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>05293013AC</code> </td><td class="col1"> 128 KB </td><td class="col2"> 2 KB </td><td class="col3"> $03E08 </td><td class="col4"> $0C860 </td><td class="col5"> B </td><td class="col6"> 960716 </td><td class="col7"> 1997 Eagle Talon, manual [source: 2GNT forum] </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>05293014AC</code> </td><td class="col1"> 128 KB </td><td class="col2"> 2 KB </td><td class="col3"> $03E08 </td><td class="col4"> $0C860 </td><td class="col5"> B </td><td class="col6"> 961211 </td><td class="col7"> 1997 Mitsubishi Eclipse (VIN 4A3AK44Y0VE097567 in the SBECBootLoader README) [source] </td>
+</tr>
+<tr class="row5">
+<td class="col0"> <code>05007038</code> </td><td class="col1"> 128 KB </td><td class="col2"> 2 KB </td><td class="col3"> $00302 </td><td class="col4"> $06A00 </td><td class="col5"> C </td><td class="col6 leftalign"> </td><td class="col7"> unknown; probably a Mopar Performance calibration [inferred] </td>
+</tr>
+<tr class="row6">
+<td class="col0"> <code>05293148AA</code> </td><td class="col1"> 128 KB </td><td class="col2"> 2 KB </td><td class="col3"> $00302 </td><td class="col4"> $06A00 </td><td class="col5"> C </td><td class="col6 leftalign"> </td><td class="col7"> unknown; probably the factory counterpart of 05007038 [inferred] </td>
+</tr>
+<tr class="row7">
+<td class="col0"> <code>05269833AH</code> </td><td class="col1"> 256 KB </td><td class="col2"> 4 KB ($F8FFE) </td><td class="col3"> $00302 </td><td class="col4"> $0D132 </td><td class="col5"> D </td><td class="col6"> 970804 </td><td class="col7"> unknown; probably Neon [inferred] </td>
+</tr>
+<tr class="row8">
+<td class="col0"> <code>05269833AI</code> </td><td class="col1"> 256 KB </td><td class="col2"> 4 KB </td><td class="col3"> $00302 </td><td class="col4"> $0D08C </td><td class="col5"> E </td><td class="col6 leftalign"> </td><td class="col7"> unknown; probably Neon [inferred] </td>
+</tr>
+<tr class="row9">
+<td class="col0"> <code>05269834AJ</code> </td><td class="col1"> 256 KB </td><td class="col2"> 4 KB </td><td class="col3"> $00302 </td><td class="col4"> $0D08C </td><td class="col5"> E </td><td class="col6 leftalign"> </td><td class="col7"> unknown; probably Neon [inferred] </td>
+</tr>
+<tr class="row10">
+<td class="col0"> <code>05293190AC</code> </td><td class="col1"> 256 KB </td><td class="col2"> 4 KB </td><td class="col3"> $00302 </td><td class="col4"> $0D08C </td><td class="col5"> F </td><td class="col6"> 980929 </td><td class="col7"> 1999 Mitsubishi Eclipse, manual [source: 2GNT forum and calibration page] </td>
+</tr>
+<tr class="row11">
+<td class="col0"> <code>05032017AA</code> </td><td class="col1"> 256 KB </td><td class="col2"> 4 KB </td><td class="col3"> $00302 </td><td class="col4"> $0D08C </td><td class="col5"> G </td><td class="col6 leftalign"> </td><td class="col7"> unknown; copyright 1998 </td>
+</tr>
+</table></div>
+<ul>
+<li class="level1"><div class="li"> <strong>Families.</strong> Images with an identical exception vector table ($00000-$001FF) are put in one</div>
+</li>
+</ul>
+<p>
+family; inside a family the vector tables, and so most likely the code, are the same. Families E,
+F and G share the reset entry and the padded block layout, so they are probably revisions of one
+program. How far the families differ will be measured once the disassembler exists (stage 2). [code]
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Two generations of hardware.</strong> 128 KB flash with 2 KB RAM (stack top $F87FE) and 256 KB flash</div>
+</li>
+</ul>
+<p>
+with 4 KB RAM ($F8FFE). That matches the 68HC16Z2 (2 KB) and 68HC16Z3 (4 KB) named on the 2GNT
+forum. The build stamps of the 128 KB images are from 1996 and those of the 256 KB images from 1997
+and 1998. [code] [source]
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Build stamp.</strong> Four images contain a 12-digit string whose last six digits read as a date</div>
+</li>
+</ul>
+<p>
+(960716 = 16 July 1996 and so on). [inferred]
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Vehicle hints.</strong> Part numbers 05269xxx are in the block of the 1995 Neon revisions (5269646,</div>
+</li>
+</ul>
+<p>
+5269709, 5269712, 5269718, 5269738), and 5007xxx in the Mopar Performance block (P5007033 and
+P5007034 are the Mopar 1995 Neon calibrations). 05007038 also has $98 where the other headers
+have the first revision letter. These are hints only. [inferred]
+</p>
+</div>
+<h4 id="notes_on_the_files_received">Notes on the files received</h4>
+<div class="level4">
+<ul>
+<li class="level1"><div class="li"> <code>05293013AC</code> and <code>05293063AC</code> arrived as 256 KB files that hold the same 128 KB image twice</div>
+</li>
+</ul>
+<p>
+(read from a 128 KB chip as if it were 256 KB). Only the first half is used.
+</p>
+<ul>
+<li class="level1"><div class="li"> The file named <code>05293063AC</code> carries part number <strong>05293148AA</strong> in its header, so it is listed</div>
+</li>
+</ul>
+<p>
+under that number.
+</p>
+<ul>
+<li class="level1"><div class="li"> The files named <code>05269834AI</code> and <code>05269834aj</code> are identical and their header says <strong>AJ</strong>.</div>
+</li>
+<li class="level1"><div class="li"> <code>05293190AC_99_eclipse</code> and <code>05293013AC_97_taloon</code> were duplicates of <code>05293190AC</code> and</div>
+</li>
+</ul>
+<p>
+<code>05293013AC</code>.
+</p>
+</div>
+<h3 class="sectionedit5" id="memory_layout_first_look">Memory layout (first look)</h3>
+<div class="level3">
+<div class="table sectionedit6"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Range </th><th class="col1"> Content </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> $00000-$00007 </td><td class="col1"> CPU16 reset vector: word 0 holds ZK, SK and PK ($0FF0: ZK = 0, SK = F, PK = 0), then the initial PC, SP and IZ. The PC is the reset entry above; SP is $87FE or $8FFE in bank F, so RAM sits at $F8000 [code] </td>
+</tr>
+<tr class="row2">
+<td class="col0"> $00008-$001FF </td><td class="col1"> Exception vectors, 16-bit addresses in bank 0. About 27 distinct targets; all unused vectors point to the reset entry [code] </td>
+</tr>
+<tr class="row3">
+<td class="col0"> $00200-$00203 </td><td class="col1"> $0000 and the address of the header block [code] </td>
+</tr>
+<tr class="row4">
+<td class="col0"> $00204-$002FF </td><td class="col1"> $FF filler (in families B, D and F only up to $00283 or $0028F, followed by data) [code] </td>
+</tr>
+<tr class="row5">
+<td class="col0"> Header block </td><td class="col1"> Part number (4 bytes BCD), revision (2 <abbr title="American Standard Code for Information Interchange">ASCII</abbr> letters), one byte ($A0 or $B0), six spaces, checksum correction byte (+13), then further bytes. Family A uses a different form: part number, $0A, part number again, $0A, one byte [code] </td>
+</tr>
+<tr class="row6">
+<td class="col0"> Calibration </td><td class="col1"> Families A and B: header at the <strong>end</strong> of the calibration ($03DDD / $03E08), $FF up to $03FFF, code from about $04000. Families C-G: header at the <strong>start</strong>, $00302. In the 256 KB images the data ends around $04A1A-$04AE4 ($05839 in 05032017AA), followed by $FF up to $06FFF [code] </td>
+</tr>
+<tr class="row7">
+<td class="col0"> Code </td><td class="col1"> 256 KB images: modules padded to 2 KB or 4 KB boundaries up to $3FFDB. Family C is packed without padding [code] </td>
+</tr>
+<tr class="row8">
+<td class="col0"> End </td><td class="col1"> “COPYRIGHT 199x CHRYSLER CORPORATION” just before the end ($1FFDC or $3FFDC). Family C has no copyright string [code] </td>
+</tr>
+</table></div>
+<p>
+Peripheral registers: the SBECBootLoader kernels reach the serial interface as <code>$7C0C,Z</code> with Z
+set to $F8000, that is $FFC0C, the SCI status register of the 68HC16Z queued serial module
+(registers at $FFxxx). [source: SBECBootLoader]
+</p>
+<p>
+In bootstrap mode (voltage on SCI RX at power-on) RAM is mapped at $00000 and an 8 KB mask ROM
+appears at $E0000; the flash is then reached at $40000 by the reflash kernels. [source: 2GNT forum,
+SBECBootLoader]
+</p>
+</div>
+<h3 class="sectionedit7" id="checksum">Checksum</h3>
+<div class="level3">
+<p>
+The 8-bit sum of every byte of the image equals the last byte of the part number (header + 3);
+header + 13 is the correction byte that is adjusted to make it so. This is the scheme of
+<code>checksum.py</code> in SBECBootLoader, and it holds for all eleven images. It is the same idea as in the
+1995 FCC firmware, where the sum must equal the last byte of the part number at $B805. [code]
+</p>
+<p>
+In the code the check is <code>ChecksumCheck</code> ($2191E), called from <code>CheckPowerDown</code> (the power-down path)
+once input bit $1000.3 has read set 32 times in a row, not at start-up. <code>SumBanks</code> ($2195E) adds the bytes of two banks at a time
+(0 and 1, then 2 and 3) in 16 KB steps; the result is compared with <code>ChecksumTarget</code> ($0305 in
+05293190AC) and a mismatch reports P0601. It is a plain 8-bit sum, not a CRC. TunerPro does not
+correct it; run <code>tools/fixsum.py –fix</code> on an edited image. [code]
+</p>
+<p>
+In family A, header + 13 is $FF; the byte after the repeated part number ($D3 / $06) is probably the
+correction byte there. [inferred]
+</p>
+</div>
+<h3 class="sectionedit8" id="next_steps">Next steps</h3>
+<div class="level3">
+<p>
+Stage 2 is done, see <a class="urlextern" href="https://github.com/DDex89/neon-sbec3-firmware/blob/main/docs/en/tools.md" rel="ugc nofollow noopener" target="_blank" title="https://github.com/DDex89/neon-sbec3-firmware/blob/main/docs/en/tools.md">tools.md</a>: disassembler, assembler and source generator, with all
+eleven images rebuilt byte for byte. It also confirmed that Z points at RAM ($F8000) and that
+extended addresses read the calibration in bank 0. The reference image is <strong>05293190AC</strong>, because
+outside reference addresses exist for it. The project owner's 1996 Neon controller is expected to be
+a 128 KB, 2 KB RAM unit; its family will be reached by porting the annotations.
+</p>
+</div>
+<h2 class="sectionedit9" id="memory_layout_first_look1">Memory layout (first look)</h2>
+<div class="level2">
+<div class="table sectionedit10"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Range </th><th class="col1"> Content </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> $00000-$00007 </td><td class="col1"> CPU16 reset vector: word 0 holds ZK, SK and PK ($0FF0: ZK = 0, SK = F, PK = 0), then the initial PC, SP and IZ. The PC is the reset entry above; SP is $87FE or $8FFE in bank F, so RAM sits at $F8000 [code] </td>
+</tr>
+<tr class="row2">
+<td class="col0"> $00008-$001FF </td><td class="col1"> Exception vectors, 16-bit addresses in bank 0. About 27 distinct targets; all unused vectors point to the reset entry [code] </td>
+</tr>
+<tr class="row3">
+<td class="col0"> $00200-$00203 </td><td class="col1"> $0000 and the address of the header block [code] </td>
+</tr>
+<tr class="row4">
+<td class="col0"> $00204-$002FF </td><td class="col1"> $FF filler (in families B, D and F only up to $00283 or $0028F, followed by data) [code] </td>
+</tr>
+<tr class="row5">
+<td class="col0"> Header block </td><td class="col1"> Part number (4 bytes BCD), revision (2 <abbr title="American Standard Code for Information Interchange">ASCII</abbr> letters), one byte ($A0 or $B0), six spaces, checksum correction byte (+13), then further bytes. Family A uses a different form: part number, $0A, part number again, $0A, one byte [code] </td>
+</tr>
+<tr class="row6">
+<td class="col0"> Calibration </td><td class="col1"> Families A and B: header at the <strong>end</strong> of the calibration ($03DDD / $03E08), $FF up to $03FFF, code from about $04000. Families C-G: header at the <strong>start</strong>, $00302. In the 256 KB images the data ends around $04A1A-$04AE4 ($05839 in 05032017AA), followed by $FF up to $06FFF [code] </td>
+</tr>
+<tr class="row7">
+<td class="col0"> Code </td><td class="col1"> 256 KB images: modules padded to 2 KB or 4 KB boundaries up to $3FFDB. Family C is packed without padding [code] </td>
+</tr>
+<tr class="row8">
+<td class="col0"> End </td><td class="col1"> “COPYRIGHT 199x CHRYSLER CORPORATION” just before the end ($1FFDC or $3FFDC). Family C has no copyright string [code] </td>
+</tr>
+</table></div>
+<p>
+Peripheral registers: the SBECBootLoader kernels reach the serial interface as <code>$7C0C,Z</code> with Z
+set to $F8000, that is $FFC0C, the SCI status register of the 68HC16Z queued serial module
+(registers at $FFxxx). [source: SBECBootLoader]
+</p>
+<p>
+In bootstrap mode (voltage on SCI RX at power-on) RAM is mapped at $00000 and an 8 KB mask ROM
+appears at $E0000; the flash is then reached at $40000 by the reflash kernels. [source: 2GNT forum,
+SBECBootLoader]
+</p>
+</div>
+<h2 class="sectionedit11" id="checksum1">Checksum</h2>
+<div class="level2">
+<p>
+The 8-bit sum of every byte of the image equals the last byte of the part number (header + 3);
+header + 13 is the correction byte that is adjusted to make it so. This is the scheme of
+<code>checksum.py</code> in SBECBootLoader, and it holds for all eleven images. It is the same idea as in the
+1995 FCC firmware, where the sum must equal the last byte of the part number at $B805. [code]
+</p>
+<p>
+In the code the check is <code>ChecksumCheck</code> ($2191E), called from <code>CheckPowerDown</code> (the power-down path)
+once input bit $1000.3 has read set 32 times in a row, not at start-up. <code>SumBanks</code> ($2195E) adds the bytes of two banks at a time
+(0 and 1, then 2 and 3) in 16 KB steps; the result is compared with <code>ChecksumTarget</code> ($0305 in
+05293190AC) and a mismatch reports P0601. It is a plain 8-bit sum, not a CRC. TunerPro does not
+correct it; run <code>tools/fixsum.py –fix</code> on an edited image. [code]
+</p>
+<p>
+In family A, header + 13 is $FF; the byte after the repeated part number ($D3 / $06) is probably the
+correction byte there. [inferred]
+</p>
+</div>
+<h2 class="sectionedit12" id="hardware_set-up_reset_code">Hardware set-up (reset code)</h2>
+<div class="level2">
+<p>
+<code>Reset</code> ($0D08C) configures the controller before anything else runs:
+</p>
+<div class="table sectionedit13"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Item </th><th class="col1"> Setting </th><th class="col2"> Result </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> Stack, Z, extension registers </td><td class="col1"> SK = ZK = $F, SP = $8FFE, IZ = $8000, EK = 0 </td><td class="col2"> Z = $F8000 (RAM start); extended addresses read bank 0 (calibration) </td>
+</tr>
+<tr class="row2">
+<td class="col0"> Clock </td><td class="col1"> SYNCR = $7F80 </td><td class="col2"> 16.78 <abbr title="Megahertz">MHz</abbr> from the 32.768 kHz reference </td>
+</tr>
+<tr class="row3">
+<td class="col0"> Internal SRAM </td><td class="col1"> RAMBAH/RAMBAL = $FF8000 </td><td class="col2"> 4 KB at $F8000-$F8FFF </td>
+</tr>
+<tr class="row4">
+<td class="col0"> Periodic interrupt </td><td class="col1"> PITR = 7, PICR = $0338 </td><td class="col2"> every 7 x 4 / 32768 s = 0.854 ms, level 3, vector $38 </td>
+</tr>
+<tr class="row5">
+<td class="col0"> Software watchdog </td><td class="col1"> SYPCR = $94 </td><td class="col2"> serviced by <code>KickWatchdogs</code> </td>
+</tr>
+<tr class="row6">
+<td class="col0"> Chip selects </td><td class="col1"> CSBOOT, CS0: base 0, 256 KB; CS2: base $F9000, 2 KB </td><td class="col2"> flash; one external device at $F9000-$F97FF </td>
+</tr>
+<tr class="row7">
+<td class="col0"> GPT </td><td class="col1"> ICR = $B340 </td><td class="col2"> level 3, vectors $40-$4B; the pulse accumulator input is the adjusted channel </td>
+</tr>
+<tr class="row8">
+<td class="col0"> SCI / QSPI </td><td class="col1"> QILR = $1B, QIVR = $FE </td><td class="col2"> SCI vector $FE, QSPI vector $FF </td>
+</tr>
+</table></div>
+<p>
+The external device on CS2 is reached as <code>$1000,Z</code>-<code>$17FF,Z</code>; the code uses 61 different
+addresses there. It is a timer, output driver and bus interface chip, described below.
+</p>
+<p>
+Reset also counts the reset causes: the bits of the SIM reset status register RSR are added as
+4-bit counters into <code>ResetCountsExtSw</code> ($08,Z: external reset, software watchdog) and
+<code>ResetCountsHltPow</code> ($09,Z: halt monitor, power-on). <code>ResetCheckWord</code> ($06,Z) is rewritten by every
+main-loop pass and checked at reset to tell a warm restart from a cold start.
+</p>
+</div>
+<h2 class="sectionedit14" id="memory_map">Memory map</h2>
+<div class="level2">
+<div class="table sectionedit15"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Address </th><th class="col1"> Content </th><th class="col2"> Reached as </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> $00000-$001FF </td><td class="col1"> exception vectors </td><td class="col2 leftalign"> </td>
+</tr>
+<tr class="row2">
+<td class="col0"> $00200-$0FFFF </td><td class="col1"> header, calibration, then code </td><td class="col2"> <code>$xxxx</code> (EXT, EK = 0) for calibration </td>
+</tr>
+<tr class="row3">
+<td class="col0"> $10000-$3FFFF </td><td class="col1"> code and tables </td><td class="col2"> <code>JSR $xxxxx</code>, indexed with XK/YK </td>
+</tr>
+<tr class="row4">
+<td class="col0"> $F8000-$F8FFF </td><td class="col1"> RAM (4 KB) </td><td class="col2"> <code>$xxxx,Z</code> </td>
+</tr>
+<tr class="row5">
+<td class="col0"> $F9000-$F97FF </td><td class="col1"> external device (CS2) </td><td class="col2"> <code>$1xxx,Z</code> </td>
+</tr>
+<tr class="row6">
+<td class="col0"> $FF700-$FFDFF </td><td class="col1"> module registers (ADC, MRM, GPT, SIM, SRAM, QSM) </td><td class="col2"> <code>$7xxx,Z</code>, named in <code>00_equates.asm</code> </td>
+</tr>
+</table></div>
+<p>
+Single bits of RAM flag bytes are described in <code>annotations/bits.json</code>. The generator writes the
+meaning after every <code>BSET</code>/<code>BCLR</code>/<code>BRSET</code>/<code>BRCLR</code> on such a bit and under the byte in
+<code>00_equates.asm</code>. The bits of <code>FaultSet00-1B</code> and <code>FaultMem00-1B</code> come from the fault table itself:
+each row gives its byte, its bit and its P-code.
+</p>
+<p>
+Configuration bits of the calibration live around $0328-$0338 and are tested with <code>BRSET</code>/<code>BRCLR</code>
+on extended addresses, for example <code>BRSET $032E,#$04,…</code> (see below). The meaning of each used bit
+is in <code>annotations/bits.json</code> as well; the source and the XDF flags show it.
+</p>
+</div>
+<h2 class="sectionedit16" id="the_cs2_device_f9000">The CS2 device ($F9000)</h2>
+<div class="level2">
+<p>
+The SIM chip selects are set in the reset code: CSBOOT and CS0 cover the 256 KB program flash (CSBOOT
+reads, CS0 only writes, for programming), CS1 and CS3-CS10 are off, and CS2 opens a 2 KB window at
+$F9000 with 16-bit data, read and write, one wait state. The program reaches it as <code>$1xxx,Z</code>. It is
+a peripheral chip, not memory: only offsets $000-$084 are used, and what the code does with them
+makes it a combined timer, output driver and bus interface. The register names in <code>ram.json</code> start
+with <code>Io</code>; their bits are in <code>bits.json</code>.
+</p>
+<div class="table sectionedit17"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Offset </th><th class="col1"> Name </th><th class="col2"> Use </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> $000-$001 </td><td class="col1"> <code>IoInputs0</code>, <code>IoInputs1</code> </td><td class="col2"> discrete inputs: key off (bit 3, probably), ASD output present (bit 2, probably), leak detection pump switch, speed control switch; the switch map is collected from this word; feedback bits of some drivers </td>
+</tr>
+<tr class="row2">
+<td class="col0"> $002-$003 </td><td class="col1"> <code>IoStatus2</code>, <code>IoStatus3</code> </td><td class="col2"> driver and knock status bits </td>
+</tr>
+<tr class="row3">
+<td class="col0"> $006-$010 </td><td class="col1"> <code>IoTimer06</code> … <code>IoIrqStatus</code> </td><td class="col2"> timers and the interrupt registers: <code>IoIrqEnable</code> ($00C) and <code>IoIrqStatus</code> ($00E, cleared by writing ones) </td>
+</tr>
+<tr class="row4">
+<td class="col0"> $016, $01A </td><td class="col1"> <code>IoBusData</code>, <code>IoBusStatus</code> </td><td class="col2"> received bus byte and its error bits ($000E), read by the IRQ4 and IRQ2 bus handlers </td>
+</tr>
+<tr class="row5">
+<td class="col0"> $012-$020 </td><td class="col1"> <code>IoCtl12</code>, <code>IoCfg14</code> … <code>IoCfg20</code> </td><td class="col2"> control and set-up words written at reset and checked by <code>HardwareCheck</code> </td>
+</tr>
+<tr class="row6">
+<td class="col0"> $024-$038 </td><td class="col1"> <code>IoOcChan0-5</code> </td><td class="col2"> six output channels, set by <code>OcOutputsReset</code> and fired by the output test </td>
+</tr>
+<tr class="row7">
+<td class="col0"> $03E-$050 </td><td class="col1"> <code>IoPwmC18A/B</code>, <code>IoFanPwmA/B</code>, <code>IoPurgePwmA/B</code> </td><td class="col2"> PWM period and duty pairs (output C18, radiator fan, purge) </td>
+</tr>
+<tr class="row8">
+<td class="col0"> $056-$060 </td><td class="col1"> <code>IoInjector0-5</code> </td><td class="col2"> six injector timers written by <code>FuelEventCalc</code> and <code>InjectorSequence</code> </td>
+</tr>
+<tr class="row9">
+<td class="col0"> $062-$06E </td><td class="col1"> <code>IoDriver62</code> … <code>IoDriver6E</code> </td><td class="col2"> one word per low-side output: bit 13 output on, bits 15-14 driver status (LDP solenoid, lamp/C18, tuning valve, fan, purge, generator field) </td>
+</tr>
+<tr class="row10">
+<td class="col0"> $070-$07A </td><td class="col1"> <code>IoEvent70</code> … <code>IoEvent7A</code> </td><td class="col2"> six words cleared by <code>EventCorrections</code> </td>
+</tr>
+<tr class="row11">
+<td class="col0"> $07E-$084 </td><td class="col1"> <code>IoPwmC18Read</code>, <code>IoFanPwmRead</code>, <code>IoKnockRead</code> </td><td class="col2"> read-back of the PWM outputs and of the knock set-up </td>
+</tr>
+</table></div>
+<p>
+IRQ2 comes from this chip. <code>Isr_IRQ2</code> reads <code>IoIrqStatus</code>: a bus event (bit 3 of the low byte)
+goes to <code>Irq2Dispatch</code> and the CCD/PCI handler, a timer event (bit 1 of the high byte) is counted in
+<code>Irq2Counter</code> for the misfire segment times, anything else clears all flags. IRQ4 runs
+<code>Irq4BusHandler</code>, which reads the received byte and its status from <code>IoBusData</code>/<code>IoBusStatus</code> and
+compares it with the byte just sent (bus arbitration). So the CCD (or PCI) interface is part of this
+chip too.
+</p>
+</div>
+<h2 class="sectionedit18" id="interrupts">Interrupts</h2>
+<div class="level2">
+<div class="table sectionedit19"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Vector </th><th class="col1"> Handler </th><th class="col2"> Function </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> $38 </td><td class="col1"> <code>Isr_PIT</code> ($08344) </td><td class="col2"> 0.854 ms time base, fast scheduler (below) </td>
+</tr>
+<tr class="row2">
+<td class="col0"> $40 </td><td class="col1"> <code>Isr_GPT_PAI</code> ($0AAEA) </td><td class="col2"> pulse accumulator input: camshaft signal; the first edge sets <code>CrankSyncFlags</code> = $84 (synchronised) and <code>DriveFlags</code> bit 2 </td>
+</tr>
+<tr class="row3">
+<td class="col0"> $41 </td><td class="col1"> <code>Isr_GPT_IC1</code> ($0A02E) </td><td class="col2"> input capture 1: crankshaft reference signal (<code>RefPeriod</code>, <code>EngineRpm</code>, fuel and spark events) </td>
+</tr>
+<tr class="row4">
+<td class="col0"> $42 </td><td class="col1"> <code>Isr_GPT_IC2</code> ($0ACD2) </td><td class="col2"> input capture 2: starts a period measurement and enables IC1; IC1 rejects a pulse shorter than $10 counts after TIC2, so IC2 probably sees the other edge of the crank signal </td>
+</tr>
+<tr class="row5">
+<td class="col0"> $43 </td><td class="col1"> <code>Isr_GPT_IC3</code> ($080CA) </td><td class="col2"> input capture 3: vehicle speed sensor pulses (<code>DistancePulses</code>) </td>
+</tr>
+<tr class="row6">
+<td class="col0"> $45, $46, $47 </td><td class="col1"> <code>Isr_GPT_OC2/3/4</code> </td><td class="col2"> three ignition coil channels (<code>SparkOutputOc2</code>; driver status bits 1-3 of <code>IoCfg1FL</code>); the injectors run on the timers of the CS2 chip </td>
+</tr>
+<tr class="row7">
+<td class="col0"> $48 </td><td class="col1"> <code>Isr_GPT_IC4OC5</code> ($08A90) </td><td class="col2"> input capture 4: second timing input for per-event spark, only with calibration bit $0337.7; uses the table at $08A6C </td>
+</tr>
+<tr class="row8">
+<td class="col0"> $49 </td><td class="col1"> <code>Isr_GPT_Overflow</code> ($0ACF0) </td><td class="col2"> counts timer overflows in <code>Ic2OverflowCount</code> (saturating) </td>
+</tr>
+<tr class="row9">
+<td class="col0"> $12 </td><td class="col1"> <code>Isr_IRQ2</code> ($089BE) </td><td class="col2"> external interrupt from the CS2 device </td>
+</tr>
+<tr class="row10">
+<td class="col0"> $14 </td><td class="col1"> <code>Isr_IRQ4</code> ($08A18) </td><td class="col2"> external interrupt, calls <code>Irq4BusHandler</code> </td>
+</tr>
+<tr class="row11">
+<td class="col0"> $FE </td><td class="col1"> <code>Isr_SCI</code> ($08A22) </td><td class="col2"> serial line: diagnostics and reflash (<code>SciInterrupt</code>) </td>
+</tr>
+<tr class="row12">
+<td class="col0"> $FF </td><td class="col1"> <code>Isr_QSPI</code> ($08A3E) </td><td class="col2"> serial peripheral interface, calls <code>QspiService</code> </td>
+</tr>
+<tr class="row13">
+<td class="col0"> $11, $13, $15-$17, $44, $4A </td><td class="col1"> <code>UnexpectedInterrupt</code> </td><td class="col2"> should never occur (below) </td>
+</tr>
+<tr class="row14">
+<td class="col0"> all others </td><td class="col1"> <code>Reset</code> </td><td class="col2 leftalign"> </td>
+</tr>
+</table></div>
+<p>
+The handlers of the interrupts that should not occur (IRQ1, IRQ3, IRQ5-IRQ7, OC1, pulse
+accumulator overflow) disable their own source and jump to <code>UnexpectedInterrupt</code>, which sets a bit
+per source in <code>UnexpectedIrqFlags</code> ($00,Z) and saves two words of the interrupted stack frame at
+<code>UnexpectedIrqStack4</code> ($02,Z) and <code>UnexpectedIrqStack6</code> ($04,Z). That is a record for diagnosis, not a recovery.
+</p>
+</div>
+<h2 class="sectionedit20" id="fast_schedulerthe_pit_interrupt">Fast scheduler: the PIT interrupt</h2>
+<div class="level2">
+<p>
+<code>Isr_PIT</code> runs every 0.854 ms. Unless <code>O2HeaterSample</code> ($0550,Z) is set it increments <code>PitTickCounter</code> and
+<code>LoopTickCounter</code> and then picks work by the low bits of <code>PitTickCounter</code>:
+</p>
+<div class="table sectionedit21"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Ticks </th><th class="col1"> Period </th><th class="col2"> Work </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> odd </td><td class="col1"> 1.71 ms </td><td class="col2"> <code>HighRpmTimerPit</code>, <code>SciPitService</code>; <code>MtvTiming</code> and <code>TuneValve2Control</code> if calibration bits $0335.5 / $0335.7 are set </td>
+</tr>
+<tr class="row2">
+<td class="col0"> 2 mod 4 </td><td class="col1"> 3.42 ms </td><td class="col2"> starts an ADC conversion sequence (ADCTL1 = $24), then <code>ChargeControl2</code> or <code>ChargeControl</code> (calibration bit $0338.1) </td>
+</tr>
+<tr class="row3">
+<td class="col0"> 4 mod 8 </td><td class="col1"> 6.84 ms </td><td class="col2"> <code>IacStepperDrive</code> </td>
+</tr>
+<tr class="row4">
+<td class="col0"> 0 mod 8 </td><td class="col1"> 6.84 ms </td><td class="col2"> nothing </td>
+</tr>
+</table></div>
+<p>
+After that, on every tick: <code>FanPwmOutputCheck</code> if calibration bit $0334.4 is set, a counter for <code>FieldPwmCounter</code> ($0DC0,Z), and
+every 24 ticks (20.5 ms) <code>CcdTransmit</code> or <code>PciPitTick</code>, chosen by calibration bit $032E.2.
+</p>
+</div>
+<h2 class="sectionedit22" id="background_schedulerthe_main_loop">Background scheduler: the main loop</h2>
+<div class="level2">
+<p>
+<code>MainLoop</code> ($0DC36) makes one pass every 14 PIT ticks, about 12.0 ms:
+</p>
+<ol>
+<li class="level1"><div class="li"> 33 routines on every pass, starting with <code>KickWatchdogs</code> and <code>MainLoopCounters</code>.</div>
+</li>
+<li class="level1"><div class="li"> One group of routines chosen by the lowest set bit of <code>MainLoopCounter</code>, the same scheme as in</div>
+</li>
+</ol>
+<p>
+the FCC:
+</p>
+<div class="table sectionedit23"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Lowest set bit </th><th class="col1"> Period </th><th class="col2"> Routines </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> 0 </td><td class="col1"> 2 passes, 24 ms </td><td class="col2"> 9 (<code>SkimEepromSave</code> … <code>PwmC18CircuitCheck</code>) </td>
+</tr>
+<tr class="row2">
+<td class="col0"> 1 </td><td class="col1"> 4 passes, 48 ms </td><td class="col2"> 3 (<code>ChargeDeficitCalc</code>, <code>BatteryVoltsUpdate</code>, <code>AsdRelayCheck</code>) </td>
+</tr>
+<tr class="row3">
+<td class="col0"> 2 </td><td class="col1"> 8 passes, 96 ms </td><td class="col2"> 13 (<code>SecurityState</code> … <code>LimitReasonCode</code>) </td>
+</tr>
+<tr class="row4">
+<td class="col0"> 3 </td><td class="col1"> 16 passes, 191 ms </td><td class="col2"> 5 (<code>PciLinkCheck</code> … <code>WotLeanMonitor</code>) </td>
+</tr>
+<tr class="row5">
+<td class="col0"> 4 </td><td class="col1"> 32 passes, 383 ms </td><td class="col2"> 5 (<code>KnockLearnDecayStep</code> … <code>BusTempFlag</code>) </td>
+</tr>
+<tr class="row6">
+<td class="col0"> 5 </td><td class="col1"> 64 passes, 766 ms </td><td class="col2"> 2 (<code>FlexFaultReport</code>, <code>FuelSenderMonitor</code>) </td>
+</tr>
+<tr class="row7">
+<td class="col0"> 6 </td><td class="col1"> 128 passes, 1.5 s </td><td class="col2"> none </td>
+</tr>
+<tr class="row8">
+<td class="col0"> 7 </td><td class="col1"> 256 passes, 3.1 s </td><td class="col2"> 6 (<code>SriMileageStore</code> … <code>BusStatusByte</code>) </td>
+</tr>
+</table></div>
+<ol>
+<li class="level1"><div class="li"> About 60 more routines on every pass; one of them is chosen by calibration bit $032E.2</div>
+</li>
+</ol>
+<p>
+(<code>CcdReceive</code>, or <code>PciReceive</code> and <code>QspiCheck</code>).
+</p>
+<ol>
+<li class="level1"><div class="li"> <code>CheckPowerDown</code>, then wait until <code>LoopTickCounter</code> reaches 14, calling <code>MeasureLoopTime</code></div>
+</li>
+</ol>
+<p>
+meanwhile; clear the counter and start again.
+</p>
+<p>
+<code>MainLoopCounters</code> also keeps slower time bases: <code>Count3s</code> (every 256 passes) and <code>Count191ms</code>
+(every 16 passes), both saturating at $FF, and <code>MainLoopPhaseMask</code> ($0C3B,Z). Bit n of
+<code>MainLoopPhaseMask</code> is set once every 2^(n+1) passes; 127 instructions test it with
+<code>BRCLR MainLoopPhaseMask,Z,#mask,…</code> to run part of a routine at a lower rate.
+</p>
+</div>
+<h2 class="sectionedit24" id="two_communication_variants_ccd_or_pci_bus">Two communication variants (CCD or PCI bus)</h2>
+<div class="level2">
+<p>
+Calibration bit $032E.2 is tested in 30 places. In several of them it selects between two sets of
+routines: in the main loop (see above), in the PIT interrupt (<code>CcdTransmit</code> / <code>PciPitTick</code>), in
+<code>Isr_IRQ2</code> (<code>Irq2BusHandler</code> / <code>PciIrq2Start</code>) and in the reset code. Reading the receive side confirms two
+vehicle-bus interfaces:
+</p>
+<ul>
+<li class="level1"><div class="li"> <code>CcdReceive</code> takes one-byte message IDs with up to two data bytes from two receive buffers</div>
+</li>
+</ul>
+<p>
+($89A2, $89A8). <code>CcdTransmit</code> sends a fixed rotation of messages built by small routines; each
+message is an ID, two data bytes and a checksum byte (the sum of the other three). The message
+set includes MAP, throttle with the speed control set or resume speed, coolant and battery
+temperature, battery and target voltage, engine rpm with the idle target, baro and air temperature, fuel used and
+distance pulses, and the VIN one character at a time (<code>Vin01</code>-<code>Vin17</code>).
+</p>
+<ul>
+<li class="level1"><div class="li"> <code>PciReceive</code> takes frames of up to 11 bytes; the low bits of the first byte are tested as a</div>
+</li>
+</ul>
+<p>
+header and the second byte selects the handler from a jump table at $3105A. Its handlers store
+the same values as the CCD ones. Together with the header byte this points to J1850 PCI, but
+the bus type is still an inference.
+</p>
+<p>
+The two variants also use different hardware. The CCD bytes go through the CS2 chip (<code>IoBusData</code>,
+<code>IoBusStatus</code>, IRQ2 and IRQ4, see above). The PCI frames go over the QSPI: <code>QspiSendFrame</code> copies a
+frame into the QSPI transmit RAM, <code>PciRxFrame</code> reads the received frame from the receive RAM and
+checks a one-byte sum, and <code>PciTimeoutRestart</code> arms the frame timer. So in the PCI variant a
+separate bus controller sits on the QSPI and does the bus framing itself; a J1850 controller with an
+SPI port fits that, but the part cannot be told from the code.
+</p>
+<p>
+Both receive routines handle the SKIM (immobiliser) exchange: messages $0B and $C2 carry the
+status and the key data (<code>SkimStatus</code>, <code>SkimData0</code>-<code>SkimData4</code>). <code>SkimKeyCheck</code> ($320D6) works out
+the expected key from the VIN bytes, and a wrong key reports P1685.
+</p>
+</div>
+<h2 class="sectionedit25" id="diagnostics_over_the_sci_line">Diagnostics over the SCI line</h2>
+<div class="level2">
+<p>
+<code>Isr_SCI</code> calls <code>SciInterrupt</code> ($3343C). The diagnostic commands are dispatched through the jump
+tables at $35000, $3509C, $350CC, $350DC and $35BB0. Among them is a service that writes a received
+routine byte by byte into RAM at $F8700-$F87FF (<code>DiagWriteRamByte</code>) and, after checking its length,
+its checksum and the final <code>RTS</code>, runs it (<code>DiagRunRamCode</code>, <code>JMP $F8700</code>). A tester can therefore
+run its own code in the controller without reflashing. This is separate from the bootstrap mode that
+<code>third_party/SBECBootLoader</code> uses.
+</p>
+<p>
+The same line also carries a high-speed logging mode (<code>SciLogReceive</code>): command bytes $F2 and
+$F3-$F6 set the mode bits in <code>SciLogFlags</code> and $FE leaves the mode; after that, each received byte
+selects a value that is sent back (from a RAM index list, or a word from a bank-3 page chosen by
+$F3-$F5). <code>SciRequestReceive</code> takes the ordinary requests (<code>DiagCommand</code>,
+<code>DiagParam1</code>-<code>DiagParam3</code>); a fixed byte sequence ($F8, $F7, $F5, $F3, $14), tracked in
+<code>SciUnlockState</code>, switches to command $52.
+</p>
+<p>
+See <a class="wikilink1" data-wiki-id="sbec3_reflash" href="sbec3_reflash.html" title="sbec3_reflash">reflashing</a> for the separate bootstrap mode used to erase and rewrite the flash.
+</p>
+</div>
+<h2 class="sectionedit26" id="unreached_code">Unreached code</h2>
+<div class="level2">
+<p>
+Thirteen routines (about 2.2 KB) are never called, jumped to or pointed at: an older copy of the
+flex fuel learning with its helpers ($17512-$17F2x and $18264), a rpm-window flag and fuel hold
+table ($12BFA), a crank period delta, a period tracker and five small arithmetic helpers in bank 0
+(two of them, $0C9F8 and $0CA5C, use the bit-mask words at $0C9D8), and <code>UnusedCylSparkOverride</code>
+($1E65C). A fourteenth piece, <code>UnusedCylSparkSet</code> ($1E418), sits inside <code>SparkEventCalc</code> (in its spark start ramp part)
+behind a <code>BRA</code> that always skips it. Together they are the remains of a per-cylinder spark override: the
+skipped block fills <code>CylSparkOverride</code> (RAM $0D7A, one byte per cylinder) from
+<code>CylSparkOverrideBase</code> ($04A2) plus <code>CylSparkOverrideValues</code> ($04A3, 6 bytes), and the uncalled
+routine would return that value instead of the spark advance for cylinders selected by a byte from
+the bus. It replaces the angle rather than adding to the spark map, so it looks like a test
+function. The live <code>GetSparkAdvance</code> has the same interface (cylinder in A, angle back in A): its
+three callers still load <code>CylinderIndex</code> into A, which it ignores, so it is the stand-in for that
+routine. The same code, equally skipped, is in families D and E; families A, B, C and G do not
+have it. The calibration bytes are 0 and appear in the XDF under “Not used”. They
+decode cleanly and end in RTS (the skipped block falls through to the code after it), so they are listed in
+<code>annotations/analysis.json</code> (<code>unreached_code</code>) and disassembled; their names start with <code>Unused</code>.
+The string <code>COPYRIGHT 1996 CHRYSLER CORPORATION</code> sits at $07000.
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>sbec3_overview.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

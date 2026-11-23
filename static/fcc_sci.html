@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>'95 Neon FCC: diagnostics and communication [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="fcc_sci" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body">
+<ul class="">
+<li class="level1"><a href="#neon_fccdiagnostics_and_communication">'95 Neon FCC: diagnostics and communication</a>
+<ul class="">
+<li class="level2"><a href="#serial_settings">Serial settings</a></li>
+<li class="level2"><a href="#drb_protocol">DRB protocol</a></li>
+<li class="level2"><a href="#actuator_tests_command_13">Actuator tests (command $13)</a></li>
+<li class="level2"><a href="#obd-ii_monitors_dormant_in_the_two_calibrations_in_this_repository">OBD-II monitors (dormant in the two calibrations in this repository)</a></li>
+<li class="level2"><a href="#iso_9141_sae_j1979_generic_obd-ii">ISO 9141 / SAE J1979 (generic OBD-II)</a></li>
+<li class="level2"><a href="#lamps">Lamps</a></li>
+<li class="level2"><a href="#companion_chip_link_and_ccd_bus">Companion chip link and CCD bus</a>
+<ul class="">
+<li class="level3"><a href="#frame_types">Frame types</a></li>
+<li class="level3"><a href="#ccd_messages_sent">CCD messages sent</a></li>
+<li class="level3"><a href="#ccd_messages_received">CCD messages received</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Hard" src="_static/lib/plugins/howhard/images/style1/4.png"/></div><div class="howhard_txt">Hard</div></div><hr/>
+<h1 class="sectionedit1" id="neon_fccdiagnostics_and_communication">'95 Neon FCC: diagnostics and communication</h1>
+<div class="level1">
+<hr/>
+<p>
+This complements <a class="wikilink1" data-wiki-id="sci_tech_info" href="sci_tech_info.html" title="sci_tech_info">SCI bus technical info</a> with the FCC side of the protocol: the DRB commands, the actuator tests, the OBD-II monitors, ISO 9141 / J1979, and the separate link to the I/O companion chip and the CCD bus. Source: <a class="urlextern" href="https://github.com/DDex89/neon-fcc-firmware" rel="ugc nofollow noopener" target="_blank" title="https://github.com/DDex89/neon-fcc-firmware">neon-fcc-firmware</a>.
+</p>
+<p>
+The controller has two diagnostic links on the same SCI port (connector pins 9 receive and 30
+transmit). One is the Chrysler DRB protocol, used by the DRB II/III scan tool, MP Scan-type loggers
+and code download. The other is ISO 9141 for generic OBD-II scan tools. The fault codes themselves are
+listed in <a class="wikilink1" data-wiki-id="fcc_fault_codes" href="fcc_fault_codes.html" title="fcc_fault_codes">fault_codes.md</a>.
+</p>
+<p>
+Confidence: <strong>[code]</strong> = follows directly from the code, <strong>[inferred]</strong> = likely, not yet confirmed.
+</p>
+</div>
+<h2 class="sectionedit2" id="serial_settings">Serial settings</h2>
+<div class="level2">
+<div class="table sectionedit3"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Mode </th><th class="col1"> <code>BAUD</code> </th><th class="col2"> Rate (8 <abbr title="Megahertz">MHz</abbr> crystal, E = 2 <abbr title="Megahertz">MHz</abbr>) </th><th class="col3 leftalign"> </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> DRB normal </td><td class="col1"> <code>$22</code> </td><td class="col2"> 7812.5 baud </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row2">
+<td class="col0"> DRB high speed (command <code>$12</code>) </td><td class="col1"> <code>$01</code> </td><td class="col2"> 62500 baud </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row3">
+<td class="col0"> ISO 9141 </td><td class="col1"> <code>$12</code> </td><td class="col2"> 10417 baud (10.4 kbaud) </td><td class="col3"> [code] </td>
+</tr>
+</table></div>
+<p>
+The rates match the known Chrysler SCI and ISO 9141-2 rates, which also confirms the 8 <abbr title="Megahertz">MHz</abbr> crystal.
+</p>
+</div>
+<h2 class="sectionedit4" id="drb_protocol">DRB protocol</h2>
+<div class="level2">
+<p>
+<code>DRBIISerialCommunications_MM</code> ($4FDB) runs from the main loop. It echoes every received byte. A
+command byte from <code>$10</code> to <code>$25</code> is kept in <code>DRBPointer1</code>. <code>DRBSerialToggles</code> says how many parameter
+bytes follow (one or two), and these go to <code>DRBPointer2</code> and <code>DRBPointer3</code>. <code>DRBIIOuput_MM</code> ($5061) then
+calls <code>DRBFunctionTable[command - $10]</code>.
+</p>
+<div class="table sectionedit5"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Cmd </th><th class="col1"> Handler </th><th class="col2"> Function </th><th class="col3 leftalign"> </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>$10</code> </td><td class="col1"> <code>OutputErrorCodes</code> </td><td class="col2"> Sends the stored fault list (<code>$001B</code>-<code>$0022</code>, flash codes), <code>$FE</code> marks the end </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>$11</code> </td><td class="col1"> <code>OutputErrorBits</code> </td><td class="col2"> Sends fault bitmap bytes </td><td class="col3"> [inferred] </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>$12</code> </td><td class="col1"> <code>SetupHiSpeedDataTransfer</code> </td><td class="col2"> Switches the SCI to 62500 baud for fast logging </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>$13</code> </td><td class="col1"> <code>SetupATM</code> </td><td class="col2"> Starts actuator test <em>n</em> (parameter, up to <code>$40</code>); refused while the engine runs </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row5">
+<td class="col0"> <code>$14</code> </td><td class="col1"> <code>SendDiagnosticDataToSCI</code> </td><td class="col2"> Sends a live data value by ID (parameter below <code>$40</code>) </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row6">
+<td class="col0"> <code>$15</code> </td><td class="col1"> <code>SendECUIDToSCI</code> </td><td class="col2"> Reads an EEPROM byte (address from the two parameters) </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row7">
+<td class="col0"> <code>$16</code> </td><td class="col1"> <code>SendConstValues</code> </td><td class="col2"> Constant / EEPROM values; parameter <code>$80</code> checks <code>PPROG</code> </td><td class="col3"> [inferred] </td>
+</tr>
+<tr class="row8">
+<td class="col0"> <code>$17</code> </td><td class="col1"> <code>ClearErrorCodes</code> </td><td class="col2"> Clears the stored faults and the freeze frame </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row9">
+<td class="col0"> <code>$18</code>, <code>$19</code>, <code>$24</code> </td><td class="col1"> <code>DRB_Return</code> </td><td class="col2"> No function </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row10">
+<td class="col0"> <code>$1A</code> </td><td class="col1"> <code>SwitchTest</code> </td><td class="col2"> Sends one of six input or output bytes: switch inputs, <code>OutputDriverBits</code>, <code>$00EE</code>, … </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row11">
+<td class="col0"> <code>$1B</code> </td><td class="col1"> <code>InitByteModeDownload</code> </td><td class="col2"> Enters byte-mode code download </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row12">
+<td class="col0"> <code>$1C</code> </td><td class="col1"> <code>DRB_ResetEMR</code> </td><td class="col2"> Stores an address for a later write (answers <code>$E2</code>); the original name says emission maintenance reminder reset </td><td class="col3"> [inferred] </td>
+</tr>
+<tr class="row13">
+<td class="col0"> <code>$1D</code>, <code>$1E</code> </td><td class="col1"> <code>DRB_UseRAM…SpecialProgramRoutine</code> </td><td class="col2"> Writes a byte into RAM at an offset from <code>$0000</code> or <code>$0438</code> (answers <code>$E5</code>) </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row14">
+<td class="col0"> <code>$1F</code>, <code>$20</code> </td><td class="col1"> <code>L52E9</code>, <code>L5312</code> </td><td class="col2"> Builds and checks a block at <code>$021C</code> (<code>DrbRamBuffer</code>, <code>$021E</code> in B559) with a sum; part of the RAM program loader </td><td class="col3"> [inferred] </td>
+</tr>
+<tr class="row15">
+<td class="col0"> <code>$21</code>, <code>$22</code> </td><td class="col1"> <code>DRB_Special1</code>, <code>DRB_Special2</code> </td><td class="col2"> Requests a special mode; <code>$21</code> answers <code>$02</code> (refused) with the throttle open, <code>$03</code> when <code>BitFlags_AIS</code> bit 3 is set, otherwise <code>$01</code> </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row16">
+<td class="col0"> <code>$23</code> </td><td class="col1"> <code>L53AB</code> </td><td class="col2"> Sub-commands <code>$01</code>-<code>$04</code>, <code>$0B</code>, engine stopped only; function not decoded </td><td class="col3 leftalign"> </td>
+</tr>
+<tr class="row17">
+<td class="col0"> <code>$25</code> </td><td class="col1"> <code>L54E4</code> </td><td class="col2"> Output override: target 1-4 in <code>DrbOverrideTarget</code>, state in <code>DrbOverrideState</code>. Target 1 is the output in <code>$00EE</code> bit 7, target 3 is the purge solenoid </td><td class="col3"> [code] </td>
+</tr>
+</table></div>
+</div>
+<h2 class="sectionedit6" id="actuator_tests_command_13">Actuator tests (command $13)</h2>
+<div class="level2">
+<p>
+The test number is the parameter of command <code>$13</code>. <code>ActuatorTestMode_MM</code> ($552D) uses entry <em>n − 1</em>
+of <code>ATMFunctionTable</code> and toggles the output at a few hertz until the test times out. The output bits
+are listed in the <a class="wikilink1" data-wiki-id="fcc_overview" href="fcc_overview.html" title="fcc_overview">input / output map</a>.
+</p>
+<div class="table sectionedit7"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Test </th><th class="col1"> Output </th><th class="col2 leftalign"> </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>$01</code> </td><td class="col1"> Ignition coil on OC5 (PA3), single spark </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>$02</code> </td><td class="col1"> Ignition coil on OC3 (PA5), single spark </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>$04</code>, <code>$05</code>, <code>$06</code>, <code>$1D</code> </td><td class="col1"> Injector cylinder 4, 3, 2, 1 (500 µs pulse) </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>$07</code> </td><td class="col1"> AIS motor, open / close </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row5">
+<td class="col0"> <code>$08</code> </td><td class="col1"> Radiator fan relay </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row6">
+<td class="col0"> <code>$09</code> </td><td class="col1"> A/C clutch relay </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row7">
+<td class="col0"> <code>$0A</code> </td><td class="col1"> ASD relay (coil outputs forced off) </td><td class="col2"> [inferred] </td>
+</tr>
+<tr class="row8">
+<td class="col0"> <code>$0C</code> </td><td class="col1"> Speed control servo, vacuum and vent sequence </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row9">
+<td class="col0"> <code>$0D</code> </td><td class="col1"> Output on <code>$0400</code> bit 2, latched by a pulse on <code>$0402</code> bit 2 </td><td class="col2"> [code], output unknown </td>
+</tr>
+<tr class="row10">
+<td class="col0"> <code>$0E</code> </td><td class="col1"> Tachometer </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row11">
+<td class="col0"> <code>$0F</code>, <code>$17</code> </td><td class="col1"> TCC / PTU solenoid (<code>$00EE</code> bit 5) </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row12">
+<td class="col0"> <code>$10</code> </td><td class="col1"> EGR solenoid </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row13">
+<td class="col0"> <code>$14</code> </td><td class="col1"> All solenoids and relays together </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row14">
+<td class="col0"> <code>$15</code> </td><td class="col1"> Purge solenoid </td><td class="col2"> [inferred] </td>
+</tr>
+<tr class="row15">
+<td class="col0"> <code>$1A</code>, <code>$1B</code> </td><td class="col1"> Speed control solenoids, one at a time </td><td class="col2"> [code] </td>
+</tr>
+<tr class="row16">
+<td class="col0"> <code>$1C</code> </td><td class="col1"> Clears <code>OutputDriverBits</code> bit 4 (fuel pump relay) </td><td class="col2"> [inferred] </td>
+</tr>
+<tr class="row17">
+<td class="col0"> other </td><td class="col1"> No output </td><td class="col2"> [code] </td>
+</tr>
+</table></div>
+</div>
+<h2 class="sectionedit8" id="obd-ii_monitors_dormant_in_the_two_calibrations_in_this_repository">OBD-II monitors (dormant in the two calibrations in this repository)</h2>
+<div class="level2">
+<p>
+The code contains a complete set of OBD-II monitors driven from a table, <code>ObdMonitorTable</code> at $E939: ten
+records of 14 bytes. Each record holds the monitor routine, its status byte in RAM, a scheduling mask, the
+fault descriptor it reports and three calibration pointers for its enable conditions. <code>ObdMonitorScheduler</code>
+($E9C5) walks the table, checks the enable conditions and calls each monitor whose status byte allows it.
+<code>ObdMonitorInit</code> ($E8EA) prepares the status bytes; it is called (from <code>StoreMAPVoltsAndCalcMAPValue</code>). [code]
+</p>
+<p>
+<strong>Nothing calls <code>ObdMonitorScheduler</code> in B4CC.</strong> There is no JSR, JMP or pointer to $E9C5 anywhere
+in the ROM, so in 5269718 and 5007033 none of these monitors runs, although most of their fault descriptors
+are enabled. [code] The factory code bases B559, B4F3 and B4C2 call it from MainSubLoop on every pass, so in the
+factory 1995 calibrations the monitors do run; see <a class="wikilink1" data-wiki-id="fcc_calibration" href="fcc_calibration.html" title="fcc_calibration">code_bases.md</a>. [code] The one exception is the O2 heater test, which runs from the key-off sequence;
+its result is stored but never processed into a code. This is the main piece of work for an OBD-II “Enhanced Edition”: the monitors exist,
+they only need to be scheduled, checked against the calibration and tested.
+</p>
+<div class="table sectionedit9"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> # </th><th class="col1"> Routine </th><th class="col2"> Address </th><th class="col3"> Monitor </th><th class="col4"> Fault </th><th class="col5"> Status byte </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> 0 </td><td class="col1"> <code>MonitorO2HeaterUp</code> </td><td class="col2"> $9449 </td><td class="col3"> Upstream O2 heater </td><td class="col4"> P0135 </td><td class="col5"> <code>$0113</code> </td>
+</tr>
+<tr class="row2">
+<td class="col0"> 1 </td><td class="col1"> <code>MonitorO2HeaterDown</code> </td><td class="col2"> $945E </td><td class="col3"> Downstream O2 heater </td><td class="col4"> P0141 </td><td class="col5"> <code>$0114</code> </td>
+</tr>
+<tr class="row3">
+<td class="col0"> 2 </td><td class="col1"> <code>MonitorO2Response</code> </td><td class="col2"> $9881 </td><td class="col3"> Upstream O2 response </td><td class="col4"> P0133 </td><td class="col5"> <code>$010E</code> </td>
+</tr>
+<tr class="row4">
+<td class="col0"> 3 </td><td class="col1"> <code>MonitorSecondaryAir</code> </td><td class="col2"> $2F58 </td><td class="col3"> Secondary air </td><td class="col4"> P0411 </td><td class="col5"> <code>$0112</code> </td>
+</tr>
+<tr class="row5">
+<td class="col0"> 4 </td><td class="col1"> <code>MonitorEvapPurgeFlow</code> </td><td class="col2"> $A118 </td><td class="col3"> EVAP purge flow </td><td class="col4"> P0441 </td><td class="col5"> <code>$0116</code> </td>
+</tr>
+<tr class="row6">
+<td class="col0"> 5 </td><td class="col1"> <code>MonitorCatalyst</code> </td><td class="col2"> $428A </td><td class="col3"> Catalyst efficiency </td><td class="col4"> P0422 </td><td class="col5"> <code>$0111</code> </td>
+</tr>
+<tr class="row7">
+<td class="col0"> 6 </td><td class="col1"> <code>MonitorEgrFlow</code> </td><td class="col2"> $6A22 </td><td class="col3"> EGR flow </td><td class="col4"> P0401 </td><td class="col5"> <code>$0115</code> </td>
+</tr>
+<tr class="row8">
+<td class="col0"> 7 </td><td class="col1"> <code>MonitorFuelSystemRich</code> </td><td class="col2"> $A337 </td><td class="col3"> Fuel system rich </td><td class="col4"> P0172 </td><td class="col5"> <code>$0117</code> </td>
+</tr>
+<tr class="row9">
+<td class="col0"> 8 </td><td class="col1"> <code>MonitorFuelSystemLean</code> </td><td class="col2"> $A55F </td><td class="col3"> Fuel system lean </td><td class="col4"> P0171 </td><td class="col5"> <code>$0118</code> </td>
+</tr>
+<tr class="row10">
+<td class="col0"> 9 </td><td class="col1"> <code>MonitorMisfire</code> </td><td class="col2"> $AE3F </td><td class="col3"> Misfire </td><td class="col4"> P0300-P0304 </td><td class="col5"> <code>$0119</code> </td>
+</tr>
+</table></div>
+</div>
+<h4 id="how_the_obd-ii_executive_works">How the OBD-II executive works</h4>
+<div class="level4">
+<p>
+Each monitor's status byte uses the same bits: 7 enabled this trip, 6 completed, 4 failed once
+(pending), 5 confirmed, 3 failed this trip, 2 test running, 0 fault to report. [code]
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Scheduling.</strong> <code>ObdMonitorScheduler</code> runs a monitor when its status bit 7 is set and its mask at</div>
+</li>
+</ul>
+<p>
+<code>$E931</code> allows this main-loop pass. Before each monitor it evaluates three condition lists from the
+calibration (<code>EvalConditionList</code>): the first suspends the monitor while the MIL is on, the other
+two set <code>ObdStatusFlags</code> bits 0 and 1 for the monitor to use.
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Two-trip confirmation</strong> (<code>ObdProcessMonitorResult</code>). A first failure sets the pending bit and</div>
+</li>
+</ul>
+<p>
+stores a freeze frame with priority 1 (2 for misfire and fuel system). A second failure on a later
+trip turns the MIL on (<code>ObdStatusFlags</code> bit 7), stores the code through <code>ThrowNonCriticalError</code> and
+a freeze frame with priority 3 (4).
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Similar conditions.</strong> Misfire and fuel system faults keep the RPM, MAP and closed-loop state of</div>
+</li>
+</ul>
+<p>
+the failure (records at <code>$0129</code> and <code>$012D</code>). They heal only when the engine runs under similar
+conditions again (<code>ObdSimilarConditions</code>: MAP within <code>$18</code>, RPM within <code>$0C</code>).
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Warm-up cycles.</strong> A trip counts as a warm-up cycle when coolant has risen by <code>$16</code> from the start</div>
+</li>
+</ul>
+<p>
+value and reached <code>$C7</code> (<code>ObdWarmupCycleCheck</code>). After 40 warm-up cycles without the MIL the codes
+are erased (<code>ObdAutoClearCodes</code>).
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>MIL off.</strong> After 3 good trips without a pending misfire or fuel system fault, the MIL goes off</div>
+</li>
+</ul>
+<p>
+(<code>ObdMisfireMilLogic</code>). A catalyst-damaging misfire sets <code>ObdStatusFlags</code> bit 3 (blink).
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Readiness.</strong> <code>ObdUpdateReadiness</code> keeps <code>ObdMonitorsComplete</code> in J1979 PID <code>$01</code> order and clears</div>
+</li>
+</ul>
+<p>
+a bit when its monitor completes.
+</p>
+</div>
+<h4 id="the_monitors">The monitors</h4>
+<div class="level4">
+<div class="table sectionedit10"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Monitor </th><th class="col1"> Runs when </th><th class="col2"> Method </th><th class="col3"> Verdict </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> O2 heaters (P0135, P0141) </td><td class="col1"> After key-off, power held (<code>ShutDownSubroutineA</code>) </td><td class="col2"> ASD on to heat the sensors; samples both sensors with and without a load switched onto the lines (<code>O2LoadTestSample</code>) </td><td class="col3"> Passes when the readings rise by <code>LCCA0</code>/<code>LCCA1</code>. This test <strong>does run</strong> at each key-off; in B4CC its result is never reported because the scheduler is dormant </td>
+</tr>
+<tr class="row2">
+<td class="col0"> O2 response (P0133) </td><td class="col1"> Warm engine, time at speed, adaptive cell <code>LCCB4</code>, closed loop, steady state, RPM window </td><td class="col2"> Counts large voltage steps (<code>LCCC1</code>) and lean/rich switches </td><td class="col3"> Pass on <code>LCCC2</code> steps or <code>LCCC4</code> switches; fail when <code>LCCC5</code> elapses first </td>
+</tr>
+<tr class="row3">
+<td class="col0"> Catalyst (P0422) </td><td class="col1"> Warm engine, catalyst warm estimate (driving above <code>LCB6E</code>), MAP/RPM windows, closed loop </td><td class="col2"> Purge forced off, settle <code>LCB6C</code>, measure <code>LCB74</code> </td><td class="col3"> Result against <code>LCB76</code> (stricter after earlier fails) </td>
+</tr>
+<tr class="row4">
+<td class="col0"> EGR flow (P0401) </td><td class="col1"> Warm engine, speed, closed loop, steady state, vacuum and MAP/TPS/RPM windows </td><td class="col2"> Short-term fuel trim averaged with EGR normal, then with EGR switched </td><td class="col3"> Difference inside the window at <code>$CB59/$CB5A</code> = flow; fault after <code>LCB5B</code> fails </td>
+</tr>
+<tr class="row5">
+<td class="col0"> EVAP purge flow (P0441) </td><td class="col1"> Idle in adaptive cell <code>LCD39</code>, stable battery and AIS loads </td><td class="col2"> Purge duty ramped up from closed </td><td class="col3"> Change in AIS position, O2 trim or RPM = flow; no change by duty <code>LCD35</code> = fail </td>
+</tr>
+<tr class="row6">
+<td class="col0"> Fuel system rich / lean (P0172, P0171) </td><td class="col1"> Closed loop, steady state </td><td class="col2"> (short-term + adaptive trim) / 2 against coolant-dependent limits <code>TABLEcd00</code> / <code>TABLEcd1e</code>; per-cylinder trims </td><td class="col3"> Fail after <code>LCD2A</code> / <code>LCD28</code> passes beyond the limit; heals under similar conditions </td>
+</tr>
+<tr class="row7">
+<td class="col0"> Misfire (P0300-P0304) </td><td class="col1"> Not during a cold start </td><td class="col2"> Crank-synchronous code counts misfires per 100 crank events </td><td class="col3"> More than <code>LCBD2</code> per 100 = catalyst damaging (blink); more than <code>LCBD3</code> per 500 = emission failure </td>
+</tr>
+<tr class="row8">
+<td class="col0"> Secondary air (P0411) </td><td class="col1"> CONFIG2 bit 7 clear </td><td class="col2"> State machine at <code>POINTER2f3a</code> </td><td class="col3"> Descriptor disabled on the Neon </td>
+</tr>
+</table></div>
+<p>
+The variables of each monitor are named in the <a class="urlextern" href="https://github.com/DDex89/neon-fcc-firmware/blob/main/docs/en/ram_map.md" rel="ugc nofollow noopener" target="_blank" title="https://github.com/DDex89/neon-fcc-firmware/blob/main/docs/en/ram_map.md">RAM map</a> (<code>Cat…</code>, <code>Evap…</code>, <code>Egr…</code>,
+<code>O2Resp…</code>, <code>FuelSys…</code>, <code>Misfire…</code>). Thresholds are calibration bytes in the <code>$CB44</code>-<code>$CD41</code> range;
+most have no MP Tune name yet.
+</p>
+</div>
+<h2 class="sectionedit11" id="iso_9141_sae_j1979_generic_obd-ii">ISO 9141 / SAE J1979 (generic OBD-II)</h2>
+<div class="level2">
+<p>
+<code>HanldeISODiagnosticComs</code> ($1ABA) is a state machine of 20 steps (<code>DiagnosticRoutineTable</code>). At the
+start of a session it sets the SCI to 10.4 kbaud, forces OC4 (PA4) high and sends <code>$55</code>, the
+ISO 9141-2 sync byte. Requests are collected in a buffer at <code>$048E</code>. [code]
+</p>
+<p>
+<code>IsoValidateRequest</code> ($1E18) accepts a request only with the J1979 header <code>$68 $6A $Fx</code>, a correct
+sum checksum and the right length for the service. <code>IsoBuildResponse</code> ($1EEB) answers with the header
+<code>$48 $6B $40</code>. [code]
+</p>
+<div class="table sectionedit12"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Service </th><th class="col1"> Function </th><th class="col2"> Conditions </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>$01</code> </td><td class="col1"> Current data, PID table at <code>$1AEA</code> </td><td class="col2"> PID <code>$12</code> only with CONFIG2 bit 5 </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>$02</code> </td><td class="col1"> Freeze frame, PID table at <code>$1B16</code> </td><td class="col2"> Frame 0 only </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>$03</code> </td><td class="col1"> Stored emission codes </td><td class="col2"> Only when <code>ObdDtcCount</code> is not zero </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>$04</code> </td><td class="col1"> Clear codes (<code>EraseErrorCodes</code>) </td><td class="col2"> Engine stopped only </td>
+</tr>
+<tr class="row5">
+<td class="col0"> <code>$05</code> </td><td class="col1"> O2 sensor test results </td><td class="col2"> O2 sensor 1 or 2 </td>
+</tr>
+</table></div>
+<p>
+Service <code>$01</code> PIDs (handlers <code>ObdPid…</code>):
+</p>
+<div class="table sectionedit13"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> PID </th><th class="col1"> Value </th><th class="col2"> Source </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>$00</code> </td><td class="col1"> Supported PIDs <code>$BE $3E $B8 $00</code> (<code>$F8</code> in the third byte with CONFIG2 bit 5) </td><td class="col2"> constant </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>$01</code> </td><td class="col1"> Code count and MIL bit; supported and completed monitors </td><td class="col2"> <code>ObdDtcCount</code>, <code>ObdStatusFlags</code> bit 7, calibration <code>$B81F</code>/<code>$B820</code>, RAM <code>$0100</code> </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>$03</code> </td><td class="col1"> Fuel system status </td><td class="col2"> <code>FuelSystemStatus</code> ($043B) </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>$04</code> </td><td class="col1"> Calculated load </td><td class="col2"> <code>MaxRPMxMaxMAPFraction</code> </td>
+</tr>
+<tr class="row5">
+<td class="col0"> <code>$05</code> </td><td class="col1"> Coolant temperature </td><td class="col2"> <code>CoolantTempUnfiltered</code> − <code>$58</code> </td>
+</tr>
+<tr class="row6">
+<td class="col0"> <code>$06</code> </td><td class="col1"> Short-term fuel trim </td><td class="col2"> O2 feedback counter </td>
+</tr>
+<tr class="row7">
+<td class="col0"> <code>$07</code> </td><td class="col1"> Long-term fuel trim </td><td class="col2"> <code>ValueFromAdaptiveMemory</code> </td>
+</tr>
+<tr class="row8">
+<td class="col0"> <code>$0B</code> </td><td class="col1"> MAP </td><td class="col2"> <code>$0219</code> × <code>$69</code> / 256 </td>
+</tr>
+<tr class="row9">
+<td class="col0"> <code>$0C</code> </td><td class="col1"> Engine RPM </td><td class="col2"> <code>EngineRpm_HB</code> </td>
+</tr>
+<tr class="row10">
+<td class="col0"> <code>$0D</code> </td><td class="col1"> Vehicle speed </td><td class="col2"> <code>VehicleSpeed_HB</code> </td>
+</tr>
+<tr class="row11">
+<td class="col0"> <code>$0E</code> </td><td class="col1"> Spark advance </td><td class="col2"> <code>AdvanceTemporary</code> + <code>$80</code> </td>
+</tr>
+<tr class="row12">
+<td class="col0"> <code>$0F</code> </td><td class="col1"> Intake air temperature </td><td class="col2"> <code>ChargeTempUnfiltered</code> − <code>$58</code> </td>
+</tr>
+<tr class="row13">
+<td class="col0"> <code>$11</code> </td><td class="col1"> Throttle position </td><td class="col2"> <code>LastTpsVolts</code> </td>
+</tr>
+<tr class="row14">
+<td class="col0"> <code>$12</code> </td><td class="col1"> Secondary air status </td><td class="col2"> <code>OutputDriverBits</code> bit 5 </td>
+</tr>
+<tr class="row15">
+<td class="col0"> <code>$13</code> </td><td class="col1"> O2 sensors present </td><td class="col2"> <code>$03</code> (bank 1, sensors 1 and 2) </td>
+</tr>
+<tr class="row16">
+<td class="col0"> <code>$14</code>, <code>$15</code> </td><td class="col1"> O2 sensor 1 / 2 voltage </td><td class="col2"> <code>O2SensorVolts</code>, <code>DownstreamO2Volts</code> </td>
+</tr>
+</table></div>
+<p>
+Service <code>$02</code> (freeze frame) supports PIDs <code>$00</code>, <code>$02</code> (code that stored the frame), <code>$03</code>-<code>$07</code>,
+<code>$0B</code> and <code>$0C</code>, read from the frame that <code>CaptureFreezeFrame</code> keeps at <code>$011E</code>. [code]
+</p>
+<p>
+The calibration declares which monitors PID <code>$01</code> reports as supported: <code>$B81F</code> = <code>$07</code> (misfire,
+fuel system, components) and <code>$B820</code> = <code>$61</code> (catalyst, O2 sensor, O2 heater) in 5269718; <code>$00</code> and
+<code>$E1</code> (adds EGR) in 5007033. In B4CC the monitors themselves are dormant (see above), so a scan tool would
+never see them complete. [code]
+</p>
+</div>
+<h2 class="sectionedit14" id="lamps">Lamps</h2>
+<div class="level2">
+<p>
+The check-engine lamp (pin 36) and the charge indicator lamp (pin 37) are controlled through bits 6
+and 4 of <code>$00EE</code> (<code>OutputBits2</code>, called <code>StartupSwitchMirror2</code> in the original disassembly). Flash codes are
+blinked by toggling bit 6, so bit 6 is the check-engine lamp. [inferred] Bit 4 is set from <code>$0070</code> bit 7,
+which only charging-system faults set (flag bit 5), so bit 4 is most likely the charge lamp.
+[inferred] <code>$00EE</code> is sent to the I/O companion chip in the register frame with header <code>$50</code>; see
+ccd_and_link.md.
+</p>
+</div>
+<h2 class="sectionedit15" id="companion_chip_link_and_ccd_bus">Companion chip link and CCD bus</h2>
+<div class="level2">
+<p>
+Besides the SPI output driver, the HC11 talks over SPI to an <strong>I/O companion chip</strong>. That chip
+handles the CCD bus to the instrument cluster and body modules, drives the idle air stepper, the
+lamps and the TCC solenoid, and returns the switch inputs. The chip itself is not identified; all of
+this is reconstructed from the HC11 side. Confidence: <strong>[code]</strong> = follows directly from the code,
+<strong>[inferred]</strong> = likely.
+</p>
+</div>
+<h3 class="sectionedit16" id="frame_types">Frame types</h3>
+<div class="level3">
+<div class="table sectionedit17"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Frame </th><th class="col1"> Sent when </th><th class="col2"> Bytes out </th><th class="col3"> Bytes back </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> Command (1 byte) </td><td class="col1"> Default, every tick </td><td class="col2"> <code>LinkCommandByte</code>: stepper phase <code>$B1</code>, <code>$AA</code>, <code>$A3</code>, <code>$9C</code> (field 6, 5, 4, 3), hold <code>$B8</code> (field 7), <code>$95</code> once after start </td><td class="col3"> Status in bits 2-0: 6 sets <code>BitFlags69</code> bit 1 (battery volts OK), 5 or 7 set <code>BitFlags69</code> bit 4 </td>
+</tr>
+<tr class="row2">
+<td class="col0"> CCD (5 bytes) </td><td class="col1"> <code>LinkRequestFlags</code> bit 7 (<code>PrepareCCDDataForXmit_MM_1</code>) </td><td class="col2"> <code>$D0</code> (send) or <code>$D8</code> (nothing), message ID, 2 data bytes, check </td><td class="col3"> The last received CCD message: ID, 2 data bytes, check </td>
+</tr>
+<tr class="row3">
+<td class="col0"> Register (4 bytes) </td><td class="col1"> <code>LinkRequestFlags</code> bit 6 (<code>LinkRegisterUpdate</code>) </td><td class="col2"> <code>$48</code>, <code>$50</code> or <code>$58</code>, 16-bit value, check </td><td class="col3"> 16-bit value of the register </td>
+</tr>
+<tr class="row4">
+<td class="col0"> Frame C (4 bytes) </td><td class="col1"> <code>LinkRequestFlags</code> bit 5 (<code>CODE1265</code>) </td><td class="col2"> <code>LinkFrameCHeader</code>, 2 data bytes, check </td><td class="col3"> 2 bytes; purpose not decoded </td>
+</tr>
+</table></div>
+<p>
+The check byte is the complement of the sum of the bytes before it; the reply is checked the same
+way. After ten failed exchanges in a row <code>LinkError</code> pulses <code>$0409</code> bit 3, which most likely resets
+the chip. [code]
+</p>
+</div>
+<h4 id="register_frames">Register frames</h4>
+<div class="level4">
+<p>
+<code>LinkRegisterUpdate</code> cycles the header through <code>$50</code>, <code>$58</code> and <code>$48</code>. The data sent with each header
+and the use of each reply:
+</p>
+<div class="table sectionedit18"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Header </th><th class="col1"> Data sent </th><th class="col2"> Reply used as </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>$50</code> </td><td class="col1"> <code>OutputBits2</code> and <code>$00EF</code>: lamps, TCC solenoid, O2 heater test switches (<a class="wikilink1" data-wiki-id="fcc_overview" href="fcc_overview.html" title="fcc_overview">io_map.md</a>) </td><td class="col2"> <code>LinkInputWordHi/Lo</code> ($00F0/$00F1) </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>$58</code> </td><td class="col1"> <code>$0176</code>/<code>$0177</code> </td><td class="col2"> not used </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>$48</code> </td><td class="col1"> <code>$00EC</code>, <code>$00</code> </td><td class="col2"> <code>SwitchInputs</code> ($00ED) </td>
+</tr>
+</table></div>
+<p>
+A reply is decoded against <code>LinkRegLastAddress</code>, the header of the frame before, so the chip answers
+one frame late (a pipelined SPI read). Which header means “write” and which register is read is
+therefore not certain; the table shows how the code pairs them. [code]
+</p>
+</div>
+<h3 class="sectionedit19" id="ccd_messages_sent">CCD messages sent</h3>
+<div class="level3">
+<p>
+<code>PrepareCCDDataForXmit_MM_1</code> walks a 128-slot schedule (<code>CCDDataStream_1</code>, index <code>CcdTxSlot</code>). Each
+slot routine returns the message ID and two data bytes; the first message after start is <code>$E0</code> with
+zero data. [code]
+</p>
+<div class="table sectionedit20"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> ID </th><th class="col1"> Slots of 128 </th><th class="col2"> Routine </th><th class="col3"> Data byte 1 </th><th class="col4"> Data byte 2 </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>$E4</code> </td><td class="col1"> 32 </td><td class="col2"> <code>CCD_EngineRPM</code> </td><td class="col3"> Engine RPM (<code>EngineRpm_HB</code>) </td><td class="col4"> MAP (<code>MapValue</code>) </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>$24</code> </td><td class="col1"> 8 </td><td class="col2"> <code>CCD_VehicleSpeed</code> </td><td class="col3"> Vehicle speed </td><td class="col4"> Vehicle speed, second scaling </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>$42</code> </td><td class="col1"> 8 </td><td class="col2"> <code>CCD_ThrottlePos</code> </td><td class="col3"> Throttle (<code>TPSOverMINTHR</code>) </td><td class="col4"> Cruise set speed / 2 </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>$A4</code> </td><td class="col1"> 8 </td><td class="col2"> <code>CCD_SwitchState</code> </td><td class="col3"> Status bits: cruise, P/N (<code>SwitchInputs</code> bit 6), A/C clutch, check-engine lamp </td><td class="col4"> Speed control state bits </td>
+</tr>
+<tr class="row5">
+<td class="col0"> <code>$D4</code> </td><td class="col1"> 2 </td><td class="col2"> <code>CCD_BatVolts</code> </td><td class="col3"> Battery voltage </td><td class="col4"> Target charging voltage </td>
+</tr>
+<tr class="row6">
+<td class="col0"> <code>$8C</code> </td><td class="col1"> 2 </td><td class="col2"> <code>CCD_CoolantTemp</code> </td><td class="col3"> Coolant temperature </td><td class="col4"> Ambient / battery temperature (<code>AmbientAirTemp</code>) </td>
+</tr>
+<tr class="row7">
+<td class="col0"> <code>$54</code> </td><td class="col1"> 1 </td><td class="col2"> <code>CCD_Baro</code> </td><td class="col3"> Barometric pressure </td><td class="col4"> Intake air temperature </td>
+</tr>
+<tr class="row8">
+<td class="col0"> <code>$EC</code> </td><td class="col1"> 1 </td><td class="col2"> <code>CCD_ToggleFlags</code> </td><td class="col3"> Warning flags from the fault state </td><td class="col4"> Calibration bits (<code>CCDCF3</code>) </td>
+</tr>
+<tr class="row9">
+<td class="col0"> <code>$CC</code> </td><td class="col1"> 1 </td><td class="col2"> <code>CCD_EEPromData</code> </td><td class="col3"> EEPROM word 1 × 4 </td><td class="col4"> Target idle speed × 4 </td>
+</tr>
+<tr class="row10">
+<td class="col0"> <code>$AC</code> </td><td class="col1"> 1 </td><td class="col2"> <code>CCD_ConfigConst1</code> </td><td class="col3"> Calibration word <code>CCDCFG</code> (vehicle configuration) </td><td class="col4 leftalign"> </td>
+</tr>
+<tr class="row11">
+<td class="col0"> — </td><td class="col1"> 64 </td><td class="col2"> <code>CCD_Blank</code> </td><td class="col3"> Empty slot (<code>$D8</code>) </td><td class="col4 leftalign"> </td>
+</tr>
+</table></div>
+</div>
+<h3 class="sectionedit21" id="ccd_messages_received">CCD messages received</h3>
+<div class="level3">
+<p>
+<code>PrepareCCDDataForXmit_MM_2</code> calls a handler by the <strong>low nibble</strong> of the received ID
+(<code>CCDDataStream_2[CcdRxId &amp; $0F]</code>). [code]
+</p>
+<div class="table sectionedit22"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> ID low nibble </th><th class="col1"> Handler </th><th class="col2"> Action </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> 1 </td><td class="col1"> <code>CcdRx_1</code> </td><td class="col2"> Theft alarm input (sets <code>CCDFlags5</code> bit 6, <code>CCDFlags4</code> bit 4) </td>
+</tr>
+<tr class="row2">
+<td class="col0"> 4 </td><td class="col1"> <code>CcdRx_4</code> </td><td class="col2"> Stores data byte 1 in <code>CcdRxValueA</code>, restarts the CCD time-out </td>
+</tr>
+<tr class="row3">
+<td class="col0"> 8 </td><td class="col1"> <code>CcdRx_8</code> </td><td class="col2"> Stores data byte 1 in <code>CcdRxValueB</code> </td>
+</tr>
+<tr class="row4">
+<td class="col0"> other </td><td class="col1"> — </td><td class="col2"> Ignored </td>
+</tr>
+</table></div>
+<p>
+If no message with low nibble 4 arrives, <code>CcdRxTimeout</code> counts up and at <code>$75</code> fault code 66 (“no
+CCD messages”) is reported. <code>CCD_HandleAlarm</code> keeps the theft alarm state in EEPROM4 bits 0-1 and
+is skipped when CONFIG bit 2 (alarm disable) is set. Which module sends IDs ending in 4 and 8, and what
+<code>CcdRxValueA/B</code> mean, is not decoded yet. [code] / [inferred]
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>fcc_sci.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

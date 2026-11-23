@@ -1,0 +1,24 @@
+====== Other Info ======
+
+  * [[sci_tech_info|SCI bus technical info]]
+  * [[template_file|What is a 'template' file?]]
+  * [[file_types|MP Tune file types explanation]]
+
+===== '95 Neon FCC firmware reference =====
+
+Reverse-engineered, rebuildable source for the 1995 Neon FCC (68HC11), from [[https://github.com/DDex89/neon-fcc-firmware|neon-fcc-firmware]]:
+
+  * [[fcc_overview|Hardware and firmware overview]]
+  * [[fcc_calibration|Calibration]]
+  * [[fcc_sci|Diagnostics and communication]]
+  * [[fcc_fault_codes|Fault codes]]
+  * [[fcc_tuning_notes|Engine control and tuning notes]]
+
+===== SBEC3 firmware reference (1996+ Neon / 2G Eclipse-Talon) =====
+
+The companion project for the newer 68HC16 controller, from [[https://github.com/DDex89/neon-sbec3-firmware|neon-sbec3-firmware]]:
+
+  * [[sbec3_overview|Hardware and firmware overview]]
+  * [[sbec3_calibration|Calibration]]
+  * [[sbec3_tuning|TunerPro, porting and open questions]]
+  * [[sbec3_reflash|Reading and reflashing over the SCI line]]

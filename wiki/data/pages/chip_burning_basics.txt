@@ -1,0 +1,59 @@
+{{howhard>2}}
+----
+====Burning a chip:====
+----
+
+**Required tools/materials:**
+  * Chip burner
+  * Chip
+  * .bin file to burn to the chip
+
+First, you will need a burner. There are many types/brand available, but your best bet is to buy a Willem style burner or a Burn2. The Willem cost is ~$40 (or less), and it will burn/erase every type of chip that could be used in our ECU's (and then some). Also, the Willem software is free and open-source. The Burn2 is basically fool-proof in setup; but it can't burn the factory chips used in the SBEC. The Burn2 algorithm is now integrated into MP Tune. SO, you can burn the 27SF512 chips directly from MP Tune, without needed a 2nd burner program.
+
+Also, before I go into burning the chip, I want to talk about the various chips that can be used. The original chip used was a 28-pin DIP, 16k or 32k EPROM (Erasable-Programmable-Read-Only-Memory). An EPROM is a ceramic chip with a quartz window. The window is used to erase the chip by exposure to UV light. A specific type (wavelength) of UV light is required. Commercial UV erasers are about $100 minimum. They are fully enclosed and usually incorporate a timer to keep from over-exposing the chips. But, you can use a handheld "germicidal" UV light. They cost about $20. But, there is no protection for the user, and no timer. Also, they are much lower power. So the danger of skin exposure is less, but they also take longer to erase the chip (~10min). A regular fluorescent bulb or even a "plant" light won't do the job. Exposure to sunlight, in theory, can erase the EPROM. But, the required exposure time is ~10 hours ? not very practical. The price of flash memory chips is decreasing rapidly. As such, they are a very viable alternative to the original EPROM chips originally used by Chrysler. Also, they do not require the use of a UV eraser. But, they will require a burner capable of erasing them.
+
+----
+====Chip choices:====
+----
+
+**LM:**
+  * 27C128 : 16k 28-pin Ceramic DIP
+  * 27C256 : 32k 28-pin Ceramic DIP
+  * 29C256 : 32k EEPROM (Electrically-Erasable-PROM) 28-pin Plastic DIP; These are out-of-production in the 28-pin DIP and as such are expensive when you can find them.
+  * 27SF512 : 64k Flash Memory 28-pin Plastic DIP; These are actually cheaper than the 27C256 at this point in time.
+
+**SMEC:**
+  * 27C128 : 16k 28-pin Ceramic DIP; only for the 16k bins (T2/S60 based)
+  * 27C256 : 32k 28-pin Ceramic DIP
+  * 29C256 : 32k EEPROM (Electrically-Erasable-PROM) 28-pin Plastic DIP; this chip is out-of-production in the 28-pin DIP and as such are expensive when you can find them.
+  * 27SF512 : 64k Flash Memory 28-pin Plastic DIP; this chip is actually cheaper than the 27C256 at this point in time.
+
+**SBEC:**
+  * 87C257 : 32k 28-pin Ceramic DIP; this is currently the only chip available for use in the SBEC. This chip is the same as the 27C256, except that it has a built-in address latch. There are no EEPROM or Flash memory chips with similar configuration available.
+
+I won't get into the support of the burner. The Willem has a good form with a ton of information. And, there are TM guys that can guide you if you get stuck.
+
+There is also good support for the Moates Burn2. MP Tune supports flashing the chip via the Burn2 from within MP Tune; making this combination a good choice.
+
+----
+====Offsets:==== 
+----
+
+Here's where things can get confusing. I'll try to explain as simply as possible, without confusing you with too much HEX or hacker jargon. 
+
+The chip memory offset is required to in order to place the interrupt vectors in the correct location. Interrupt vectors are special subroutines called when certain outside events happen (for example, when the ECU is powered up, or the HEP input is triggered). The microprocessor expects these interrupts to be in a specific memory address at end of the memory space. If these are NOT at the correct address, the code will not be able to run at all. So, the offset places the .bin file in the correct location on the chip so that these memory addresses are where they need to be. The offset is dependent on both the size of the .bin and the size of the chip itself.
+
+For example, if the .bin is 16k (LM or T2/S60 SMEC), and you're burning it to a 32k chip, you need to offset the .bin by 16k to put it at the end. If you are burning a 16k .bin to a 64k chip (27SF512), you need to offset the .bin by 48k. 
+
+Here's a breakdown:
+
+^.bin size|Chip size|offset| (hex)^
+|16k| 16k| 0  | (0x0000)|
+|:::| 32k| 16k| (0x4000)|
+|:::| 64k| 48k| (0xC000)|
+|32k| 32k| 0  | (0x0000)|
+|:::| 64k| 32k| (0x8000)|
+
+Once you get the offset configured correctly, simply load up the chip and burn it according to your burners' instructions.
+
+Now, just load the chip into your newly socketed ECU, plug it back into the car, and give it a try. 

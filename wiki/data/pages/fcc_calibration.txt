@@ -1,0 +1,389 @@
+{{howhard>4}}
+
+----
+====== '95 Neon FCC: calibration ======
+----
+
+See also [[fcc_overview|FCC overview]], [[fcc_fault_codes|fault codes]] and [[fcc_tuning_notes|tuning notes]]. Background and the full generated reference: [[https://github.com/DDex89/neon-fcc-firmware|neon-fcc-firmware]].
+
+
+Program versions ("code bases") found in the FCC images collected so far, named by the end
+address of the first code section. All images with the same code base have byte-identical program
+code (compared over $1200 to the end of code part 1 and $F000-$FFFF); only the calibration differs.
+Applications and revision letters come from the "Neon Code Families" spreadsheet.
+
+^ Code base ^ Images ^ Copyright ^ Notes ^
+| B588 | 1 | 1993 | 94½ generation |
+| B559 | 12 | 1994 | The original 1995 part numbers, SOHC and DOHC, all markets; buildable from this repository (''src_b559/'') |
+| B4F3 | 3 | 1994 | Later revisions (rev D of 4874154 and 4874156, export automatic); buildable (''src_b4f3/'') |
+| B4C2 | 1 | 1994 | Rev C of 4874154; not listed in the spreadsheet; buildable (''src_b4c2/'') |
+| B4CC | 3 (+2 "enh") | 1994 | Mopar Performance SOHC/DOHC and 5269718 (rev B of 4874164); the code base of this repository |
+
+===== All images =====
+
+^ Part number ^ Application ^ Code base ^ CONFIG ^ Notes ^
+| 5293121 | Not in the spreadsheet; 1993 copyright, automatic | B588 | ''$A7'' A/C, auto |  |
+| 4874154 | SOHC Fed low altitude, manual | B559 | ''$87'' A/C, manual |  |
+| 4874155 | SOHC Fed high altitude & California, manual | B559 | ''$C7'' A/C, EGR, manual |  |
+| 4874156 | SOHC Fed low altitude & Taiwan, automatic | B559 | ''$A7'' A/C, auto |  |
+| 4874157 | SOHC Fed & California, manual, racing | B559 | ''$C7'' A/C, EGR, manual |  |
+| 4874158 | SOHC Fed high altitude, automatic | B559 | ''$A7'' A/C, auto |  |
+| 4874159 | SOHC California, automatic | B559 | ''$E7'' A/C, EGR, auto |  |
+| 4874160 | Export & Mexico, manual, Sport | B559 | ''$87'' A/C, manual |  |
+| 4874161 | Export, manual | B559 | ''$87'' A/C, manual |  |
+| 4874162 | DOHC Fed low altitude, manual | B559 | ''$87'' A/C, manual |  |
+| 4874164 | DOHC Fed & California, manual, racing | B559 | ''$C7'' A/C, EGR, manual | checksum fails (edited, sums to $9C) |
+| 4874165 | DOHC Fed low altitude, automatic | B559 | ''$A7'' A/C, auto |  |
+| 5013113 | FJ 2.0 Fed/Canada, manual, flex head | B559 | ''$87'' A/C, manual |  |
+| 5269709 | SOHC Fed low altitude, manual (4874154 rev D) | B4F3 | ''$87'' A/C, manual |  |
+| 5269712 | SOHC Fed & Taiwan, automatic (4874156 rev D) | B4F3 | ''$A7'' A/C, auto |  |
+| 5269738 | SOHC export, automatic | B4F3 | ''$A7'' A/C, auto |  |
+| 5269646 | SOHC Fed low altitude, manual (4874154 rev C) | B4C2 | ''$87'' A/C, manual | file was named 5289646 |
+| 5007033 | Mopar Performance SOHC, manual | B4CC | ''$C7'' A/C, EGR, manual | “enh” file; checksum fails (edited, sums to $9C) |
+| 5007033 | Mopar Performance SOHC, manual | B4CC | ''$C7'' A/C, EGR, manual |  |
+| 5007034 | Mopar Performance DOHC, manual | B4CC | ''$86'' A/C, manual | checksum fails (edited, sums to $9C); same code as 5007033, copyright text changed |
+| 5007034 | Mopar Performance DOHC, manual | B4CC | ''$86'' A/C, manual | “enh” file; checksum fails (edited, sums to $9C); same code as 5007033, copyright text changed |
+| 5269718 | DOHC Fed & California, manual, racing (4874164 rev B) | B4CC | ''$86'' A/C, manual | checksum fails (edited, sums to $9C); edited copy; the repository uses a clean one |
+
+==== Findings ====
+
+  * **B4C2** is a code base that the spreadsheet does not list (5269646, rev C of 4874154).
+  * The revision letters are not in code-base order: for 4874154 rev C is on B4C2 and rev D on B4F3,
+so the letter does not tell which program version is newer.
+  * **Checksum:** five images fail the $B805 checksum. In each of them $FF50 was changed and the
+8-bit sum is $9C, so they were saved by an editor that forces the sum to a constant instead of the
+$B805 byte. On a B559 calibration this sets code 53. The unedited images all pass with $FF50 = $FF.
+  * **EEPROM window:** several images carry data in $B600-$B7FF. That range is the HC11's internal
+EEPROM, which the CPU sees instead of the chip, so these bytes have no effect; they show that the
+file was read from a programmed ECU or saved by a tool.
+  * 4874157 (SOHC racing) and 4874164 (DOHC racing) have EGR enabled; their rev B, 5269718, has it off.
+  * The Mopar 5007033 keeps the EGR bit in CONFIG set, but its EGR windows (''EGR21'', ''EGR23'', ''EGR27''
+and the byte after it) are set to $FD/$FE, which the engine never reaches, so EGR is never enabled.
+
+The calibration layout differs between code bases (for example the fault descriptor table is at
+$D4E9 in B559 and at $D4E3 in B4CC), so tables must not be copied byte for byte between them.
+
+===== B559 compared with B4CC =====
+
+The annotations of this repository were made on B4CC and ported to B559 with
+''tools/port_base.py'' (see [[https://github.com/DDex89/neon-fcc-firmware/blob/main/docs/en/building.md|building.md]]). The comparison below comes
+from that alignment: code part 2 ($E229-$FFD5) is identical, and in code part 1 41,653 of 41,677
+B4CC bytes have an exact counterpart in B559. [code]
+
+**B4CC is B559 with calls removed.** The B4CC program is 141 bytes shorter. About 100 of them are the
+three temperature features listed below; the rest are ''jsr'' instructions that B4CC no longer has.
+The called routines are still in the B4CC ROM, byte for byte, but nothing reaches them there. [code]
+
+^ Routine ^ Called from (B559) ^ What B4CC loses ^
+| ''ObdMonitorScheduler'' | MainSubLoop | All ten OBD-II monitors (see [[fcc_sci|diagnostics.md]]) |
+| ''ControlPurgeSolenoid_MM'' | MainSubLoop | Purge duty calculation: the on/off times sent to the companion chip in register frame $58 stay at their reset value. The separate on/off logic at $B290 (''OutputDriverBits'' bit 5) still runs in B4CC; which of the two switches the solenoid at pin 16 is not confirmed yet |
+| ''DetermineIndividualInjectorTrims_MM'' | MainSubLoop | Individual cylinder fuel trims |
+| ''CalculateVariableRevLimit_MM'' | MainSubLoop | Variable rev limit; ''VariableRevLimit'' stays at $FF from reset, only the fixed limits act |
+| ''CheckIfCheckEngineLightShouldBeOn_A_MM'', ''_B_MM'' | MainSubLoop | Charge-warning lamp logic (''OutputBits2'' bit 4); despite the name not the MIL. Only the fan code (with CONFIG2 bit 6 set) and the DRB tests still touch the bit |
+| ''EmmissionMaintenanceRemider1_MM'' | MainSubLoop | Emission maintenance reminder record in EEPROM, code 62 |
+| ''VerifyOperationOfDownstreamO2Sensor_MM'' | MainSubLoop | Downstream O2 sensor check (code 21) |
+| ''DecrementDSO2SensorDiagnosticCounter_MM'' | MainSubLoop | Downstream O2 diagnostic counter |
+| ''VerifyOperationOfAmbientTempSensor_MM'' | MainSubLoop | Key-on plausibility check of the air temperature sensors (code 23) |
+| ''CheckErrorMaskingAndSetCodes_MM'' | SubLoopA | A speed / TPS related check (not decoded yet) |
+| ''FurtherMAPAndBaroDiagnostics2_SM'' | SubLoopC | MAP versus TPS rationality check (code 24) |
+| ''IncrementOrClearKnockDiagCounter_SM'' | SubLoopC | Knock sensor signal check (code 16) |
+
+So the racing / Mopar code base runs without OBD-II monitors, the purge duty calculation, cylinder trims, the variable
+rev limit and several sensor checks, which fits its use. The fault descriptors of these checks are
+still in the calibration and may be enabled, but nothing reports them. [code]
+
+**Code only in B559.** Three short additions, all using the same start temperature: ''BatteryTemp'',
+or ''AmbientAirTemp'' when CONFIG2 bit 5 is set. [code]
+
+^ Where (B559) ^ What it does ^ Calibration (B559) ^
+| Reset init, $9202-$9224 | Sets the purge delay ''PurgeDelayTimer'' ($021C): colder than ''PurgeDelayTempCold'' gives $FFFF, colder than ''PurgeDelayTempWarm'' gives ''PurgeDelayTime'', warmer gives no delay | $C983, $C984, $C985-$C986 |
+| ''ControlPurgeSolenoid_MM'', $9CF9-$9D1D | While the delay runs, the throttle is closed and the car is below ''MPHREF'', counts the delay down (once per ''Counter_MainLoop'' wrap) and keeps purge from running | - |
+| ''ExhGasRecirc_MM'', $B257-$B272 | EGR only above ''EgrTempOn''; once on, it stays on down to ''EgrTempOff'' | $CB3C, $CB3B |
+
+Values in the factory images (temperatures in °C = count − 128, see
+[[fcc_tuning_notes|engine_control.md]]; one ''Counter_MainLoop'' wrap is
+256 × 10.75 ms = 2.75 s): [code]
+
+^  ^ 4874154-4874165 ^ 5013113 ^
+| ''PurgeDelayTempCold'' | $6E = −18 °C | $6E = −18 °C |
+| ''PurgeDelayTempWarm'' | $8A = 10 °C | $84 = 4 °C |
+| ''PurgeDelayTime'' | $0221 = 545 wraps ≈ 25 min | $028E = 654 wraps ≈ 30 min |
+| ''EgrTempOff'' / ''EgrTempOn'' | $73 / $74 = −13 / −12 °C | $7B / $7C = −5 / −4 °C |
+| ''MPHREF'' | 7 = 3.5 mph | 5 = 2.5 mph |
+
+So after a start below 10 °C the factory calibration keeps the purge off while the car stands or
+creeps until about 25 minutes of such time have passed (practically for the whole trip below −18 °C),
+and EGR is not used below about −12 °C. [code]
+
+**Layout consequences.** Because of these additions the B559 calibration has 4 extra bytes after the
+idle purge table and 2 after the EGR constants: B4CC addresses $C983-$CB36 are 4 higher in B559 and
+$CB37-$DFF7 are 6 higher. RAM is the same except the DRB RAM-program buffer, which moved from $021C to
+$021E to make room for ''PurgeDelayTimer''. [code]
+
+===== B4F3 and B4C2 compared with B4CC =====
+
+Both were ported the same way (''annotations/bases/B4F3/'', ''annotations/bases/B4C2/'') and all their
+images rebuild byte-identically from ''src_b4f3/'' and ''src_b4c2/''. Their RAM and calibration layouts
+are the same as B4CC's: every one of about 1,020 calibration references in the code points to the same
+address. [code]
+
+**B4F3 is B4CC plus the thirteen calls.** The only difference is in MainSubLoop, SubLoopA and SubLoopC:
+B4F3 has the same thirteen ''jsr'' instructions as B559 (39 bytes), so its OBD-II monitors, purge duty, cylinder
+trims, variable rev limit and sensor checks run. It does not have B559's three temperature features
+(purge delay, EGR temperature gate). [code]
+
+**B4C2 is B4F3 with two more differences:** [code]
+
+^ Where ^ B4C2 ^ B559, B4F3, B4CC ^
+| J1979 PIDs $14 / $15 (O2 voltages) | Sends the raw A/D byte | Scales by $03ED/256 to 5 mV per bit, $FF from $41 up; B4C2 therefore shows about a quarter of the real voltage on a scan tool |
+| Companion chip status 6 (''AisDriveRoutine'') | Sets ''BitFlags69'' bit 1 unconditionally | Only when ''BatteryVolts'' is at least ''BTVAIS'' |
+
+===== Feature summary =====
+
+^  ^ B559 ^ B4C2 ^ B4F3 ^ B4CC ^
+| Images | 4874154-4874165, 5013113 | 5269646 (rev C) | 5269709, 5269712, 5269738 (rev D) | 5269718, 5007033, 5007034 |
+| Calibration layout | own (+4/+6 bytes) | as B4CC | as B4CC | reference |
+| OBD-II monitors, purge duty calculation, cylinder trims, variable rev limit, sensor checks | yes | yes | yes | not called |
+| Purge delay and EGR temperature gate | yes | no | no | no |
+| O2 PIDs scaled to 5 mV | yes | no (raw) | yes | yes |
+| Battery check on companion status 6 | yes | no | yes | yes |
+
+The revision letters do not give the order of the code bases, so this table does not say which came
+first; it only shows that B4CC is the stripped-down one. [inferred]
+
+===== B588 (1993) =====
+
+5293121 is a different generation. Its calibration is larger (code part 2 starts about $EB5E instead
+of $E229) and its header and vectors differ. A first alignment finds a counterpart for about 83 % of
+the B4CC code part 1 and 60 % of part 2, spread over some 2,000 pieces, so it is not ported yet. [code]
+
+
+===== Calibration table reference =====
+
+Generated by ''tools/gen_cal_docs.py'' from the table definitions (derived from the MP Tune definition files). Addresses are the same for every calibration built on code base B4CC. Descriptions are the original English ones; many are still placeholders.
+
+Type codes: 0 = 2D point-slope curve, 2 = 2D curve (other format), 3 = byte constant, 4 = word constant, 5 = bit flags, 7 = 3D map (rows x cols), 9 = address list, 11 = O2 ramp kick table, 17 = 3D map with its own axis.
+
+The reference image's calibration has about 460 tables and constants, grouped by MP Tune category:
+
+  * 0 - Setup / Cal Configuration
+  * 0 - Setup / Cal ID
+  * 0 - Setup / Transfer Functions
+  * 0 - Setup / Transfer Functions / RPMAverage
+  * 1 - Fuel / Decel Fuel Shutoff
+  * 1 - Fuel / Individual Cylinder Trim
+  * 1 - Fuel / Modifiers
+  * 1 - Fuel / Modifiers / Baro Enrichment
+  * 1 - Fuel / Modifiers / ChargeTemp Enrichment
+  * 1 - Fuel / O2 Feedback Control
+  * 1 - Fuel / O2 Feedback Control / Adaptive Memory Timer
+  * 1 - Fuel / O2 Feedback Control / Adaptive memory
+  * 1 - Fuel / O2 Feedback Control / O2 Controller
+  * 1 - Fuel / O2 Feedback Control / O2 Controller Ramps
+  * 1 - Fuel / Running
+  * 1 - Fuel / Starting
+  * 1 - Fuel / Transient Enrichment
+  * 1 - Fuel / Transient Enrichment / Decel LO / Decreasing MAP LO
+  * 1 - Fuel / Transient Enrichment / Decel LO / Decreasing TPS LO
+  * 1 - Fuel / Transient Enrichment / Decel Lean-out / Decreasing MAP LO
+  * 1 - Fuel / Transient Enrichment / Part Throttle Enrichment
+  * 1 - Fuel / Transient Enrichment / PumpShot Calculation / AIS PumpShot
+  * 1 - Fuel / Transient Enrichment / PumpShot Calculation / MAP PumpShot
+  * 1 - Fuel / Transient Enrichment / PumpShot Calculation / TPS PumpShot
+  * 2 - Spark / Knock Retard / Adaptive Retard
+  * 2 - Spark / Knock Retard / Normal Knock
+  * 2 - Spark / Normal Advance
+  * 2 - Spark / Normal Advance / DeltaRPMRetard
+  * 2 - Spark / Normal Advance / RetardFromSpeed
+  * 2 - Spark / Normal Advance / TPSRetard
+  * 2 - Spark / Scatter Control
+  * 3 - Idle / AIS ACControl
+  * 3 - Idle / AIS Control
+  * 3 - Idle / AIS Decel
+  * 3 - Idle / Special setup
+  * 4 - OB, Speed, and Rev Limiter / Decel Fuel Cut
+  * 4 - OB, Speed, and Rev Limiter / Misc, Limp Mode
+  * 4 - OB, Speed, and Rev Limiter / Overboost
+  * 4 - OB, Speed, and Rev Limiter / Rev Limiter
+  * 4 - OB, Speed, and Rev Limiter / Speed Limiter
+  * 5 - Aux Functions / Baro Read
+  * 5 - Aux Functions / Cruise Control
+  * 5 - Aux Functions / DRB Datalogging
+  * 5 - Aux Functions / EGR
+  * 5 - Aux Functions / On-Board Diagnostics
+  * 5 - Aux Functions / On-Board Diagnostics / Alternator Diagnostics
+  * 5 - Aux Functions / On-Board Diagnostics / Battery Diagnostics
+  * 5 - Aux Functions / On-Board Diagnostics / Coil Diagnosis
+  * 5 - Aux Functions / On-Board Diagnostics / Coolant Temp Sensor
+  * 5 - Aux Functions / On-Board Diagnostics / Intake Air Temp Sensor
+  * 5 - Aux Functions / On-Board Diagnostics / MAP Sensor
+  * 5 - Aux Functions / On-Board Diagnostics / O2 Sensor Diagnostics
+  * 5 - Aux Functions / On-Board Diagnostics / T-Stat Diagnostics
+  * 5 - Aux Functions / On-Board Diagnostics / TPS Diagnosis
+  * 5 - Aux Functions / PTU Control (LU Solenoid)
+  * 5 - Aux Functions / Throttle Calibration
+  * Fan
+  * Fuel / Transient Enrichment / PumpShot Calculation / AIS PumpShot
+  * Other
+
+Every table with its address, name, type and description is in the generated [[https://github.com/DDex89/neon-fcc-firmware/blob/main/docs/en/calibration_tables.md|calibration table reference]] in the repository; it is regenerated automatically whenever a table is renamed or described more fully, so the wiki does not duplicate it table by table.
+
+===== Differences between the two repository calibrations =====
+
+5269718: Chrysler factory 1995 Neon 2.0 DOHC manual 'Racing' calibration (rev B of 4874164)
+5007033: Mopar Performance 1995 Neon SOHC manual-transmission calibration
+
+Both use exactly the same program code; only the calibration area differs. Tables listed below contain at least one different byte.
+
+^ Address ^ Table ^ Bytes changed ^ Description ^
+| ''$B803'' | ''PARTNO2'' | 1 | Part Number prefix. The 1st 4 digits of the Mopar PN for this ECU. |
+| ''$B804'' | ''PARTNO1'' | 1 | Part Number prefix. The 1st 4 digits of the Mopar PN for this ECU. |
+| ''$B805'' | ''PARTNO0'' | 1 | Part Number prefix. The 1st 4 digits of the Mopar PN for this ECU. |
+| ''$B806'' | ''PARTREV'' | 1 | Revision Level |
+| ''$B808'' | ''RFINO2'' | 1 | RFINO2 |
+| ''$B809'' | ''RFINO1'' | 1 | RFINO1 |
+| ''$B80A'' | ''RFINO0'' | 1 | RFINO0 |
+| ''$B80B'' | ''RFIREV'' | 1 | RFIRevision |
+| ''$B80C'' | ''BITSUM'' | 1 | ChecksumValue |
+| ''$B80D'' | ''CODE13'' | 1 | CODE13 |
+| ''$B80F'' | ''CODE11_'' | 1 | CODE11 |
+| ''$B811'' | ''CONFIG'' | 1 | These are the factory configuration options. |
+| ''$B817'' | ''IPLMSK1'' | 1 | Illuminate PowerLoss Light Mask1. These errors alert the driver. |
+| ''$B818'' | ''IPLMSK2'' | 1 | Illuminate PowerLoss Light Mask2. These errors alert the driver. |
+| ''$B819'' | ''IPLMSK3'' | 4 | Illuminate PowerLoss Light Mask3. These errors alert the driver. |
+| ''$B829'' | ''HOTMRP'' | 245 | AdvanceFromMAPAndRPMWarmIdlePart |
+| ''$B94D'' | ''BASADV'' | 36 | BaseAdvanceFromMAPandCoolant3D |
+| ''$B9D6'' | ''IDLADV'' | 3 | IdleAdvanceFromCoolantTemp |
+| ''$B9E5'' | ''IDLAD2'' | 6 | IdleAdvanceFromCoolantTemp2 |
+| ''$B9F9'' | ''SPKADD'' | 13 | This is how much advance is added to increase engine speed. |
+| ''$BA0C'' | ''SPKRET'' | 14 | This is how much advance is added to increase engine speed. |
+| ''$BA1F'' | ''SPKAD2'' | 8 | This is how much advance is added to increase engine speed. |
+| ''$BA32'' | ''SPKRT2'' | 6 | This is how much advance is added to increase engine speed. |
+| ''$BA5E'' | ''ADO2C2'' | 6 | AdvanceAddedFromO2FeedbackCounter2 |
+| ''$BA8C'' | ''BASCHG'' | 12 | Product is added to the coolant temp base advance. |
+| ''$BA9B'' | ''BASMAP'' | 5 | Product is added to the coolant temp base advance. |
+| ''$BAAA'' | ''BASRPM'' | 22 | Product is added to the coolant temp base advance. |
+| ''$BAC8'' | ''ILDMAP'' | 6 | IdlePWFactorFromMAP |
+| ''$BACF'' | ''ADOTFN'' | 10 | Added to the total advance. |
+| ''$BAE6'' | ''WOTMRP'' | 144 | AdvanceFromMAPAndRPMWarmFull |
+| ''$BB89'' | ''KNARPM'' | 1 | MinRPMForAverageKnockVoltCalc |
+| ''$BB8A'' | ''KNARPX'' | 1 | MaxRPMForAverageKnockVoltCalc |
+| ''$BB8B'' | ''KNACLT'' | 1 | MinCoolantTempForAverageKnockVoltCalc |
+| ''$BB8C'' | ''KNAIAT'' | 1 | MinChargeTempForAverageKnockVoltCalc |
+| ''$BB93'' | ''DLTKNK'' | 17 | Input from the knock sensor that is above this voltage is considered Knock. |
+| ''$BBB6'' | ''INNBNK'' | 1 | KnockRetardIncrProduct NoBoostNoKnock |
+| ''$BBBE'' | ''MAXRTD'' | 7 | MaximumKnockRetardPerCylinder |
+| ''$BBC9'' | ''RETMAX'' | 7 | Maximum Knock Retard from Map |
+| ''$BBD4'' | ''ARMAP'' | 6 | This table is reduced by the value in #002b (0, 1/4, 1/2, 3/4, or 1) depending on the boost control routine. And the result is subtracted from the advance calculated by 8010 or 805b |
+| ''$BBEF'' | ''ARRPM'' | 6 | The result of this table is multiplied by #002b (0, 1/4, 1/2, 3/4, or 1) and subtracted from the table at #8098 |
+| ''$BC0A'' | ''ARMPIC'' | 1 | ff disables the Adaptive Knock Retard |
+| ''$BC0B'' | ''ARINDX'' | 1 | AdaptiveRetardIndexBase 80 |
+| ''$BC0E'' | ''ARTM5P'' | 1 | AdaptiveRetardTimeOver5psiBoost |
+| ''$BC0F'' | ''TOTKRT'' | 1 | TotalKnockRetardRef |
+| ''$BC10'' | ''ARMINT'' | 1 | AdaptiveRetardMinimumTemp |
+| ''$BC24'' | ''RPMRT2'' | 1 | RPMLimitForTPSRetard WithAR |
+| ''$BC27'' | ''TPSRT2'' | 6 | Retard from deltaTPS. |
+| ''$BC33'' | ''MMPDRE'' | 1 | MinimumMAPForDeltaRPMEvaluation |
+| ''$BC35'' | ''MSPDRE'' | 1 | MinimumMPHForDeltaRPMEvaluation |
+| ''$BC3B'' | ''ICCNT2'' | 101 | IdleControlCounterInit2 |
+| ''$BD6A'' | ''RETSPD'' | 1 | Retard from Speed. |
+| ''$BDBC'' | ''STRTFL'' | 10 | Start fuel uSec = [ STRTFL // STRTFL // (1 - STFBAR - STFTMP) // EPPMUL + (BATOFF // 4) ] * 4 |
+| ''$BDE3'' | ''STRLMT'' | 1 | Coldest temperature accepted as input to STRTFL table - anything below this value will be replaced with this value |
+| ''$BDE4'' | ''STFLOI'' | 6 | StartFuelOffIdleFactor fromRPM |
+| ''$BE0B'' | ''STFLID'' | 6 | StartFuelIdleFactor fromRPM |
+| ''$BE41'' | ''EPPMUL'' | 5 | Start fuel uSec = [ STRTFL // STRTFL // (1 - STFBAR - STFTMP) // EPPMUL + (BATOFF // 4) ] * 4. This table decreases fuel for each engine rotation while starting |
+| ''$BE96'' | ''SFDCAY'' | 3 | Start fuel uSec = [ STRTFL // STRTFL // (1 - STFBAR - STFTMP) // EPPMUL + (BATOFF // 4) ] * 4. This allows fuel to decay gradually after the start-run transition. |
+| ''$BEA5'' | ''BATOFF'' | 12 | Compensates for slower opening times of injectors with lower voltage. |
+| ''$BEC9'' | ''PRTTBL'' | 279 | FuelFromRPMAndMAP |
+| ''$BFED'' | ''PTEADJ'' | 107 | EnrichAdjust FromMap |
+| ''$C089'' | ''PTENRP'' | 1 | EPP per amount for increasing multiplier |
+| ''$C08D'' | ''PTENUM'' | 1 | No of PTENRD below PTELMT that PT enrich must be to return to HOTMAP spark advance after maxed out |
+| ''$C091'' | ''RPMMAP'' | 4 | EPP Control toggle |
+| ''$C0A9'' | ''DLTPRP'' | 1 | Throttle self calibration |
+| ''$C0B4'' | ''UNLOAD'' | 17 | DeltaThrottleFrom MINTHR ToUnloadCrankingFuel |
+| ''$C0CA'' | ''WOTENR'' | 152 | WOTEnrichmentFromRPMAndMAP |
+| ''$C166'' | ''CURV3D'' | 69 | Fuel Modifier from coolant temp and time. |
+| ''$C1C3'' | ''CLDLDP'' | 68 | Base Fuel Modifier for Off-Idle |
+| ''$C220'' | ''CLDLDI'' | 68 | Base Fuel Modifier for Idle |
+| ''$C28D'' | ''BARENR'' | 8 | Baro enrichment factor |
+| ''$C29C'' | ''BARMAP'' | 5 | Baro enrichment factor multiplier from MAP |
+| ''$C2CA'' | ''AIRTMP'' | 8 | Charge Temp Factor. Note that this is an unfiltered charge temp voltage, so higher numbers are lower temps |
+| ''$C2DD'' | ''AIRMAP'' | 10 | Charge temp enrichment factor multiplier from MAP |
+| ''$C2E8'' | ''AIRRPM'' | 6 | Charge temp enrichment factor multiplier from RPM |
+| ''$C2F5'' | ''POSSLP'' | 4 | Throttle Transient Enrich PW Addition |
+| ''$C307'' | ''AESLOP'' | 4 | Transient Enrichment PW Addition |
+| ''$C316'' | ''LOTTHR'' | 4 | Decel leanout factor - THR based. When Y is zero, factor is 1.00 |
+| ''$C328'' | ''DECEL'' | 8 | DecelLeanoutFactorMAP FromTemp |
+| ''$C457'' | ''CLTEMP'' | 1 | Temperature to start CLTIME Timer - $94 = 70degreesF |
+| ''$C477'' | ''PRIRMP'' | 32 | Lower RPM Boundary - RPM/32 |
+| ''$C4A3'' | ''SECRMP'' | 21 | Lower RPM Boundary - RPM/32 |
+| ''$C4E0'' | ''MP2'' | 1 | AutoCalMapCellBoundary1 |
+| ''$C4E1'' | ''MP3'' | 1 | AutoCalMapCellBoundary1 |
+| ''$C4E3'' | ''MP5'' | 1 | AutoCalMapCellBoundary1 |
+| ''$C4E4'' | ''DLTMAP'' | 1 | Map Hysteresis At Map Cell Boundaries |
+| ''$C4EF'' | ''MAPDEC'' | 1 | No Cell Update And O2CNTR Held Below This Map. Set to 0xff to disable O2 feedback. |
+| ''$C4F9'' | ''PEFMUL'' | 13 | Pumping Efficiency multiplier from MAP |
+| ''$C51F'' | ''KNNRCH'' | 1 | Multiplied by total knock to calculate knock enrich factor. |
+| ''$C520'' | ''MAXKNR'' | 2 | Maximum knock enrich factor. |
+| ''$C528'' | ''DFS20M'' | 1 | 20MPHDecelFuelShutoffSpeedLimitOFF |
+| ''$C529'' | ''DFS20L'' | 1 | 20MPHDecelFuelShutoffSpeedLimitON |
+| ''$C53E'' | ''DFRPMX'' | 9 | DecelFuelShutoffTurnonLimitFrom0x046f |
+| ''$C569'' | ''SPDLMH'' | 1 | SpeedLimitFuelShutoff254mph |
+| ''$C56A'' | ''SPDLML'' | 1 | SpeedLimitFuelShutoffRestore253mph |
+| ''$C56B'' | ''SPDRPM'' | 1 | EngineSpeedHighLimitToEnableOverspeed |
+| ''$C56C'' | ''SPDRPM2'' | 1 | EngineSpeedLowLimitToDisableOverspeed |
+| ''$C56F'' | ''REVLMT3'' | 1 | MapAbove75PctAndIdleSwitchClosed2000 |
+| ''$C570'' | ''REVLMT4'' | 1 | MapAbove75PctAndThrLimpin2000 |
+| ''$C571'' | ''REVLMT5'' | 1 | RPMLimiterNormalOnRPM |
+| ''$C572'' | ''REVLMT6'' | 1 | RPMLimiterNormalOffRPM |
+| ''$C574'' | ''RVLSPD'' | 1 | CarSpeedForRevLimitWithTBOff |
+| ''$C578'' | ''DCLRPL'' | 1 | Low RPM to activate decel fuel shutoff. Should be lower than shutoff RPM On point. |
+| ''$C57B'' | ''DFRPM1'' | 2 | 2050RPM DecelFuelShutoffTurnonLimit |
+| ''$C57E'' | ''DLYRPM'' | 1 | Decel AIS RPM trigger (third AIS delay) |
+| ''$C5A5'' | ''AISPN'' | 5 | Idle Speed From Temp in park/neutral or manual trans |
+| ''$C5B0'' | ''AISCLD'' | 9 | Idle Speed From temp in Drive, auto trans only |
+| ''$C64C'' | ''CLDPOS'' | 13 | Cold OffIdle AIS Positioning, Increases instantly, decreases after DLYOFI |
+| ''$C672'' | ''BARAIS'' | 12 | Barometric compensation factor for AIS control |
+| ''$C6AC'' | ''ACCTBL'' | 14 | ACOffIdleDelta FromSpeed |
+| ''$C6BF'' | ''PERKCK'' | 1 | AcClutchAisAdjustmentConstant |
+| ''$C6C0'' | ''OFFPER2'' | 1 | AisInstantlyClosesWhenAcDisengages2 |
+| ''$C6C1'' | ''AMBAIS'' | 93 | AmbientTempAISCompensation |
+| ''$C769'' | ''DCALRT'' | 12 | DacalUpdateRate01 03 07 0f 1f 3f 7f ff |
+| ''$C779'' | ''AISINC'' | 35 | AISPOSIncrementForSW2b7 |
+| ''$C7DB'' | ''DANOM2'' | 2 | Base nominalCal2 |
+| ''$C7DD'' | ''DANOM'' | 1 | Base nominalCal |
+| ''$C7ED'' | ''TEMPDC'' | 6 | DecelAis FromTemp |
+| ''$C839'' | ''DCLMIN'' | 2 | MinLimitOnDecelAisControlledMap |
+| ''$C83B'' | ''DLYTIM'' | 16 | Decel AIS Delay after throttle closes when moving |
+| ''$C87E'' | ''RPMDLT'' | 4 | RollingAisMinRpm |
+| ''$C882'' | ''ISPDCY'' | 1 | RollingAisDecay |
+| ''$C883'' | ''DECAIS'' | 2 | RollingAisUpdateRate 01 03 07 0f 1f 3f 7f ff |
+| ''$C893'' | ''FANTMP1'' | 1 | Detailed Description3 |
+| ''$C894'' | ''FANTMP2'' | 1 | Detailed Description3 |
+| ''$C895'' | ''FANTMP3'' | 1 | Detailed Description3 |
+| ''$C896'' | ''FANTMP4'' | 1 | Detailed Description3 |
+| ''$C897'' | ''FANTMP5'' | 1 | Detailed Description3 |
+| ''$C898'' | ''FANTMP6'' | 4 | Detailed Description3 |
+| ''$C998'' | ''CLTRMN'' | 1 | MinimumCylinderTrim |
+| ''$CA70'' | ''SCNVLO'' | 1 | CruiseControlForBrakeFlagManualTransmissionClutchDisableLo |
+| ''$CB26'' | ''MININC'' | 1 | Amount MINTHR IsIncreasedAtKeyOnOnly |
+| ''$CB27'' | ''MAPTHR'' | 1 | ThrottleSelfCalibrationMapDeltaThreshold |
+| ''$CB28'' | ''RPMTHR'' | 1 | ThrottleSelfCalibrationRpmThreshold |
+| ''$CB31'' | ''EGR23'' | 1 | ExhGasRecircConstFromMAP1 |
+| ''$CB32'' | ''EGR24'' | 1 | ExhGasRecircConstFromMAP2 |
+| ''$CB35'' | ''EGR27'' | 7 | ExhGasRecircConstFromCoolantTemp |
+| ''$CB46'' | ''EGR18'' | 2 | ExhGasRecircConstLoLimit18 |
+| ''$CB48'' | ''EGR15'' | 2 | ExhGasRecircConstFromRPMLoLimit15 |
+| ''$CB4A'' | ''EGR9'' | 3 | ExhGasRecircConstFromTimeEngRunning9 |
+| ''$CB50'' | ''EGR16'' | 1 | ExhGasRecircConstLoLimit16 |
+| ''$CB51'' | ''EGR16A'' | 1 | ExhGasRecircConstHiLimit16a |
+| ''$CB52'' | ''EGR17A'' | 1 | ExhGasRecircConstHiLimit17a |
+| ''$CB53'' | ''EGR19'' | 1 | ExhGasRecircConstLoLimit19 |
+| ''$CB55'' | ''EGR6'' | 1 | ExhGasRecircConst6 |
+| ''$CB57'' | ''SCRMP1'' | 110 | SecondaryRampSubtractor1 |
+| ''$CDA8'' | ''COILHI'' | 49 | HiLimitBatteryVoltsForCoilVerify |
+| ''$CF5D'' | ''RPMSCL'' | 15 | Output is used as the input to the 3D tables |
+| ''$CFDF'' | ''RPMTHS'' | 47 | AISPos from RPM |
+| ''$D423'' | ''FASTDA'' | 6 | FastDataOutputAddressTable |
+
+The full table-by-table diff (over 100 tables) is in [[https://github.com/DDex89/neon-fcc-firmware/blob/main/docs/en/calibration_variants.md|calibration_variants.md]].

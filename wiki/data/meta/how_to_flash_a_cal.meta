@@ -1,0 +1,10 @@
+a:2:{s:7:"current";a:9:{s:4:"date";a:2:{s:7:"created";i:1421955664;s:8:"modified";i:1428458530;}s:11:"last_change";a:7:{s:4:"date";i:1428458530;s:2:"ip";s:13:"23.115.161.12";s:4:"type";s:1:"E";s:2:"id";s:18:"how_to_flash_a_cal";s:4:"user";s:8:"shelgame";s:3:"sum";s:11:"[Overview] ";s:5:"extra";s:0:"";}s:4:"user";s:0:"";s:7:"creator";s:0:"";s:11:"contributor";a:1:{s:8:"shelgame";s:9:"Rob Lloyd";}s:5:"title";s:70:"How to flash the BoostButton flash module installed in a SMEC or SBEC.";s:11:"description";a:2:{s:15:"tableofcontents";a:2:{i:0;a:4:{s:3:"hid";s:69:"how_to_flash_the_boostbutton_flash_module_installed_in_a_smec_or_sbec";s:5:"title";s:70:"How to flash the BoostButton flash module installed in a SMEC or SBEC.";s:4:"type";s:2:"ul";s:5:"level";i:2;}i:1;a:4:{s:3:"hid";s:8:"overview";s:5:"title";s:8:"Overview";s:4:"type";s:2:"ul";s:5:"level";i:3;}}s:8:"abstract";s:445:"----------
+
+How to flash the BoostButton flash module installed in a SMEC or SBEC.
+
+----------
+
+Overview
+
+	*  Make sure your car is setup to bootstrap the ECU. For the SMEC, you will need to add a wire to pin#11 of the 60-way connector.
+	*  You will also need to add a switch (for the SMEC) or pushbutton (for the SBEC) to apply power to the bootstrap wire. See the bottom of the page for more details on setting up the wire/switch for flashing.";}s:8:"relation";a:3:{s:10:"references";a:2:{s:9:"add_a_pin";b:1;s:11:"cable_setup";b:1;}s:5:"media";a:3:{s:20:"mpt_com_settings.jpg";b:1;s:14:"write_chip.jpg";b:1;s:18:"flash_progress.jpg";b:1;}s:10:"firstimage";s:20:"mpt_com_settings.jpg";}s:8:"internal";a:2:{s:5:"cache";b:1;s:3:"toc";b:1;}}s:10:"persistent";a:5:{s:4:"date";a:2:{s:7:"created";i:1421955664;s:8:"modified";i:1428458530;}s:11:"last_change";a:7:{s:4:"date";i:1428458530;s:2:"ip";s:13:"23.115.161.12";s:4:"type";s:1:"E";s:2:"id";s:18:"how_to_flash_a_cal";s:4:"user";s:8:"shelgame";s:3:"sum";s:11:"[Overview] ";s:5:"extra";s:0:"";}s:4:"user";s:0:"";s:7:"creator";s:0:"";s:11:"contributor";a:1:{s:8:"shelgame";s:9:"Rob Lloyd";}}}

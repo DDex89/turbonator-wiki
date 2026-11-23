@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>'95 Neon FCC: hardware and firmware overview [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="fcc_overview" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body">
+<ul class="">
+<li class="level1"><a href="#neon_fcchardware_and_firmware_overview">'95 Neon FCC: hardware and firmware overview</a>
+<ul class="">
+<li class="level2"><a href="#memory_map">Memory map</a></li>
+<li class="level2"><a href="#timers_and_interrupts">Timers and interrupts</a></li>
+<li class="level2"><a href="#start-up_and_recovery">Start-up and recovery</a></li>
+<li class="level2"><a href="#main_loop_and_scheduler">Main loop and scheduler</a></li>
+<li class="level2"><a href="#table_formats">Table formats</a></li>
+<li class="level2"><a href="#rom_checksum">ROM checksum</a></li>
+<li class="level2"><a href="#input_output_map">Input / output map</a>
+<ul class="">
+<li class="level3"><a href="#hc11_timer_pins_port_a">68HC11 timer pins (port A)</a></li>
+<li class="level3"><a href="#a_d_converter_port_e">A/D converter (port E)</a></li>
+<li class="level3"><a href="#external_i_o_device_at_0400">External I/O device at $0400</a></li>
+<li class="level3"><a href="#spi_output_driver">SPI output driver</a></li>
+<li class="level3"><a href="#companion_chip_outputs">Companion chip outputs</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#pcm_connector_60_pins">PCM connector (60 pins)</a></li>
+<li class="level2"><a href="#engine_position_and_event_scheduling">Engine position and event scheduling</a></li>
+</ul></li>
+</ul>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Hard" src="_static/lib/plugins/howhard/images/style1/4.png"/></div><div class="howhard_txt">Hard</div></div><hr/>
+<h1 class="sectionedit1" id="neon_fcchardware_and_firmware_overview">'95 Neon FCC: hardware and firmware overview</h1>
+<div class="level1">
+<hr/>
+<p>
+This page and its companions (<a class="wikilink1" data-wiki-id="fcc_calibration" href="fcc_calibration.html" title="fcc_calibration">calibration</a>, <a class="wikilink1" data-wiki-id="fcc_sci" href="fcc_sci.html" title="fcc_sci">diagnostics and communication</a>, <a class="wikilink1" data-wiki-id="fcc_fault_codes" href="fcc_fault_codes.html" title="fcc_fault_codes">fault codes</a>, <a class="wikilink1" data-wiki-id="fcc_tuning_notes" href="fcc_tuning_notes.html" title="fcc_tuning_notes">engine control and tuning notes</a>) summarise the reverse-engineered, rebuildable firmware source published at <a class="urlextern" href="https://github.com/DDex89/neon-fcc-firmware" rel="ugc nofollow noopener" target="_blank" title="https://github.com/DDex89/neon-fcc-firmware">github.com/DDex89/neon-fcc-firmware</a>. The source assembles back into the original ROM images byte for byte, so every statement below can be checked against real code. Statements marked <em>(inferred)</em> come from reading the code and are not yet confirmed on real hardware; the board is potted in soft compound, so probing the CPU pins directly has not been done.
+</p>
+<p>
+The 1995 Neon controller (“FCC”, Four Cylinder Controller) has a single 60-pin connector. From 1996
+the Neon uses the SBEC III with two 40-pin connectors, which is different hardware and firmware.
+</p>
+<p>
+The CPU is a Motorola <strong>68HC11</strong> running in expanded mode. The register layout used by the code
+(OPTION at $1039, INIT at $103D, BPROT at $1035, EEPROM window at $B600) matches the 68HC11 A/E
+family. The program lives in an external (E)EPROM that fills $1200-$FFFF: 60,928 bytes, exactly the
+size of the <code>.bin</code> dumps.
+</p>
+</div>
+<h2 class="sectionedit2" id="memory_map">Memory map</h2>
+<div class="level2">
+<div class="table sectionedit3"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Range </th><th class="col1"> Contents </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>$0000-$00FF</code> </td><td class="col1"> Direct-page RAM: the most used variables (8-bit addressing) </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>$0100-$03FF</code> </td><td class="col1"> RAM: more variables, fault code data, buffers </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>$0400-$0437</code> </td><td class="col1"> External I/O device registers (the original disassembly calls it “PIA”). Initialised from the table after ResetInterrupt. It also drives the <strong>injectors</strong>: per-cylinder pulse widths at <code>$0424/$0428/$042C/$0430</code>, command register <code>$0410</code>, status in <code>$0400/$0401</code>. Register <code>$0409</code> bit 4 is toggled every main-loop pass (heartbeat). <em>(inferred)</em> </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>$0438-$04FF</code> </td><td class="col1"> RAM and the stack (the stack pointer starts at $04FF) <em>(inferred)</em> </td>
+</tr>
+<tr class="row5">
+<td class="col0"> <code>$1000-$103F</code> </td><td class="col1"> 68HC11 internal registers (<code>src/inc/hc11_regs.inc</code>) </td>
+</tr>
+<tr class="row6">
+<td class="col0"> <code>$1200-$B4CC</code> </td><td class="col1"> Program code, part 1 </td>
+</tr>
+<tr class="row7">
+<td class="col0"> <code>$B4CD-$B5FF</code> </td><td class="col1"> Unused ($FF) </td>
+</tr>
+<tr class="row8">
+<td class="col0"> <code>$B600-$B7FF</code> </td><td class="col1"> Window of the HC11 internal EEPROM. The CPU sees the EEPROM here, not the EPROM image, and the ROM checksum skips this range. </td>
+</tr>
+<tr class="row9">
+<td class="col0"> <code>$B800-$E228</code> </td><td class="col1"> Calibration: header (part number, configuration flags) and about 460 tables and constants </td>
+</tr>
+<tr class="row10">
+<td class="col0"> <code>$E229-$FFD5</code> </td><td class="col1"> Program code, part 2; the copyright string is at $FFA4. $FDDA-$FFA2 (457 bytes, including the checksum spare byte $FF50) and $FFC0-$FFD5 (22 bytes) are unused $FF </td>
+</tr>
+<tr class="row11">
+<td class="col0"> <code>$FFD6-$FFFF</code> </td><td class="col1"> Interrupt vectors </td>
+</tr>
+</table></div>
+</div>
+<h4 id="calibration_header">Calibration header</h4>
+<div class="level4">
+<div class="table sectionedit4"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Address </th><th class="col1"> Meaning </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>$B800-$B801</code> </td><td class="col1"> Calibration ID bytes </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>$B802-$B805</code> </td><td class="col1"> Part number in BCD, for example <code>05 00 70 33</code> = 05007033. <strong>$B805 is also the ROM checksum target.</strong> </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>$B806</code> </td><td class="col1"> Revision </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>$B807-$B80B</code> </td><td class="col1"> RFI number and revision </td>
+</tr>
+<tr class="row5">
+<td class="col0"> <code>$B811</code> </td><td class="col1"> Configuration flags: bit 7 A/C, bit 6 EGR, bit 5 automatic transmission, bit 2 alarm disable, bit 1 early TPS transient fuel </td>
+</tr>
+<tr class="row6">
+<td class="col0"> <code>$B812</code> </td><td class="col1"> Configuration flags 2 (bit 4 transient fuel, bit 6 O2) </td>
+</tr>
+<tr class="row7">
+<td class="col0"> <code>$B813-$B816</code> </td><td class="col1"> CCD bus configuration </td>
+</tr>
+<tr class="row8">
+<td class="col0"> <code>$B817-$B819</code> </td><td class="col1"> Masks of the faults that light the check-engine lamp </td>
+</tr>
+</table></div>
+<p>
+See also the input / output map, the connector pinout and
+<a class="wikilink1" data-wiki-id="fcc_sci" href="fcc_sci.html" title="fcc_sci">diagnostics</a>.
+</p>
+</div>
+<h2 class="sectionedit5" id="timers_and_interrupts">Timers and interrupts</h2>
+<div class="level2">
+<p>
+The timer runs at E-clock / 4. With the usual 8 <abbr title="Megahertz">MHz</abbr> crystal (2 <abbr title="Megahertz">MHz</abbr> E-clock) one TCNT tick is
+<strong>2 us</strong> and the counter wraps every 131 ms.
+</p>
+<div class="table sectionedit6"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Vector </th><th class="col1"> Handler </th><th class="col2"> Use </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> RESET </td><td class="col1"> <code>ResetInterrupt</code> </td><td class="col2"> Start-up </td>
+</tr>
+<tr class="row2">
+<td class="col0"> PAI (PA7 edge) </td><td class="col1"> <code>Isr_PAI_CamPhase</code> </td><td class="col2"> Cam sensor edges (both polarities): cylinder identification from the crank signal level <em>(inferred)</em> </td>
+</tr>
+<tr class="row3">
+<td class="col0"> PAOV </td><td class="col1"> <code>Isr_PAOV</code> </td><td class="col2"> Pulse accumulator overflow count </td>
+</tr>
+<tr class="row4">
+<td class="col0"> TIC1 (PA2) </td><td class="col1"> <code>Isr_TIC1_CrankEvent</code> </td><td class="col2"> Crank sensor edges: the main engine event; dispatches the per-edge handlers that schedule fuel and spark <em>(inferred; Lloyd called it the cam sensor)</em> </td>
+</tr>
+<tr class="row5">
+<td class="col0"> TIC2 </td><td class="col1"> <code>Interrupt_SpeedometerSignal</code> </td><td class="col2"> Vehicle speed sensor </td>
+</tr>
+<tr class="row6">
+<td class="col0"> TIC3 (PA0) </td><td class="col1"> <code>Isr_TIC3</code> </td><td class="col2"> Other edge of the crank signal (slot width); starts the long period measurement together with TOF <em>(inferred)</em> </td>
+</tr>
+<tr class="row7">
+<td class="col0"> TOF </td><td class="col1"> <code>Isr_TOF</code> </td><td class="col2"> Timer overflow count for long periods </td>
+</tr>
+<tr class="row8">
+<td class="col0"> TOC1 </td><td class="col1"> <code>Isr_TOC1_Periodic</code> </td><td class="col2"> Periodic interrupt every $03B9 ticks (about 1.9 ms) </td>
+</tr>
+<tr class="row9">
+<td class="col0"> TOC3 (PA5) </td><td class="col1"> <code>Interrupt_DwellTimerA</code> </td><td class="col2"> Ignition coil A driver: dwell start and spark </td>
+</tr>
+<tr class="row10">
+<td class="col0"> TOC4 (PA4) </td><td class="col1"> <code>Isr_TOC4_KnockSample</code> </td><td class="col2"> End of the knock window: samples the knock sensor through the A/D </td>
+</tr>
+<tr class="row11">
+<td class="col0"> TOC5 (PA3) </td><td class="col1"> <code>Interrupt_DwellTimerB</code> </td><td class="col2"> Ignition coil B driver: dwell start and spark </td>
+</tr>
+<tr class="row12">
+<td class="col0"> TOC2, IRQ, XIRQ, SWI, illegal opcode, COP, clock monitor, SCI, SPI, RTI </td><td class="col1"> <code>Trap_*</code> </td><td class="col2"> Not used: these handlers record the cause and restart the controller </td>
+</tr>
+</table></div>
+<p>
+Reset sets TCTL2 = $1A (IC1 on rising edges, IC2 and IC3 on falling edges) and TCTL1 = $2A (OC3, OC4
+and OC5 clear their pins on compare; OC2 is disconnected from its pin).
+</p>
+<p>
+The register names in the original disassembly (inherited from the turbo SMEC) call OC3 and OC4
+injector drivers and OC2 “wastegate”. On the FCC the coils use OC3/OC5 directly, while the four
+injectors are timed by the external I/O device (see <a class="wikilink1" data-wiki-id="fcc_tuning_notes" href="fcc_tuning_notes.html" title="fcc_tuning_notes">engine_control.md</a>).
+</p>
+</div>
+<h2 class="sectionedit7" id="start-up_and_recovery">Start-up and recovery</h2>
+<div class="level2">
+<p>
+<code>ResetInterrupt</code> programs the HC11 system registers within the first 64 cycles, as the HC11
+requires for the protected registers. It then checks whether RAM survived:
+</p>
+<ul>
+<li class="level1"><div class="li"> <code>CountRamValuesFrom05to38</code> sums the RAM that holds adaptive memory, fault codes and learned values</div>
+</li>
+</ul>
+<p>
+($0005-$0036 and $0100-$014D);
+</p>
+<ul>
+<li class="level1"><div class="li"> if the sum matches the stored copy and the signature <code>$AAA5</code> is present, the RAM is kept (warm start);</div>
+</li>
+<li class="level1"><div class="li"> otherwise RAM is cleared and default values are loaded (cold start).</div>
+</li>
+</ul>
+<p>
+Every unused interrupt vector points to a small <code>Trap_*</code> stub. The stub puts a cause bit into
+<code>BYTE00</code>, then runs the same initialisation as reset <strong>without</strong> clearing RAM, so after a crash,
+watchdog timeout or illegal opcode the engine keeps its learned values and fault codes.
+</p>
+<div class="table sectionedit8"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Cause bit </th><th class="col1"> Trap </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> $01 </td><td class="col1"> SCI / SPI / real-time interrupt </td>
+</tr>
+<tr class="row2">
+<td class="col0"> $02 </td><td class="col1"> XIRQ </td>
+</tr>
+<tr class="row3">
+<td class="col0"> $04 </td><td class="col1"> COP watchdog </td>
+</tr>
+<tr class="row4">
+<td class="col0"> $08 </td><td class="col1"> Clock monitor </td>
+</tr>
+<tr class="row5">
+<td class="col0"> $10 </td><td class="col1"> Illegal opcode </td>
+</tr>
+<tr class="row6">
+<td class="col0"> $20 </td><td class="col1"> SWI </td>
+</tr>
+<tr class="row7">
+<td class="col0"> $40 </td><td class="col1"> Output compare 2 </td>
+</tr>
+<tr class="row8">
+<td class="col0"> $80 </td><td class="col1"> IRQ pin </td>
+</tr>
+</table></div>
+</div>
+<h2 class="sectionedit9" id="main_loop_and_scheduler">Main loop and scheduler</h2>
+<div class="level2">
+<p>
+<code>MainProgramLoop</code> runs once every <strong>$1500 ticks = 10.75 ms</strong>. That is the “x 11 ms” unit that
+appears in many calibration constants.
+</p>
+<ol>
+<li class="level1"><div class="li"> <code>MainSubLoop</code> runs on every pass: COP watchdog kick, heartbeat on $0409, period measurements,</div>
+</li>
+</ol>
+<p>
+A/D of battery voltage, TPS and cruise switches, throttle and baro logic, cranking fuel, and
+further always-run tasks.
+</p>
+<ol>
+<li class="level1"><div class="li"> Then at most <strong>one</strong> of the eight sub-loops <code>SubLoopA</code>..<code>SubLoopH</code> runs. Their request bits are in</div>
+</li>
+</ol>
+<p>
+RAM $0150; the lowest pending bit is served and cleared. Slow tasks (temperature sensors,
+diagnostics …) are spread this way. <code>IncrementLoopCounters_MM</code> sets request bit n each time bit n
+of <code>Counter_MainLoop</code> changes from 0 to 1, so sub-loop A runs every 2 passes (21.5 ms), B every 4,
+and so on up to H every 256 passes (2.75 s). [code]
+</p>
+<ol>
+<li class="level1"><div class="li"> The loop measures how long the pass took (RAM $0455, worst case in $0454) and waits until TCNT</div>
+</li>
+</ol>
+<p>
+reaches the next 10.75 ms slot.
+</p>
+<p>
+Time-critical work (fuel and spark scheduling relative to crankshaft position, knock sampling, coil
+dwell) runs in the interrupt handlers, not in the main loop.
+</p>
+</div>
+<h2 class="sectionedit10" id="table_formats">Table formats</h2>
+<div class="level2">
+<p>
+Almost all calibration data uses two formats.
+</p>
+</div>
+<h4 id="d_curves_point-slope_lookup4bytetable_fa9d">2D curves, "point-slope" (''Lookup4ByteTable'', $FA9D)</h4>
+<div class="level4">
+<pre class="code">count n
+x0, y0, slope0_hi, slope0_lo
+x1, y1, slope1_hi, slope1_lo
+...
+x(n-1), y(n-1)            ; last point has no slope</pre>
+<p>
+For an input x below x0 the result is y0. Otherwise the routine finds the segment x_i ⇐ x &lt; x_(i+1)
+and returns <code>y_i + (x - x_i) * slope_i / 256</code>. The slope is stored rather than computed, so editing
+a y value without updating the slope gives a wrong curve. MP Tune recalculates slopes automatically.
+</p>
+</div>
+<h4 id="d_maps_lookup3dtableroutine_2_b437">3D maps (''Lookup3DTableRoutine_2'', $B437)</h4>
+<div class="level4">
+<pre class="code">rows, cols, sign          ; sign: $00 unsigned, $80/$FF signed
+rows x cols bytes, row by row</pre>
+<p>
+The two inputs are 0-255 coordinates produced by transfer curves: for example <code>RPMSCL</code> turns engine
+RPM into the column coordinate and <code>MAPHI</code> turns MAP into the row coordinate. The coordinate is
+spread evenly over the (cols-1) and (rows-1) intervals and the four surrounding cells are
+interpolated bilinearly. So the RPM and MAP breakpoints of a map are defined by its transfer curve,
+not by the map itself. Changing <code>RPMSCL</code> moves every map that uses it.
+</p>
+</div>
+<h2 class="sectionedit11" id="rom_checksum">ROM checksum</h2>
+<div class="level2">
+<p>
+<code>CaculateChecksum</code> ($56E7) adds every byte of $1200-$B5FF and $B800-$FFFF (8-bit sum, skipping the
+EEPROM window). The result must equal the byte at <strong>$B805</strong>, the last byte of the part number. On a
+mismatch the routine reports fault code 53 (internal controller failure). In both images in this
+repository that fault descriptor is disabled (flag bit 7 clear, see <a class="wikilink1" data-wiki-id="fcc_fault_codes" href="fcc_fault_codes.html" title="fcc_fault_codes">fault_codes.md</a>), so
+nothing is stored and the engine runs normally. In the factory images (B559, B4F3 and B4C2)
+the same descriptor (at $D4F9 in B559) is enabled, so a wrong sum does store code 53.
+</p>
+<p>
+Anyone who changes the calibration should fix the sum with a spare byte. Factory images keep $FF50
+at $FF for this. Some images edited with MP Tune that were examined for this project do not pass
+this test, so check the sum after using any editor.
+</p>
+</div>
+<h2 class="sectionedit12" id="input_output_map">Input / output map</h2>
+<div class="level2">
+<p>
+Reconstructed from the code: register accesses, A/D conversion sequences, the actuator tests and the routines that drive each output bit. <strong>[code]</strong> follows directly from the code, <strong>[inferred]</strong> is likely but not yet confirmed on the board.
+</p>
+</div>
+<h3 class="sectionedit13" id="hc11_timer_pins_port_a">68HC11 timer pins (port A)</h3>
+<div class="level3">
+<div class="table sectionedit14"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> HC11 pin </th><th class="col1"> Function </th><th class="col2"> Use </th><th class="col3"> Pin </th><th class="col4 leftalign"> </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> PA0 </td><td class="col1"> IC3 </td><td class="col2"> Crank sensor, falling edges (slot width) </td><td class="col3"> 25 </td><td class="col4"> [inferred] </td>
+</tr>
+<tr class="row2">
+<td class="col0"> PA1 </td><td class="col1"> IC2 </td><td class="col2"> Vehicle speed sensor </td><td class="col3"> 5 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row3">
+<td class="col0"> PA2 </td><td class="col1"> IC1 </td><td class="col2"> Crank sensor, rising edges: main engine event </td><td class="col3"> 25 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row4">
+<td class="col0"> PA3 </td><td class="col1"> OC5 </td><td class="col2"> Ignition coil driver (ATM test <code>$01</code>) </td><td class="col3"> 21 or 1 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row5">
+<td class="col0"> PA4 </td><td class="col1"> OC4 </td><td class="col2"> Knock window timer; also forced high at the start of an ISO 9141 session </td><td class="col3"> — </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row6">
+<td class="col0"> PA5 </td><td class="col1"> OC3 </td><td class="col2"> Ignition coil driver (ATM test <code>$02</code>) </td><td class="col3"> 1 or 21 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row7">
+<td class="col0"> PA6 </td><td class="col1"> OC2 / output </td><td class="col2"> Intake air temperature sensor pull-up range: set selects the cold range (table <code>TMPTL1</code>), clear the hot range (<code>TMPTL2</code>); switched by <code>CheckAndFilterChargeTempSensor_SM</code> </td><td class="col3"> — </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row8">
+<td class="col0"> PA7 </td><td class="col1"> PAI </td><td class="col2"> Cam sensor, both edges </td><td class="col3"> 26 </td><td class="col4"> [code] </td>
+</tr>
+</table></div>
+<p>
+Which OC pin drives coil #1 (pin 21) and which drives coil #2 (pin 1) is not known yet.
+</p>
+</div>
+<h3 class="sectionedit15" id="a_d_converter_port_e">A/D converter (port E)</h3>
+<div class="level3">
+<p>
+Two scan modes are used: <code>ADCTL = $10</code> converts AN0-AN3, <code>ADCTL = $14</code> converts AN4-AN7. AN4 and AN5
+are each fed by a 4-to-1 analog multiplexer; bits 0-1 of I/O register <code>$0400</code> select the input of
+both at once. Results are stored as 16-bit pairs (ADR1:ADR2 and ADR3:ADR4).
+</p>
+<div class="table sectionedit16"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Channel </th><th class="col1"> Signal </th><th class="col2"> Stored in </th><th class="col3"> Pin </th><th class="col4 leftalign"> </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> AN0 </td><td class="col1"> MAP sensor (crank-synchronous scan) </td><td class="col2"> <code>MapVolts</code> </td><td class="col3"> 29 </td><td class="col4"> [inferred] </td>
+</tr>
+<tr class="row2">
+<td class="col0"> AN1 </td><td class="col1"> Battery voltage </td><td class="col2"> <code>BatteryVolts</code> </td><td class="col3"> 11 (fused B+) </td><td class="col4"> [code] signal, [inferred] pin </td>
+</tr>
+<tr class="row3">
+<td class="col0"> AN2 </td><td class="col1"> Upstream O2 sensor </td><td class="col2"> <code>O2SensorVolts</code> </td><td class="col3"> 8 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row4">
+<td class="col0"> AN3 </td><td class="col1"> Knock signal, single conversion in <code>Isr_TOC4_KnockSample</code> (<code>ADCTL = $03</code>), probably after an interface circuit </td><td class="col2 leftalign"> </td><td class="col3"> 27 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row5">
+<td class="col0"> AN4, select <code>00</code> </td><td class="col1"> Coolant temperature; the pull-up range is switched with <code>$0400</code> bit 7 </td><td class="col2"> <code>LastCoolantTempVolts</code> ($016C) </td><td class="col3"> 28 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row6">
+<td class="col0"> AN4, select <code>01</code> </td><td class="col1"> Read but never used </td><td class="col2"> <code>AnalogMux01_AN4</code> ($016E) </td><td class="col3"> ? </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row7">
+<td class="col0"> AN4, select <code>10</code> </td><td class="col1"> ASD relay output voltage, checked against battery voltage (fault code 42) and used for the injector supply </td><td class="col2"> <code>AsdOutputVolts</code> ($0170) </td><td class="col3"> 42 </td><td class="col4"> [inferred] </td>
+</tr>
+<tr class="row8">
+<td class="col0"> AN4, select <code>11</code> </td><td class="col1"> Read but never used </td><td class="col2"> <code>AnalogMux11_AN4</code> ($0172) </td><td class="col3"> ? </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row9">
+<td class="col0"> AN5, select <code>00</code> </td><td class="col1"> Intake air temperature (<code>ChargeTemp</code> in the original names); the pull-up range is switched with PA6 </td><td class="col2"> <code>LastChargeTempVolts</code> ($016D) </td><td class="col3"> 6 </td><td class="col4"> [code] signal, [inferred] pin </td>
+</tr>
+<tr class="row10">
+<td class="col0"> AN5, select <code>01</code> </td><td class="col1"> Downstream O2 sensor </td><td class="col2"> <code>DownstreamO2Volts</code> ($016F) </td><td class="col3"> 7 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row11">
+<td class="col0"> AN5, select <code>10</code> </td><td class="col1"> Temperature input checked by fault code 44 (<code>AmbientAirTempVolts</code> in the original names) </td><td class="col2"> ($0171) </td><td class="col3"> 49? </td><td class="col4"> [inferred] </td>
+</tr>
+<tr class="row12">
+<td class="col0"> AN5, select <code>11</code> </td><td class="col1"> Battery temperature (fault code 44) </td><td class="col2"> <code>BatteryTempVolts</code> ($0173) </td><td class="col3"> 49 </td><td class="col4"> [inferred] </td>
+</tr>
+<tr class="row13">
+<td class="col0"> AN6 </td><td class="col1"> Throttle position (TPS) </td><td class="col2"> <code>LastTpsVolts</code> ($0174) </td><td class="col3"> 10 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row14">
+<td class="col0"> AN7 </td><td class="col1"> Speed control switches (one resistor ladder) </td><td class="col2"> <code>CruiseControlSwitchStateAnalog</code> ($0175) </td><td class="col3"> 31 </td><td class="col4"> [code] </td>
+</tr>
+</table></div>
+<p>
+The fuel level sensor (pin 13) is not used anywhere in the code. If it is wired to the controller,
+the likely places are the two AN4 inputs that are read but never used.
+</p>
+</div>
+<h3 class="sectionedit17" id="external_i_o_device_at_0400">External I/O device at $0400</h3>
+<div class="level3">
+<div class="table sectionedit18"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Register </th><th class="col1"> Bits </th><th class="col2"> Use </th><th class="col3 leftalign"> </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>$0400</code> (write) </td><td class="col1"> 0-1 </td><td class="col2"> Select for the AN4 / AN5 analog multiplexers </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row2">
+<td class="col0 leftalign"> </td><td class="col1"> 2 </td><td class="col2"> Output driven by ATM test <code>$0D</code>, latched by a pulse on <code>$0402</code> bit 2 </td><td class="col3"> [code], output unknown </td>
+</tr>
+<tr class="row3">
+<td class="col0 leftalign"> </td><td class="col1"> 7 </td><td class="col2"> Coolant sensor pull-up range: set selects the cold range (<code>TMPTL1</code>), clear the hot range (<code>TMPTL2</code>); switched after four readings beyond $40 / $DC </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>$0400</code> (read) </td><td class="col1"> 3 </td><td class="col2"> Companion chip ready: every link byte waits for this bit to clear </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row5">
+<td class="col0 leftalign"> </td><td class="col1"> 4 </td><td class="col2"> Injector driver status, checked before each injection command </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row6">
+<td class="col0 leftalign"> </td><td class="col1"> 6 </td><td class="col2"> Read by the shutdown routine </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row7">
+<td class="col0"> <code>$0401</code> (read) </td><td class="col1 leftalign"> </td><td class="col2"> Status read by the tachometer test and the injector driver check </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row8">
+<td class="col0"> <code>$0402</code> </td><td class="col1"> 2 </td><td class="col2"> Strobe for <code>$0400</code> bit 2 </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row9">
+<td class="col0 leftalign"> </td><td class="col1"> 3 </td><td class="col2"> Clock pulse for each companion chip byte </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row10">
+<td class="col0"> <code>$0403</code> </td><td class="col1"> 0 </td><td class="col2"> Set at reset and after each link frame </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row11">
+<td class="col0 leftalign"> </td><td class="col1"> 1 </td><td class="col2"> Tachometer output, pin 48 </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row12">
+<td class="col0 leftalign"> </td><td class="col1"> 2 </td><td class="col2"> Chip select of the SPI output driver </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row13">
+<td class="col0 leftalign"> </td><td class="col1"> 3 </td><td class="col2"> Knock window gate: set in crank phase 3, cleared when the knock sample is taken </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row14">
+<td class="col0"> <code>$0409</code> </td><td class="col1"> 3 </td><td class="col2"> Companion chip reset: pulsed low after ten failed link frames </td><td class="col3"> [inferred] </td>
+</tr>
+<tr class="row15">
+<td class="col0 leftalign"> </td><td class="col1"> 4 </td><td class="col2"> Heartbeat, toggled every main-loop pass (external watchdog) </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row16">
+<td class="col0 leftalign"> </td><td class="col1"> 1, 2 (read) </td><td class="col2"> Inputs, see above </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row17">
+<td class="col0"> <code>$040E</code> (read) </td><td class="col1"> 0, 3 </td><td class="col2"> Status bits read by the ISO 9141 routines </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row18">
+<td class="col0"> <code>$0410</code> </td><td class="col1 leftalign"> </td><td class="col2"> Injector command: <code>$04</code> hands the latest pulse widths to the injector timers </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row19">
+<td class="col0"> <code>$0424</code>, <code>$0428</code>, <code>$042C</code>, <code>$0430</code> </td><td class="col1"> 16 bit </td><td class="col2"> Injector pulse width, cylinders 1, 2, 3, 4 (microseconds); pins 4, 23, 3, 24 </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row20">
+<td class="col0"> <code>$0404</code>-<code>$0408</code>, <code>$040A</code>-<code>$040D</code>, <code>$040F</code> </td><td class="col1 leftalign"> </td><td class="col2"> Set once by <code>InitPeripheralRegisters</code> ($0407 = $1B, $040D = $33, …); meaning not known without the device's documentation </td><td class="col3 leftalign"> </td>
+</tr>
+</table></div>
+</div>
+<h3 class="sectionedit19" id="spi_output_driver">SPI output driver</h3>
+<div class="level3">
+<p>
+<code>SendOutputDriverByte</code> ($5A29) pulls <code>$0403</code> bit 2 low, shifts this byte out over SPI and stores
+the byte shifted back in (<code>OutputDriverStatus</code>), which is the driver's fault status. This behaviour
+matches an octal serial low-side switch with diagnostics. [code]
+</p>
+<div class="table sectionedit20"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Bit </th><th class="col1"> Output </th><th class="col2"> Evidence </th><th class="col3"> Pin </th><th class="col4 leftalign"> </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> 0 </td><td class="col1"> A/C compressor clutch relay </td><td class="col2"> ATM test <code>$09</code>, air conditioning routines </td><td class="col3"> 59 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row2">
+<td class="col0"> 1 </td><td class="col1"> EGR solenoid </td><td class="col2"> <code>ExhGasRecirc_MM</code>, ATM test <code>$10</code> </td><td class="col3"> 39 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row3">
+<td class="col0"> 2 </td><td class="col1"> ASD relay </td><td class="col2"> Switched together with bit 4 by <code>ControlAsdRelay_MM</code>; ATM test <code>$0A</code> </td><td class="col3"> 18 </td><td class="col4"> [inferred] </td>
+</tr>
+<tr class="row4">
+<td class="col0"> 3 </td><td class="col1"> Radiator fan relay </td><td class="col2"> ATM test <code>$08</code> </td><td class="col3"> 19 </td><td class="col4"> [code] </td>
+</tr>
+<tr class="row5">
+<td class="col0"> 4 </td><td class="col1"> Fuel pump relay </td><td class="col2"> Switched together with bit 2 by <code>ControlAsdRelay_MM</code> </td><td class="col3"> 38 </td><td class="col4"> [inferred] </td>
+</tr>
+<tr class="row6">
+<td class="col0"> 5 </td><td class="col1"> Canister purge solenoid; reported as secondary air status by OBD-II PID <code>$12</code> on cars with that option </td><td class="col2"> Duty-cycle routine at <code>$B290</code>, ATM test <code>$15</code>, DRB override target 3 </td><td class="col3"> 16 </td><td class="col4"> [inferred] </td>
+</tr>
+<tr class="row7">
+<td class="col0"> 6, 7 </td><td class="col1"> Speed control vacuum and vent solenoids (order not confirmed) </td><td class="col2"> Speed control routine, ATM tests <code>$0C</code>, <code>$1A</code>, <code>$1B</code> </td><td class="col3"> 40, 60 </td><td class="col4"> [code] </td>
+</tr>
+</table></div>
+</div>
+<h3 class="sectionedit21" id="companion_chip_outputs">Companion chip outputs</h3>
+<div class="level3">
+<p>
+<code>OutputBits2</code> (<code>StartupSwitchMirror2</code> in the original disassembly) is sent to the companion chip
+with register header <code>$50</code> by <code>LinkRegisterUpdate</code> (see <a class="wikilink1" data-wiki-id="fcc_sci" href="fcc_sci.html" title="fcc_sci">ccd_and_link.md</a>). Bit 6 is reported as “lamp on” on CCD when it is clear, so
+the outputs may be active low.
+</p>
+<div class="table sectionedit22"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Bit </th><th class="col1"> Output </th><th class="col2"> Pin </th><th class="col3 leftalign"> </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> 0 </td><td class="col1"> Power hold after key-off for the O2 heater test (confirmed by <code>LinkInputWordHi</code> bit 0) </td><td class="col2"> — </td><td class="col3"> [inferred] </td>
+</tr>
+<tr class="row2">
+<td class="col0"> 3 </td><td class="col1"> Load switch on the O2 sensor lines for the heater test (confirmed by <code>LinkInputWordHi</code> bit 3) </td><td class="col2"> — </td><td class="col3"> [inferred] </td>
+</tr>
+<tr class="row3">
+<td class="col0"> 4 </td><td class="col1"> Charge indicator lamp (driven by charging-system faults through <code>$0070</code> bit 7) </td><td class="col2"> 37 </td><td class="col3"> [inferred] </td>
+</tr>
+<tr class="row4">
+<td class="col0"> 5 </td><td class="col1"> TCC / PTU solenoid (<code>PTU_SetPTUBits</code>, ATM tests <code>$0F</code>, <code>$17</code>) </td><td class="col2"> 17 </td><td class="col3"> [code] </td>
+</tr>
+<tr class="row5">
+<td class="col0"> 6 </td><td class="col1"> Check-engine lamp (toggled to blink flash codes) </td><td class="col2"> 36 </td><td class="col3"> [inferred] </td>
+</tr>
+<tr class="row6">
+<td class="col0"> 7 </td><td class="col1"> Output driven by <code>$9C6A</code> (<code>ControlPurgeSolenoid_MM</code> in the original disassembly) and DRB override target 1 </td><td class="col2"> ? </td><td class="col3 leftalign"> </td>
+</tr>
+</table></div>
+<p>
+The companion chip itself also carries the CCD bus and the idle air stepper; see <a class="wikilink1" data-wiki-id="fcc_sci" href="fcc_sci.html#companion_chip_link_and_ccd_bus" title="fcc_sci">companion chip link and CCD bus</a>.
+</p>
+</div>
+<h2 class="sectionedit23" id="pcm_connector_60_pins">PCM connector (60 pins)</h2>
+<div class="level2">
+<p>
+Pinout of the 1995 Neon FCC engine controller, from the wiring diagram supplied by the project owner. Pin 48 (tachometer) was added later and is missing from some diagrams.
+</p>
+<p>
+Pinout of the 1995 Neon FCC engine controller, from the wiring diagram, supplied by the project owner. Pin 48 (tachometer) was added later and is missing from some diagrams. For the firmware side of each signal see io_map.md.
+</p>
+<div class="table sectionedit24"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Pin </th><th class="col1"> Circuit </th><th class="col2"> Wire </th><th class="col3"> Function </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> 1 </td><td class="col1"> K19 </td><td class="col2"> BK/GY </td><td class="col3"> Ignition coil #2 driver </td>
+</tr>
+<tr class="row2">
+<td class="col0"> 2 </td><td class="col1"> Z12 </td><td class="col2"> BK/TN </td><td class="col3"> Ground </td>
+</tr>
+<tr class="row3">
+<td class="col0"> 3 </td><td class="col1"> K13 </td><td class="col2"> YL/WT </td><td class="col3"> Injector #3 driver </td>
+</tr>
+<tr class="row4">
+<td class="col0"> 4 </td><td class="col1"> K11 </td><td class="col2"> WT/DB </td><td class="col3"> Injector #1 driver </td>
+</tr>
+<tr class="row5">
+<td class="col0"> 5 </td><td class="col1"> G7 </td><td class="col2"> WT/OR </td><td class="col3"> Vehicle speed sensor signal </td>
+</tr>
+<tr class="row6">
+<td class="col0"> 6 </td><td class="col1"> K21 </td><td class="col2"> BK/RD </td><td class="col3"> Intake air temperature sensor signal </td>
+</tr>
+<tr class="row7">
+<td class="col0"> 7 </td><td class="col1"> K141 </td><td class="col2"> TN/WT </td><td class="col3"> Downstream O2 sensor signal </td>
+</tr>
+<tr class="row8">
+<td class="col0"> 8 </td><td class="col1"> K41 </td><td class="col2"> BK/DG </td><td class="col3"> Upstream O2 sensor signal </td>
+</tr>
+<tr class="row9">
+<td class="col0"> 9 </td><td class="col1"> D20 </td><td class="col2"> LG </td><td class="col3"> SCI receive </td>
+</tr>
+<tr class="row10">
+<td class="col0"> 10 </td><td class="col1"> K22 </td><td class="col2"> OR/DB </td><td class="col3"> Throttle position sensor signal </td>
+</tr>
+<tr class="row11">
+<td class="col0"> 11 </td><td class="col1"> A14 </td><td class="col2"> RD/WT </td><td class="col3"> Fused B+ </td>
+</tr>
+<tr class="row12">
+<td class="col0"> 12 </td><td class="col1 leftalign"> </td><td class="col2 leftalign"> </td><td class="col3"> Empty </td>
+</tr>
+<tr class="row13">
+<td class="col0"> 13 </td><td class="col1"> G4 </td><td class="col2"> DB </td><td class="col3"> Fuel level sensor signal </td>
+</tr>
+<tr class="row14">
+<td class="col0"> 14 </td><td class="col1"> K60 </td><td class="col2"> YL/BK </td><td class="col3"> IAC #2 driver </td>
+</tr>
+<tr class="row15">
+<td class="col0"> 15 </td><td class="col1"> K39 </td><td class="col2"> GY/RD </td><td class="col3"> IAC #3 driver </td>
+</tr>
+<tr class="row16">
+<td class="col0"> 16 </td><td class="col1"> K52 </td><td class="col2"> PK/BK </td><td class="col3"> EVAP purge solenoid control </td>
+</tr>
+<tr class="row17">
+<td class="col0"> 17 </td><td class="col1"> K54 </td><td class="col2"> OR/BK </td><td class="col3"> TCC solenoid control </td>
+</tr>
+<tr class="row18">
+<td class="col0"> 18 </td><td class="col1"> K51 </td><td class="col2"> DB/YL </td><td class="col3"> ASD relay control </td>
+</tr>
+<tr class="row19">
+<td class="col0"> 19 </td><td class="col1"> C27 </td><td class="col2"> DB/PK </td><td class="col3"> Radiator fan relay control </td>
+</tr>
+<tr class="row20">
+<td class="col0"> 20 </td><td class="col1 leftalign"> </td><td class="col2 leftalign"> </td><td class="col3"> Empty </td>
+</tr>
+<tr class="row21">
+<td class="col0"> 21 </td><td class="col1"> K17 </td><td class="col2"> DB/TN </td><td class="col3"> Ignition coil #1 driver </td>
+</tr>
+<tr class="row22">
+<td class="col0"> 22 </td><td class="col1"> Z12 </td><td class="col2"> BK/TN </td><td class="col3"> Ground </td>
+</tr>
+<tr class="row23">
+<td class="col0"> 23 </td><td class="col1"> K12 </td><td class="col2"> TN </td><td class="col3"> Injector #2 driver </td>
+</tr>
+<tr class="row24">
+<td class="col0"> 24 </td><td class="col1"> K14 </td><td class="col2"> LB/BR </td><td class="col3"> Injector #4 driver </td>
+</tr>
+<tr class="row25">
+<td class="col0"> 25 </td><td class="col1"> K24 </td><td class="col2"> GY/BK </td><td class="col3"> Crankshaft position sensor signal </td>
+</tr>
+<tr class="row26">
+<td class="col0"> 26 </td><td class="col1"> K44 </td><td class="col2"> TN/YL </td><td class="col3"> Camshaft position sensor signal </td>
+</tr>
+<tr class="row27">
+<td class="col0"> 27 </td><td class="col1"> K42 </td><td class="col2"> DB/LG </td><td class="col3"> Knock sensor signal </td>
+</tr>
+<tr class="row28">
+<td class="col0"> 28 </td><td class="col1"> K2 </td><td class="col2"> TN/DB </td><td class="col3"> Coolant temperature sensor signal </td>
+</tr>
+<tr class="row29">
+<td class="col0"> 29 </td><td class="col1"> K1 </td><td class="col2"> DG/RD </td><td class="col3"> MAP sensor signal </td>
+</tr>
+<tr class="row30">
+<td class="col0"> 30 </td><td class="col1"> D21 </td><td class="col2"> PK </td><td class="col3"> SCI transmit </td>
+</tr>
+<tr class="row31">
+<td class="col0"> 31 </td><td class="col1"> V37 </td><td class="col2"> RD/LG </td><td class="col3"> Speed control switch signal </td>
+</tr>
+<tr class="row32">
+<td class="col0"> 32 </td><td class="col1"> K29 </td><td class="col2"> WT/PK </td><td class="col3"> Brake switch sense </td>
+</tr>
+<tr class="row33">
+<td class="col0"> 33 </td><td class="col1"> C20 </td><td class="col2"> BR/OR </td><td class="col3"> A/C switch sense </td>
+</tr>
+<tr class="row34">
+<td class="col0"> 34 </td><td class="col1"> K59 </td><td class="col2"> VT </td><td class="col3"> IAC #4 driver </td>
+</tr>
+<tr class="row35">
+<td class="col0"> 35 </td><td class="col1"> K40 </td><td class="col2"> BR/WT </td><td class="col3"> IAC #1 driver </td>
+</tr>
+<tr class="row36">
+<td class="col0"> 36 </td><td class="col1"> G3 </td><td class="col2"> BK/PK </td><td class="col3"> Malfunction indicator lamp driver </td>
+</tr>
+<tr class="row37">
+<td class="col0"> 37 </td><td class="col1"> G12 </td><td class="col2"> TN/BK </td><td class="col3"> Charge indicator lamp driver </td>
+</tr>
+<tr class="row38">
+<td class="col0"> 38 </td><td class="col1"> K31 </td><td class="col2"> BR </td><td class="col3"> Fuel pump relay control </td>
+</tr>
+<tr class="row39">
+<td class="col0"> 39 </td><td class="col1"> K35 </td><td class="col2"> GY/YL </td><td class="col3"> EGR solenoid control </td>
+</tr>
+<tr class="row40">
+<td class="col0"> 40 </td><td class="col1"> K36 </td><td class="col2"> TN/RD </td><td class="col3"> Speed control vacuum solenoid control </td>
+</tr>
+<tr class="row41">
+<td class="col0"> 41 </td><td class="col1"> K20 </td><td class="col2"> DG </td><td class="col3"> Generator field driver </td>
+</tr>
+<tr class="row42">
+<td class="col0"> 42 </td><td class="col1"> A142 </td><td class="col2"> DG/OR </td><td class="col3"> ASD relay output </td>
+</tr>
+<tr class="row43">
+<td class="col0"> 43 </td><td class="col1"> K6 </td><td class="col2"> VT/WT </td><td class="col3"> 5 V supply </td>
+</tr>
+<tr class="row44">
+<td class="col0"> 44 </td><td class="col1"> K7 </td><td class="col2"> OR </td><td class="col3"> 8 V supply </td>
+</tr>
+<tr class="row45">
+<td class="col0"> 45 </td><td class="col1 leftalign"> </td><td class="col2 leftalign"> </td><td class="col3"> Empty </td>
+</tr>
+<tr class="row46">
+<td class="col0"> 46 </td><td class="col1 leftalign"> </td><td class="col2 leftalign"> </td><td class="col3"> Empty </td>
+</tr>
+<tr class="row47">
+<td class="col0"> 47 </td><td class="col1"> V32 </td><td class="col2"> YL/RD </td><td class="col3"> Speed control power supply </td>
+</tr>
+<tr class="row48">
+<td class="col0"> 48 </td><td class="col1"> G21 </td><td class="col2"> GY/LB </td><td class="col3"> Tachometer signal </td>
+</tr>
+<tr class="row49">
+<td class="col0"> 49 </td><td class="col1"> G31 </td><td class="col2"> VT/LG </td><td class="col3"> Battery temperature sensor signal </td>
+</tr>
+<tr class="row50">
+<td class="col0"> 50 </td><td class="col1"> T41 </td><td class="col2"> BR/YL </td><td class="col3"> Park/neutral position switch sense </td>
+</tr>
+<tr class="row51">
+<td class="col0"> 51 </td><td class="col1"> K4 </td><td class="col2"> BK/LB </td><td class="col3"> Sensor ground </td>
+</tr>
+<tr class="row52">
+<td class="col0"> 52 </td><td class="col1"> Z11 </td><td class="col2"> BK/WT </td><td class="col3"> Ground </td>
+</tr>
+<tr class="row53">
+<td class="col0"> 53 </td><td class="col1 leftalign"> </td><td class="col2 leftalign"> </td><td class="col3"> Empty </td>
+</tr>
+<tr class="row54">
+<td class="col0"> 54 </td><td class="col1"> F18 </td><td class="col2"> LG/BK </td><td class="col3"> Fused ignition switch output </td>
+</tr>
+<tr class="row55">
+<td class="col0"> 55 </td><td class="col1"> L1 </td><td class="col2"> VT/BK </td><td class="col3"> Reverse lamp sense </td>
+</tr>
+<tr class="row56">
+<td class="col0"> 56 </td><td class="col1"> K10 </td><td class="col2"> WT </td><td class="col3"> Power steering pressure switch sense </td>
+</tr>
+<tr class="row57">
+<td class="col0"> 57 </td><td class="col1 leftalign"> </td><td class="col2 leftalign"> </td><td class="col3"> Empty </td>
+</tr>
+<tr class="row58">
+<td class="col0"> 58 </td><td class="col1 leftalign"> </td><td class="col2 leftalign"> </td><td class="col3"> Empty </td>
+</tr>
+<tr class="row59">
+<td class="col0"> 59 </td><td class="col1"> C28 </td><td class="col2"> DB/OR </td><td class="col3"> A/C compressor clutch relay control </td>
+</tr>
+<tr class="row60">
+<td class="col0"> 60 </td><td class="col1"> V35 </td><td class="col2"> LG/RD </td><td class="col3"> Speed control vent solenoid control </td>
+</tr>
+</table></div>
+</div>
+<h2 class="sectionedit25" id="engine_position_and_event_scheduling">Engine position and event scheduling</h2>
+<div class="level2">
+<p>
+<em>Roles inferred from the code; to be confirmed with a scope on a running engine.</em>
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Crank sensor → TIC1 (PA2)</strong> (<code>Isr_TIC1_CrankEvent</code>). Every edge is time-stamped. Together with</div>
+</li>
+</ul>
+<p>
+input capture 3 on the other edge (PA0) the firmware measures the slot width and the period, which
+identifies the reference slots. Once synchronised, each edge increments <code>CrankEventCounter</code>
+($0449) and calls one of four handlers (<code>CrankPickupIntrAddressTable</code>), chosen by the event phase:
+<code>CrankInterrupt_FallingEdge</code>, <code>…_HandleCamSensorRisingEdgeA/B</code> and <code>CrankInterrupt_CalculateFuel</code>.
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Cam sensor → PAI (PA7)</strong> (<code>Isr_PAI_CamPhase</code>). Both edges are caught by flipping the PAI edge</div>
+</li>
+</ul>
+<p>
+select. The level of the crank signal at that moment tells which half of the 720 degree cycle it is,
+and sets the phase in <code>CrankEventCounter</code> and the sync flags (<code>SyncFlags74</code>, <code>SyncFlags75</code>).
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Ignition:</strong> two coils in wasted-spark mode, driven straight from <strong>OC3 (PA5)</strong> and <strong>OC5 (PA3)</strong>.</div>
+</li>
+</ul>
+<p>
+<code>ScheduleIgnitionCoils</code> writes the compare times and the TCTL1 pin actions (dwell start, then fire);
+<code>Interrupt_DwellTimerA/B</code> chain the next action.
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Injectors:</strong> sequential, but <strong>not</strong> timed by the HC11. <code>IncludeInjectorLatency</code> writes the final</div>
+</li>
+</ul>
+<p>
+pulse width (microseconds, latency included) into the external I/O device: <code>$0424</code> cylinder 1,
+<code>$0428</code> cylinder 2, <code>$042C</code> cylinder 3, <code>$0430</code> cylinder 4. <code>InjCylinderMask</code> selects the
+cylinders (bit 0 = cyl 4, bit 1 = cyl 2, bit 2 = cyl 1, bit 3 = cyl 3, firing order 1-3-4-2), and
+writing <code>$04</code> to <code>$0410</code> hands the pulse over to the device.
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>The four crank event handlers</strong> run in a fixed sequence (event phase = low two bits of <code>SyncFlags75</code>):</div>
+</li>
+</ul>
+<div class="table sectionedit26"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Phase </th><th class="col1"> Handler </th><th class="col2"> Main jobs </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> 0 </td><td class="col1"> <code>CrankInterrupt_FallingEdge</code> </td><td class="col2"> period and slot-width bookkeeping, rev limiter, MAP plausibility checks, idle spark scatter, injector hand-off </td>
+</tr>
+<tr class="row2">
+<td class="col0"> 1 </td><td class="col1"> <code>CrankInterrupt_HandleCamSensorRisingEdgeA</code> </td><td class="col2"> injector scheduling for the next cylinders </td>
+</tr>
+<tr class="row3">
+<td class="col0"> 2 </td><td class="col1"> <code>CrankInterrupt_HandleCamSensorRisingEdgeB</code> </td><td class="col2"> injector scheduling, adaptive retard index, running-time counters </td>
+</tr>
+<tr class="row4">
+<td class="col0"> 3 </td><td class="col1"> <code>CrankInterrupt_CalculateFuel</code> </td><td class="col2"> RPM, MAP sampling, knock window, coil forcing, running fuel, per-cylinder knock retard </td>
+</tr>
+</table></div>
+<p>
+(The “CamSensorRisingEdge” names are historical; all four run from the crank interrupt.)
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>MAP</strong> is sampled at a fixed crank angle: phase 3 starts an A/D scan of channels 0-3 (<code>ADCTL = $10</code>).</div>
+</li>
+<li class="level1"><div class="li"> <strong>Knock window:</strong> phase 3 sets <code>TOC4 = edge time + 2 x tooth time x factor / 256</code>, a fixed fraction of</div>
+</li>
+</ul>
+<p>
+the tooth period after the edge, and <code>Isr_TOC4_KnockSample</code> reads the knock sensor when it expires.
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Sensor signals</strong> (scope captures at idle, about 880 rpm; one from the project owner's car, one</div>
+</li>
+</ul>
+<p>
+published reference capture):
+</p>
+<p>
+<a class="media" href="_media/fcc_crank_cam_scope_owner.jpg" rel="noopener" target="_blank" title="fcc_crank_cam_scope_owner.jpg"><img alt="Crank and cam signals, owner's car" class="media" loading="lazy" src="_media/fcc_crank_cam_scope_owner_600x.jpg" title="Crank and cam signals, owner's car" width="600"/></a>
+<em>Owner's car at idle: CH1 crank, CH2 cam, 10 ms/div.</em>
+</p>
+<p>
+<a class="media" href="_media/fcc_crank_cam_reference_capture.jpg" rel="noopener" target="_blank" title="fcc_crank_cam_reference_capture.jpg"><img alt="Reference capture" class="media" loading="lazy" src="_media/fcc_crank_cam_reference_capture_600x.jpg" title="Reference capture" width="600"/></a>
+<em>Published reference capture: red crank, blue cam, green ignition/injector reference.</em>
+</p>
+<p>
+<a class="media" href="_media/fcc_crank_cam_sequence_chart.jpg" rel="noopener" target="_blank" title="fcc_crank_cam_sequence_chart.jpg"><img alt="Crankshaft and camshaft sequence chart" class="media" loading="lazy" src="_media/fcc_crank_cam_sequence_chart_600x.jpg" title="Crankshaft and camshaft sequence chart" width="600"/></a>
+<em>Chrysler sequence chart for the 2.0 SOHC (420A/420H), annotated by Dex (neon-club.ru).</em>
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Crank:</strong> one group of four pulses every 180 degrees of crankshaft (one group per cylinder</div>
+</li>
+</ul>
+<p>
+event, about 34 ms apart at idle). Inside a group the rising edges are about 3.8 ms apart, which
+is roughly 20 degrees. In every second group the first pulse is wide (it starts about 60 degrees
+earlier), which marks the two halves of a revolution.
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Cam:</strong> windows of two different lengths, roughly 0.83 and 1.17 times the group spacing,</div>
+</li>
+</ul>
+<p>
+arranged long - short - short - long over 720 degrees, so four cam edges per cycle.
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Match with the code:</strong> IC1 sees the four rising edges of each group, which are the four event</div>
+</li>
+</ul>
+<p>
+phases, so the four handlers are the four slots of one cylinder event. The long low time before
+the first rising edge of a group is what the slot-width check in <code>Isr_TIC1_CrankEvent</code> detects.
+Doing the MAP sample and the knock window in phase 3 (the last slot, closest to TDC) fits this
+picture. <code>Isr_PAI_CamPhase</code> reads the crank level at each cam edge: some cam edges fall inside a
+wide crank pulse (level high), others in a gap (level low), which identifies the cylinder.
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Angles</strong> (Chrysler service manual, “Crankshaft and Camshaft Sequence Chart”, 2.0 SOHC 420A/420H):</div>
+</li>
+</ul>
+<p>
+the four slots of each group are at <strong>69, 49, 29 and 9 degrees BTDC</strong>; the wide 60 degree
+reference window comes before the groups of cylinders 1 and 4 (every 360 degrees); the cam windows
+are 105 / 75 / 75 / 105 cam degrees (210 / 150 / 150 / 210 crank degrees). The firing order is
+1-3-4-2. All of this agrees with the scope measurements above.
+</p>
+<ul>
+<li class="level1"><div class="li"> With phase 0 = first slot of the group (the edge after the long gap), the phases are</div>
+</li>
+</ul>
+<p>
+<strong>0 = 69, 1 = 49, 2 = 29, 3 = 9 degrees BTDC</strong>. Phase 3, where MAP is sampled and the knock window
+is armed, is the 9 degree BTDC slot.
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Verification needed:</strong> the signal polarity at the HC11 pins. The input buffer may invert the</div>
+</li>
+</ul>
+<p>
+sensor signal, which would make IC1 see the other edge of each slot and shift the phase angles by
+the slot width. Checking it means probing the CPU pins, which requires opening the controller
+(the board is potted in soft compound), so it has not been done yet.
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>fcc_overview.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

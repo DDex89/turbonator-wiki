@@ -1,0 +1,107 @@
+{{howhard>2}}
+-----
+===== Get your laptop to communicate with the Chrysler ECU  =====
+-----
+
+----
+==== Selecting a laptop and making sure it will work.====
+----
+
+=== Things to look out for with cheap, older laptops. ===
+  * The battery might be trash. You can probably buy a replacement on ebay, or, buy an AC/DC inverter, which can be about $15. Make sure it can handle the wattage of your laptop power supply.
+  * USB 1.1 ports might work, but it hasn't be tested yet. USB 2.0 ports are known to work.
+  * Older laptops may have a dual-scan display instead of TFT, or their display backlight may be dim from age. This can make them extremely hard to use, especially in sunlight.
+  * USB support before Windows 2000 was not very good. Get a laptop that has at least Windows 2000.
+  * Network support, especially WiFi, can be useful. But a simple flash drive could probably get the job done as far as transferring files.
+  * OS updates like service packs and frameworks may be required for MPSCAN to run. These can be very large files and may be difficult to transfer to an older laptop if it does not have a network connection or if you try to use a flash drive to transfer several hundred megabytes over USB 1.1. If possible, see if you can install MPSCAN on a laptop you are thinking of buying. Perhaps bring it with you on a flash drive. 
+
+=== Known working combos:===
+
+  * Thinkpad T60p w/ WinXP sp3 w/ custom FTDI USB to SCI cable
+  * Samsung Galaxy S5 (MPSCANDROID)
+
+----
+==== SCI interface ====
+----
+The Chrysler ECU diagnostic connector (located in the engine compartment) communicates with diagnostic tools like the Chrysler DRB-II, OTC series, and, hopefully, your laptop, via a bus called the "SCI" bus. 
+
+This is Chryslers' proprietary serial communications interface to allow the outside world to talk to the ECU.
+
+^For detailed technical information on the Chrysler SCI bus, see here: [[sci_tech_info | SCI technical info]]|
+ 
+{{ :chrysler_ecu_comm_diagram.jpg |}}
+
+The SCI connector is located in the engine compartment, usually near the ECU.
+
+{{::sci_conn_loc.jpg?direct&300|}}
+
+And, it looks like this.
+
+{{:sci_connector_pic.jpg?direct&300|}}
+
+
+
+----
+==== NON-BoostButton USB to SCI cables ====
+----
+
+Non-BoostButton USB to SCI cables based on the FTDI chipset likely need a few things done to them:
+
+  * [[manual_ftdi_setup|Manual configuration of the FTDI chip in the USB to SCI cable]]. 
+  * Protecting the FTDI chip from the 12V voltage seen during flashing on the SCI bus. (put link to more info here)
+
+USB to SCI cables from BoostButton already have these settings and features out of the box and no changes are required.
+
+
+----
+==== Setup the USB to SCI cable ====
+----
+
+  - Plug the USB to SCI cable into your laptop. 
+  - Windows will automatically install drivers for it with the 'found new hardware' wizard.
+  - Open Windows Device manager, and find the cable in the USB devices folder.
+    - {{findusbdev.jpg}}
+  - Open the settings panel for the cable driver.
+  - Check the box for 'Load VCP Driver' on the 'Advanced' tab.
+    - {{loadvcp.jpg}}
+  - Save the settings, then unplug, and re-plug the FTDI cable.
+  - Windows will re-load the cable and set it up as a COM port.
+ 
+If you are running Win 7 for MP Scan, there may be an issue loading the SCI-USB cable drivers. Apparently, MS now has thier own driver download for the cable, and it must be based on an older FTDI driver - because it doesn't work in VCP mode.
+
+When you plug in a cable to a PC the first time, it will load as a 'USB Serial Device'; in device manager under the 'USB Devices'. If you open the properties, you can enable it to load the 'VCP' (Virtual COM Port) driver. You need to check this box. Then, unplug and re-plug the cable. Windows should now re-load the VCP drivers for the cable. If it doesn't load right as indicated above, you will get a yellow exclamation point in the Windows device manager.
+
+If that happens, you will need to manually install the FDTI-sourced driver from [[http://www.ftdichip.com/Drivers/CDM/...ied.exe|here]]. Simply run the .exe from the download, and the FTDI cable should appear as a COM port.
+
+Not sure if this happens in other versions of Windows. I know it happens in Win 7, and I assume 8, 8.1. Not sure about XP.
+----
+==== Download MPSCAN ====
+----
+
+The latest version of MPSCAN can be downloaded here:
+
+https://dl.dropboxusercontent.com/u/65623639/mpsuite/MPScanSetup/MPScan.zip
+
+
+----
+==== Installing MPSCAN ====
+----
+
+Unzip the MPSCAN.zip file. It contains 2 files, an mpscan.msi file and a setup.exe file. This is a standard installation convention. You should always execute the .exe file which is basically a wrapper around the .msi file and will do additional file checking for any program prerequisites.
+
+Instructions needed:
+
+  * <del>connecting cable to vehicle</del>
+  * <del>downloading and installing MPSCAN</del>
+  * opening MPSCAN and confirming the correct port is selected
+  * getting vehicle ready for communication (key on/off)
+  * attempting to communicate with the vehicle in MPSCAN (sensor/fault code reading is simplest/fastest to do?)
+  * creating vehicle profile, gauge layout, and logging live data at a standstill
+
+Additional info needed:
+
+  * System requirements for MPSCAN/MPTUNE/BoostButton SCI (OS, frameworks/other packages, USB port type)
+  * Specifically: how old and cheap of a laptop can I buy off craigslist that will work with MPSCAN/MPTUNE for logging/flashing/tuning?
+  * Dealing with multiple COM ports (common on laptops with bluetooth and other serial devices)
+  * What to do if all the above doesnt work (What else can go wrong?)
+

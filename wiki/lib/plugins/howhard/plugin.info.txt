@@ -1,0 +1,9 @@
+# General Plugin Info do not edit
+
+base   howhard
+author Fabrice DEJAIGHER pour Chtiland
+email  fabrice@chtiland.com
+date   2026-11-22
+name   Plugin HowHard
+desc   Rate difficulty of an article (ported to the current DokuWiki API)
+url    http://www.chtiland.fr

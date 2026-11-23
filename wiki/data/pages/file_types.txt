@@ -1,0 +1,22 @@
+===== File Types =====
+
+**MP Tune Relevant File Types:**
+
+**.tpl** - The ‘Template’ file. This file contains all of the calibration data, table data, injector scaling and map scaling information used in MP Tune.
+
+**.asm** - The ‘Assembly’ file. This is the code portion in human-readable format. It is combined with the .tpl file above and then assembled into a binary file that the ECU can read.
+
+**.bin** - The ‘Binary’ file. This is the actual file used by the ECU. It contains the code and calibration data used to run the engine. But, it does not contain the table scaling data, X+Y axis data, etc. This is the file you want to flash, burn to a chip, send to the Ostrich, etc.
+
+**.mpt** - The ‘Table’ file for MP Tune. This file is very similar to the .tpl in format, but the purpose is slightly different. This is essentially a table definition file. It is used to edit the binary file directly. This isn’t recommend, though, unless you are certain about what you are doing. Some functions in MP Tune will not work correctly on the binary file (adding data points, for example).
+
+**Other file types:**
+
+**.tbl**
+**.calx**
+
+These 2 file types were used by D-Cal and CHeM respectively. They are functionally equivalent to the .mpt file used by MP Tune. That is, they are the table definition files to allow editing of the binary file directly.
+
+**.s19**
+
+The S19 file is a version of the binary file that is only used by some Motorola-style bootloaders. Most users will never need this file tuning with MP Tune.

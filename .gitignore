@@ -1,0 +1,16 @@
+# Regenerated runtime data (not the archival wiki content)
+/wiki/data/cache/**
+!/wiki/data/cache/_dummy
+/wiki/data/locks/**
+!/wiki/data/locks/_dummy
+/wiki/data/tmp/**
+!/wiki/data/tmp/_dummy
+/wiki/data/log/**
+!/wiki/data/log/_dummy
+/wiki/data/index/**
+!/wiki/data/index/_dummy
+/wiki/data/pages/**/.DS_Store
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

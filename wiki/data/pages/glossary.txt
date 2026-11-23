@@ -1,0 +1,19 @@
+===== Glossary of Terms =====
+
+
+
+
+
+**Pumping Efficiency** - Simply stated, the Pumping Efficiency measures the flow losses thru the intake, ports, and valves. For example, if a 2.2L engine has a PumpEff of 80% @ 3000rpm, it will pump 2.2 * 0.8 = 1.76L per revolution. The Pumping Efficiency is very similar to the [[http://en.wikipedia.org/wiki/Volumetric_efficiency|Volumetric Efficiency]] used in many other engine control systems. But, mathematically they are different. The notable difference is how the ratio is calculated. In the case of volumetric efficiency, the calculation is the ratio of the volume the air in the cylinder would occupy at atmospheric temperature and pressure divided by the total swept volume of the cylinder. However, since it is comparing the air at atmospheric conditions, it is difficult to use for an engine in boost. The Volumetric Efficiency then also becomes a function of the manifold pressure and can exceed 100% easily. Pumping Efficiency on the other hand is a measure of the MASS the air in the cylinder would occupy at MANIFOLD temperature and pressure divided by the ideal cylinder filling. In this case, the ratio eliminates the effects of boost on the ratio. 
+
+**.tpl** - The ‘[[template_file|Template]]’ file. This file contains all of the calibration data, table data, injector scaling and map scaling information used in MP Tune.
+
+**.asm** - The ‘Assembly’ file. This is the code portion in human-readable format. It is combined with the .tpl file above and then assembled into a binary file that the ECU can read.
+
+**.bin** - The ‘Binary’ file. This is the actual file used by the ECU. It contains the code and calibration data used to run the engine. But, it does not contain the table scaling data, X+Y axis data, etc. This is the file you want to flash, burn to a chip, send to the Ostrich, etc.
+
+**.mpt** - The ‘Table’ file. This file is very similar to the .tpl in format, but the purpose is slightly different. This is essentially a table definition file. It is used to edit the binary file directly. This isn’t recommend, though, unless you are certain about what you are doing. Some functions in MP Tune will not work correctly on the binary file (adding data points, for example).
+
+**.tbl**; **.calx** - These 2 file types were used by D-Cal and CHeM respectively. They are functionally equivalent to the .mpt table file used by MP Tune. That is, they are the table definition files to allow editing of the binary file directly.
+
+**.s19** - The S19 file is a version of the binary file that is only used by some Motorola-style bootloaders. Most users will never need this file tuning with MP Tune.

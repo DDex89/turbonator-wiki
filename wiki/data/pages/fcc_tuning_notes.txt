@@ -1,0 +1,389 @@
+{{howhard>5}}
+
+----
+====== '95 Neon FCC: engine control and tuning notes ======
+----
+
+What the firmware actually computes, table by table, based on [[https://github.com/DDex89/neon-fcc-firmware|neon-fcc-firmware]]. Routine names refer to the published source; table names to [[fcc_calibration|the calibration reference]]. Parts marked //(from names)// follow the original disassembly's names and have not been checked against the code instruction by instruction yet.
+
+===== Units of the main inputs =====
+The J1979 PIDs convert the internal values to the units fixed by SAE J1979, so they give the exact
+internal scaling. [code]
+
+^ Value ^ Unit ^ From ^
+| ''CoolantTemp'', ''ChargeTemp'', ''AmbientAirTemp'', ''BatteryTemp'' and the temperature axes of the calibration | °C = count − 128 (0 = −128 °C, $80 = 0 °C, $FF = 127 °C) | PIDs $05/$0F send count − $58, J1979 defines A − 40 °C |
+| ''EngineRpm'' (16 bit) | 1/8 rpm; ''EngineRpm_HB'' = 32 rpm per count | PID $0C sends ''EngineRpm'' / 2, J1979 unit 1/4 rpm |
+| ''VehicleSpeed'' (16 bit) | 1/64 mph | PID $0D |
+| ''VehicleSpeedScaled'' | 0.5 mph | PID $0D sends it × $CE / 256 = km/h |
+| ''ObdMapValue'' | 105/256 = 0.41 kPa | PID $0B sends it × $69 / 256 |
+| ''AdvanceTemporary'' | 0.5° signed | PID $0E sends it + $80, J1979 unit 0.5° − 64° |
+| ''MaxRPMxMaxMAPFraction'' | 0-255 = 0-100 % load | PID $04 |
+
+The temperature lookup tables (''TMPTL1''/''TMPTL2'' for coolant with the two pull-up ranges, ''TMPAMB''
+for the ambient / battery sensor) output this unit directly. MP Tune shows it as "raw × 1.797 − 200 °F",
+which is the same scale rounded ((count − 128) × 1.8 + 32 = 1.8 × count − 198.4). For example
+''CLTEMP'' $94 = 20 °C. When the ambient / battery sensor fails, both temperatures are set to $88 = 8 °C. [code]
+
+''CoolantTempUnfiltered'' / ''ChargeTempUnfiltered'' ($021A/$021B, ''CoolantTempVolts'' / ''ChargeTempVolts'' in the
+original names) hold the table result before filtering; ''CoolantTemp'' follows it by at most one count
+per update. [code]
+
+===== Input coordinates =====
+Most maps are 3D tables whose axes are 0-255 coordinates produced by transfer curves:
+
+^ Curve ^ Input -> output ^ Used by ^
+| ''RPMSCL'' | engine RPM -> column coordinate (''RPMRescaledfor3D'') | all RPM x MAP maps |
+| ''MAPHI'' | MAP -> row coordinate (''MAPRescaledfor3D'') | PRTTBL, HOTMRP, WOTMRP |
+| ''MAPWOT'' | MAP -> row coordinate for WOT enrichment | WOTENR |
+| ''MAPPTE'' | MAP -> row coordinate for part-throttle enrichment | PTEADJ |
+| ''MAPHIP'', ''MAPHII'' | MAP -> row coordinate, off idle / idle | CLDLDP, CLDLDI |
+| ''MAPMOD'' | MAP -> coordinate for the cold/base advance map | BASADV |
+| ''TIMESC'' | time since start -> coordinate | CURV3D |
+
+The breakpoints of a map are therefore set by its transfer curve. In 5007033, for example, Mopar
+changed the low end of ''RPMSCL'', which moves the first columns of every RPM x MAP map.
+
+===== Fuel =====
+=== Where it is computed ===
+
+^ When ^ Routine ^ Result ^
+| Main loop, every 10.75 ms | ''CalculateSumOfAllFuelModifiers_MM'' | ''SumOfFuelModifiers'': cold, after-start, baro, charge-air and closed-loop factors |
+| Main loop | ''CalculatePartThrottleEnrichmentAndLatency_MM'' | ''ThrottleEnrichmentFactor'' (part throttle / WOT) and ''InjectorLatencyPW'' |
+| Main loop | ''CalculatePartThrottleTransientFuel'' | additive pump-shot pulse, decel lean-out factors, AIS step enrichment |
+| Main loop | ''CalculateInjectorPulsewidthForStarting_MM'' | cranking pulse width and the start-to-run decay rate |
+| Main loop | ''HandleO2Processing_MM'' | O2 controller and adaptive memory |
+| Crank event, phase 3 (9 deg BTDC) | ''CrankInterrupt_CalculateFuel'' -> ''CalculateInjectorPulsewidthForEngineRunning'' -> ''HandleTransitionFromStartToRun'' -> ''IncludeInjectorLatency'' | final pulse width, written to the injector registers of the I/O device |
+
+So the slow factors are refreshed every 10.75 ms, while the final pulse width uses the MAP value
+sampled at the same crank angle and is computed once per cylinder event.
+
+=== Running ===
+
+<code>
+air      = (MAP - MAPMIN) x DFPART / 2
+base_pw  = air + air x PRTTBL(rpm, map) / 256
+pw       = base_pw x throttle_enrichment x SumOfFuelModifiers  (+ knock enrichment)
+         + pump-shot pulse
+pw       = max(pw, decaying start pulse)        while the start flag is set
+pw_total = pw x fuel-pressure factor + InjectorLatencyPW x 4      (microseconds)
+</code>
+
+  * ''PRTTBL'' is the main fuel map: a correction over the MAP-proportional base, similar to a
+volumetric-efficiency table.
+  * **Throttle enrichment** (''CalculatePartThrottleEnrichmentAndLatency_MM''): part-throttle map
+''PTEADJ'' (RPM x ''MAPPTE'') or WOT map ''WOTENR'' (RPM x ''MAPWOT''), selected with the ''RPMMAP'' switch
+point. The factor moves towards its target in steps (''PTENRP'', ''PTENRN'', ''PTENRD''), so enrichment
+ramps in and out instead of jumping.
+  * **''SumOfFuelModifiers''** (''CalculateSumOfAllFuelModifiers_MM'') is the product of:
+    * cold-engine enrichment ''CLDLDP'' / ''CLDLDI'' (coolant x load, off idle / idle);
+    * after-start enrichment ''CURV3D'' (coolant x time since start), with a heat-soak correction after a
+short stall (''RUNTMP'', ''RUNLMT'');
+    * barometric compensation ''BAROCP'' and enrichment ''BARENR x BARMAP x BARRPM'';
+    * charge-air temperature enrichment ''AIRTMP x AIRMAP x AIRRPM'';
+    * the O2 closed-loop and adaptive memory factor.
+  * ''KNNRCH'' / ''MAXKNR'' add fuel in proportion to the total knock retard.
+  * ''TweakInjectorPW'' lets the diagnostic link override the pulse width (enabled by calibration byte
+''$D03E''); it is inactive in normal operation.
+
+=== Cranking (''CalculateInjectorPulsewidthForStarting_MM'') ===
+
+<code>
+start_pw = [STRTFL^2 x (1 - STFBAR - STFTMP) x EPPMUL + BATOFF x 4] x 4 us
+</code>
+
+''STRTFL'' vs coolant temperature (not colder than ''STRLMT''), reduced for altitude (''STFBAR'') and as
+the engine warms (''STFTMP'', ''STFTM2''). ''EPPMUL'' tapers the fuel with the number of engine position
+pulses since cranking began, and ''STFLID'' / ''STFLOI'' scale it with RPM for closed / open throttle.
+Opening the throttle more than ''UNLOAD'' above the learned minimum cuts cranking fuel ("clear flood").
+After start, ''HandleTransitionFromStartToRun'' keeps the larger of the running pulse and the start
+pulse decaying at the ''SFDCAY'' rate, then switches to running fuel only.
+
+=== Transient fuel (''CalculatePartThrottleTransientFuel'') ===
+
+  * **Tip-in:** MAP and TPS are compared with filtered averages (time constants ''AETIME'', ''THRTCN''
+vs coolant). A rise above ''MAPTRG'' / ''POSTRG'', limited by ''MAPMAX'' / ''THRMAX'', gives an additive
+pulse of ''delta x AESLOP'' or ''delta x POSSLP'' (vs coolant).
+  * **Tip-out:** a fall gives lean-out factors (''LOTTHR'', ''NEGSL2'', triggers ''LOTTRG'', ''LOTRG2'',
+''DECTRG'' with hysteresis, time constants ''LMAPTC'', ''LOTIME'', minimum RPM ''LOTRPM'') and holds the O2
+controller for ''DCELTM'' afterwards.
+  * **AIS steps:** opening or closing the idle air motor adds a small enrichment or enleanment pulse
+(''AISPL1'', ''AISPL2'', ''AISNLC''), so the idle mixture follows the air change.
+  * **Deceleration fuel cut-off** (''DecideToUseDecelFuelCut''): closed throttle, RPM between ''DCLRPL''
+and ''DCLRPH'' relative to the target idle speed, coolant above ''DCLMCT'', running time above ''DCLMER''.
+
+=== Closed loop and adaptive memory (''HandleO2Processing_MM'') ===
+
+  * Narrow-band O2. The controller kicks the mixture rich or lean in steps until the sensor toggles.
+The kick sizes come from ''PRIRMP'' (primary ramp) and ''SECRMP'' (secondary ramp), per **ramp cell**:
+3 RPM bands x 3 MAP bands (''DetermineRampCellFromRPMandMAP''), plus an idle cell.
+  * The secondary ramp also teaches the **adaptive memory** (''AdaptiveMemory_*''): **cells 0-11** =
+six MAP bands (''MP1''..''MP5'', hysteresis ''DLTMAP'') x two RPM bands (''R1'', hysteresis ''DLTRPM''), plus
+**idle cells 12 and 13** for closed throttle below target idle + ''IDLOFS'' (cell 13 when a second
+idle load state is active). The cells are in RAM ''AutoCalCell0''..''AutoCalCellEnd'' and survive warm
+restarts.
+  * ''MAPLIM'', ''MAPDEC'', ''RPMLIM'', ''PWMIN'' define where cells are not updated (open loop at high load);
+''O2LIMH''/''O2LIML'' and ''AMLIMH''/''AMLIML'' limit the correction.
+
+===== Spark =====
+''BitFlags65'' bit 7 (throttle open, the same flag that selects the idle O2 cell) chooses the path.
+
+**Off idle** (''LookupNormalAdvance''):
+
+<code>
+correction = BASADV(coolant, MAPMOD) + BASMAP x BASRPM + BASMAP x BASCHG     (charge-air)
+main       = WOTMRP(rpm, MAPWOT)                         at wide open throttle (BitFlags65 bit 0)
+           = HOTMRP(rpm, MAPHI) + ADOTFN(off-throttle timer)    at part throttle
+advance    = main + correction + ADVNGM(vacuum vs baro)
+           - adaptive retard (ARRPM + ARMAP) x AdaptiveRetardIndex
+           - TPS retard (TPSRT1 / TPSRT2) - speed retard (RETSPD) - delta-RPM retard
+           limited by MaxAdvanceLookup and by the minimum-advance clamp
+</code>
+
+''MaxAdvanceLookup'' is the WOT map value; at part throttle with MAP at or above the ''RPMMAP'' switch
+point it is lowered to the part-throttle value. Every step saturates to a signed byte.
+
+**Idle** (''CalculateIdleAdvance''): ''HOTMRP'' + charge-air / MAP correction ''IDLIAT x ILDMAP'' + coolant
+corrections ''IDLADV'' / ''IDLAD2'' + a closed-loop trim from the O2 feedback counter (''ADO2C1'',
+''ADO2C2'', limits ''ADO2CL'', ''ADO2CH'').
+
+**Idle spark scatter** (''HandleSparkScatter'', in the crank interrupt): idle speed is held mainly by
+small, fast spark changes (''SPKADD''/''SPKAD2'' when RPM is below target, ''SPKRET''/''SPKRT2'' above,
+vs the RPM error); the AIS motor makes the slower corrections.
+
+**Knock:**
+  * The sensor is sampled at the end of the window timed by OC4 (''Isr_TOC4_KnockSample'').
+  * ''CalculateKnockRetard_MM'' (main loop) declares knock when the sample exceeds the background average
+(''CalculateAverageKnockVolts_SM'') by ''DLTKNK'' (vs RPM), above ''KNKMAP'' and ''KNKRPM''; total retard
+is limited by ''RETMAX'' (vs MAP).
+  * The per-cylinder retard is updated in the crank interrupt
+(''CALC_SPARK_RETARD_BASED_ON_KNOCK_VOLT''): rate ''RTRDRT'', recovery ''INCSRT'', limit ''MAXRTD'' (vs MAP).
+  * The long-term **adaptive retard** (''ARMAP'', ''ARRPM'') is learned from repeated knock; ''ARMPIC = $FF''
+disables it. The total knock retard also enriches the fuel (''KNNRCH'', ''MAXKNR'').
+
+Advance values are signed bytes in 0.5 degree steps (''raw / 2'' = degrees BTDC).
+
+===== Idle =====
+  * Target idle speed vs coolant temperature: ''AISPN'' (park / neutral or manual) and ''AISCLD'' (drive,
+automatic), plus time- and load-dependent adders (for example the decel curve ''TIMED2'').
+  * AIS steps are compensated in the fuel (see transient fuel) and idle speed is trimmed by spark scatter.
+
+''ControlAIS_MM'' keeps the AIS state in the low nibble of ''AISSubIndex'' and runs one state routine
+per pass (''AISSubroutineTable''). While the engine is not running it forces state 0 or 1 by RPM
+(''BYTEc581''); a MAP sensor failure forces state 15. In the running states,
+''SelectAisStateA''/''SelectAisStateB'' choose between throttle open, throttle closed and speed control.
+
+^ State ^ Routine ^ When ^ What it does ^
+| 0 | ''AisState0_EngineStopped'' | Key on, engine stopped | Holds ''BYTEc580'' + ''CALPOS'' (baro compensated), goes to 1 when RPM reaches ''BYTEc581'' |
+| 1 | ''AisState1_Cranking'' | Cranking / start | ''AISTRT''(coolant) + ''CALPOS'', baro compensated; hands over to a running state when the motor is in position |
+| 4, 12 | ''AisState4_ThrottleOpen'', ''AisState12_ThrottleOpen'' | Throttle open | Position from speed (''MPHPOS''), RPM (''RPMPOS''), a 3D table, cold (''CLDPOS'') and throttle (''THRPOS''), the largest wins |
+| 5, 13 | ''AisState5_ClosedThrottle'', ''AisState13_ClosedThrottle'' | Throttle closed | Closed-loop idle speed control towards the target, A/C compensation, decel fuel cut decision |
+| 6, 14 | ''AisState6_SpeedControl'', ''AisState14_SpeedControl'' | Speed control engaged (flag set by the cruise servo routine) | Holds the position for cruise |
+| 15 | ''AisState15_MapLimpIn'' | MAP sensor failure | Fixed position, 32 steps |
+| 2, 3, 7-11 | ''AisState_Unused'' | — | Not used, return to state 0 |
+
+The 12-14 versions also apply the **load-step records** (''AisLoadStepRecords'', eight 10-byte
+records at $37DE) through ''AdjustAISPosition_A/B''. Each record adds or removes a step from a
+calibration byte when its conditions match, and remembers that in ''AisLoadFlagsA''. Which state set
+is used depends on whether ''AisLoadFlagsA'' and ''AisLoadFlagsB'' agree. [code] Which load each record
+stands for (A/C, fan, power steering …) is not decoded yet.
+
+===== Limiters =====
+Fuel is cut for whole engine revolutions:
+
+  * **Rev limiter:** ''REVLMT5'' / ''REVLMT6'' (RPM / 32).
+  * **Speed limiter:** ''SPDLMH'' / ''SPDLML''.
+  * **Limp-mode limits** when the MAP or TPS signal is bad (''REVLMT'' .. ''REVLMT4'').
+  * **MAP / "overboost" cut-off** (''MPSHFT'', ''MPSHFA'', ''TRNTIM''), inherited from the turbo code.
+
+===== Emissions =====
+  * **EGR** (''ExhGasRecirc_MM''): the solenoid is enabled when RPM, MAP (depending on baro), coolant
+temperature and time since start are inside the ''EGR21''..''EGR27'' windows, and only if
+configuration bit $B811.6 is set.
+  * **Canister purge**: two paths. The routine at $B290 switches output bit 5 of ''OutputDriverBits''
+on and off with coolant, MAP and rpm windows ($CAB6-$CAC5) and a delay. ''ControlPurgeSolenoid_MM''
+($9C6A) works out the purge duty and sends on/off times to the companion chip in register frame
+$58 (''OutputBits2'' bit 7 forces it). Which path drives the solenoid at pin 16 is not confirmed.
+B4CC never calls ''ControlPurgeSolenoid_MM''; the factory code bases do (see [[fcc_calibration|code_bases.md]]).
+  * **Downstream O2** sensor monitor (''VerifyOperationOfDownstreamO2Sensor_MM''), not called in B4CC.
+  * **OBD-II monitors (dormant).** The code contains ten OBD-II monitors (O2 heaters, O2 response,
+secondary air, EVAP purge flow, catalyst, EGR flow, fuel system rich / lean, misfire) with their
+scheduler ''ObdMonitorScheduler'' ($E9C5), but nothing calls the scheduler in B4CC, so none
+of them runs there (B559, B4F3 and B4C2 call it). See [[fcc_sci|diagnostics.md]].
+
+===== Other outputs =====
+  * **Radiator fan** (''ControlFan_MM'', ''FANTMP*'').
+  * **A/C clutch** (''ControlAirConditioning_MM''), with a WOT cut-out.
+  * **ASD relay** (''ControlAsdRelay_MM''): fuel pump, injectors and coils power.
+  * **Alternator field** (''ControlAlternator''): the controller regulates the charging voltage itself.
+  * **Torque converter lock-up** (''ControlPTU_MM''): automatic transmission only.
+  * **Cruise control servo** (''ControlCruiseServo0_MM'', ''ControlCruiseServo1_MM'').
+
+===== Free space for an "Enhanced Edition" =====
+
+This is the starting point for changing the firmware: where new code, tables and variables can go
+without moving anything that exists. Addresses are for B4CC unless stated; the other code bases
+are listed where they differ. "No direct access" means no instruction uses the address as a
+direct or extended operand; accesses through an index register are not counted, so each region
+below was also checked against the index bases the code loads.
+
+This is the starting point for changing the firmware: where new code, tables and variables can go
+without moving anything that exists. Addresses are for B4CC unless stated; the other code bases
+are listed where they differ. "No direct access" means no instruction uses the address as a
+direct or extended operand; accesses through an index register are not counted, so each region
+below was also checked against the index bases the code loads.
+
+===== ROM =====
+
+^ Region ^ Size ^ Contents now ^ Notes ^
+| $B4CD-$B5FF | 307 bytes | $FF after the last routine of code part 1 (''RescaleEngineRPM_MM'') | B4F3: $B4F4-$B5FF (268), B4C2: $B4C3-$B5FF (317), B559: $B55A-$B5FF (166). Counted by the checksum. [code] |
+| $DA0C-$DFFF | 1,524 bytes | $FF between the end of the fault descriptor table area and the tables at $E000 | B559: $DA12-$DFFF (1,518). No code reference points into it; ''ldx #$DDD0'' in the cruise code is a constant (a divisor), not an address. Counted by the checksum. [code] |
+| $FDDA-$FFA2 | 457 bytes | $FF after ''VarRevLimit_Return'', before the copyright text | The same in all four code bases. $FF50 inside it is the spare byte that editors use to fix the checksum, so keep one byte for that. [code] |
+| $FFC0-$FFD5 | 22 bytes | $FF between the copyright text and the vectors | [code] |
+
+Together about 2.3 KB. Code part 2 and the calibration area are reached with 16-bit addresses like
+everything else, so a new routine can live in any of them; the 68HC11 has no banking here.
+
+Earlier versions of these annotations decoded $FEFD-$FFA2 as code because the table at $8D04 was
+taken for code pointers. It holds the injector clear masks FE FD FB F7 FE FD
+(''InjCylinderClearMasks''), so that area is plain filler. [code]
+
+===== RAM =====
+
+^ Region ^ Size ^ Use ^ Notes ^
+| $0220-$03FF | 480 bytes | No direct access in normal running | ''DrbRamBuffer'' ($021C) is the DRB RAM-program download buffer; a download may fill it up to $0437. So this RAM is free while no DRB RAM program is loaded. In B559 the buffer starts at $021E, so the free part is $0222-$03FF. [code] |
+| $04C4-$04FF | 60 bytes | Stack | The reset code sets the stack pointer to $04FF; the deepest stack use is not measured yet. Not free. [code] |
+| $000D-$0010, $0012-$0018, $002A-$002D | 15 bytes | No direct access | Direct-page bytes are worth having for bit instructions, but $000D, $002A and $002D are loaded as index bases, so check before using them. |
+| $0464-$0467 | 4 bytes | No direct access |  |
+
+The RAM fault bitmap at $0135-$0148 has no direct access either, but it is used through the fault
+descriptors (offset from $0135), so it is not free. A warm start keeps RAM only if the 16-bit sum of
+$0005-$0036 and $0100-$014D matches the stored copy (''CountRamValuesFrom05to38''); a variable placed
+in those ranges either has to be included in that sum or not be kept over a warm start. [code]
+
+===== EEPROM ($B600-$B7FF, 512 bytes) =====
+
+Bytes used by the code: $B600-$B611 (''EEPROM1''-''EEPROM3'', including the emission maintenance
+reminder records), $B612-$B618 (''EEPROM4''-''EEPROM7a'', configuration and checks read at reset and by
+the CCD code), $B61D (''EEPROM8'', read by the crank / fuel code), $B7E0, $B7E1 and $B7EF (''EEPROM10''-
+''EEPROM12'') and the part number at $B7F0-$B7F3. Nothing in the code accesses **$B61E-$B7DF** (450
+bytes) directly. DRB command $15 can read any EEPROM byte, so a scan tool may still look there.
+EEPROM is outside the checksum. Writing it needs the PPROG sequence and about 10 ms per byte, and its
+endurance is limited, so it suits learned values saved at key-off rather than live data. [code]
+
+===== Processor time =====
+
+The main loop runs every 10.75 ms and records its longest pass in ''LoopTimeWorst'' (RAM $0454, in
+units of 256 timer ticks, so $15 would mean a full slot). Reading that byte over the DRB link on a
+running engine is the simplest way to see how much time is left before adding work to the main
+loop. Work in the interrupt handlers (fuel and spark scheduling) is not covered by this number.
+
+This is the starting point for changing the firmware: where new code, tables and variables can go
+without moving anything that exists. Addresses are for B4CC unless stated; the other code bases
+are listed where they differ. "No direct access" means no instruction uses the address as a
+direct or extended operand; accesses through an index register are not counted, so each region
+below was also checked against the index bases the code loads.
+
+===== ROM =====
+
+^ Region ^ Size ^ Contents now ^ Notes ^
+| $B4CD-$B5FF | 307 bytes | $FF after the last routine of code part 1 (''RescaleEngineRPM_MM'') | B4F3: $B4F4-$B5FF (268), B4C2: $B4C3-$B5FF (317), B559: $B55A-$B5FF (166). Counted by the checksum. [code] |
+| $DA0C-$DFFF | 1,524 bytes | $FF between the end of the fault descriptor table area and the tables at $E000 | B559: $DA12-$DFFF (1,518). No code reference points into it; ''ldx #$DDD0'' in the cruise code is a constant (a divisor), not an address. Counted by the checksum. [code] |
+| $FDDA-$FFA2 | 457 bytes | $FF after ''VarRevLimit_Return'', before the copyright text | The same in all four code bases. $FF50 inside it is the spare byte that editors use to fix the checksum, so keep one byte for that. [code] |
+| $FFC0-$FFD5 | 22 bytes | $FF between the copyright text and the vectors | [code] |
+
+Together about 2.3 KB. Code part 2 and the calibration area are reached with 16-bit addresses like
+everything else, so a new routine can live in any of them; the 68HC11 has no banking here.
+
+Earlier versions of these annotations decoded $FEFD-$FFA2 as code because the table at $8D04 was
+taken for code pointers. It holds the injector clear masks FE FD FB F7 FE FD
+(''InjCylinderClearMasks''), so that area is plain filler. [code]
+
+===== RAM =====
+
+^ Region ^ Size ^ Use ^ Notes ^
+| $0220-$03FF | 480 bytes | No direct access in normal running | ''DrbRamBuffer'' ($021C) is the DRB RAM-program download buffer; a download may fill it up to $0437. So this RAM is free while no DRB RAM program is loaded. In B559 the buffer starts at $021E, so the free part is $0222-$03FF. [code] |
+| $04C4-$04FF | 60 bytes | Stack | The reset code sets the stack pointer to $04FF; the deepest stack use is not measured yet. Not free. [code] |
+| $000D-$0010, $0012-$0018, $002A-$002D | 15 bytes | No direct access | Direct-page bytes are worth having for bit instructions, but $000D, $002A and $002D are loaded as index bases, so check before using them. |
+| $0464-$0467 | 4 bytes | No direct access |  |
+
+The RAM fault bitmap at $0135-$0148 has no direct access either, but it is used through the fault
+descriptors (offset from $0135), so it is not free. A warm start keeps RAM only if the 16-bit sum of
+$0005-$0036 and $0100-$014D matches the stored copy (''CountRamValuesFrom05to38''); a variable placed
+in those ranges either has to be included in that sum or not be kept over a warm start. [code]
+
+===== EEPROM ($B600-$B7FF, 512 bytes) =====
+
+Bytes used by the code: $B600-$B611 (''EEPROM1''-''EEPROM3'', including the emission maintenance
+reminder records), $B612-$B618 (''EEPROM4''-''EEPROM7a'', configuration and checks read at reset and by
+the CCD code), $B61D (''EEPROM8'', read by the crank / fuel code), $B7E0, $B7E1 and $B7EF (''EEPROM10''-
+''EEPROM12'') and the part number at $B7F0-$B7F3. Nothing in the code accesses **$B61E-$B7DF** (450
+bytes) directly. DRB command $15 can read any EEPROM byte, so a scan tool may still look there.
+EEPROM is outside the checksum. Writing it needs the PPROG sequence and about 10 ms per byte, and its
+endurance is limited, so it suits learned values saved at key-off rather than live data. [code]
+
+===== Processor time =====
+
+The main loop runs every 10.75 ms and records its longest pass in ''LoopTimeWorst'' (RAM $0454, in
+units of 256 timer ticks, so $15 would mean a full slot). Reading that byte over the DRB link on a
+running engine is the simplest way to see how much time is left before adding work to the main
+loop. Work in the interrupt handlers (fuel and spark scheduling) is not covered by this number.
+
+This is the starting point for changing the firmware: where new code, tables and variables can go
+without moving anything that exists. Addresses are for B4CC unless stated; the other code bases
+are listed where they differ. "No direct access" means no instruction uses the address as a
+direct or extended operand; accesses through an index register are not counted, so each region
+below was also checked against the index bases the code loads.
+
+===== ROM =====
+
+^ Region ^ Size ^ Contents now ^ Notes ^
+| $B4CD-$B5FF | 307 bytes | $FF after the last routine of code part 1 (''RescaleEngineRPM_MM'') | B4F3: $B4F4-$B5FF (268), B4C2: $B4C3-$B5FF (317), B559: $B55A-$B5FF (166). Counted by the checksum. [code] |
+| $DA0C-$DFFF | 1,524 bytes | $FF between the end of the fault descriptor table area and the tables at $E000 | B559: $DA12-$DFFF (1,518). No code reference points into it; ''ldx #$DDD0'' in the cruise code is a constant (a divisor), not an address. Counted by the checksum. [code] |
+| $FDDA-$FFA2 | 457 bytes | $FF after ''VarRevLimit_Return'', before the copyright text | The same in all four code bases. $FF50 inside it is the spare byte that editors use to fix the checksum, so keep one byte for that. [code] |
+| $FFC0-$FFD5 | 22 bytes | $FF between the copyright text and the vectors | [code] |
+
+Together about 2.3 KB. Code part 2 and the calibration area are reached with 16-bit addresses like
+everything else, so a new routine can live in any of them; the 68HC11 has no banking here.
+
+Earlier versions of these annotations decoded $FEFD-$FFA2 as code because the table at $8D04 was
+taken for code pointers. It holds the injector clear masks FE FD FB F7 FE FD
+(''InjCylinderClearMasks''), so that area is plain filler. [code]
+
+===== RAM =====
+
+^ Region ^ Size ^ Use ^ Notes ^
+| $0220-$03FF | 480 bytes | No direct access in normal running | ''DrbRamBuffer'' ($021C) is the DRB RAM-program download buffer; a download may fill it up to $0437. So this RAM is free while no DRB RAM program is loaded. In B559 the buffer starts at $021E, so the free part is $0222-$03FF. [code] |
+| $04C4-$04FF | 60 bytes | Stack | The reset code sets the stack pointer to $04FF; the deepest stack use is not measured yet. Not free. [code] |
+| $000D-$0010, $0012-$0018, $002A-$002D | 15 bytes | No direct access | Direct-page bytes are worth having for bit instructions, but $000D, $002A and $002D are loaded as index bases, so check before using them. |
+| $0464-$0467 | 4 bytes | No direct access |  |
+
+The RAM fault bitmap at $0135-$0148 has no direct access either, but it is used through the fault
+descriptors (offset from $0135), so it is not free. A warm start keeps RAM only if the 16-bit sum of
+$0005-$0036 and $0100-$014D matches the stored copy (''CountRamValuesFrom05to38''); a variable placed
+in those ranges either has to be included in that sum or not be kept over a warm start. [code]
+
+===== EEPROM ($B600-$B7FF, 512 bytes) =====
+
+Bytes used by the code: $B600-$B611 (''EEPROM1''-''EEPROM3'', including the emission maintenance
+reminder records), $B612-$B618 (''EEPROM4''-''EEPROM7a'', configuration and checks read at reset and by
+the CCD code), $B61D (''EEPROM8'', read by the crank / fuel code), $B7E0, $B7E1 and $B7EF (''EEPROM10''-
+''EEPROM12'') and the part number at $B7F0-$B7F3. Nothing in the code accesses **$B61E-$B7DF** (450
+bytes) directly. DRB command $15 can read any EEPROM byte, so a scan tool may still look there.
+EEPROM is outside the checksum. Writing it needs the PPROG sequence and about 10 ms per byte, and its
+endurance is limited, so it suits learned values saved at key-off rather than live data. [code]
+
+===== Processor time =====
+
+The main loop runs every 10.75 ms and records its longest pass in ''LoopTimeWorst'' (RAM $0454, in
+units of 256 timer ticks, so $15 would mean a full slot). Reading that byte over the DRB link on a
+running engine is the simplest way to see how much time is left before adding work to the main
+loop. Work in the interrupt handlers (fuel and spark scheduling) is not covered by this number.
+
+===== Building the firmware from source =====
+
+The source lives at [[https://github.com/DDex89/neon-fcc-firmware|neon-fcc-firmware]] and assembles back into the original ROM images byte for byte (checked by CI on every commit), so the Enhanced Edition above can start from a known-good baseline. Full build and regeneration instructions: [[https://github.com/DDex89/neon-fcc-firmware/blob/main/docs/en/building.md|building.md]]. In short:
+
+<code>
+python tools/build.py            # all variants, checks SHA-256 against the originals
+python tools/build.py --base B559  # the eleven factory B559 images
+</code>

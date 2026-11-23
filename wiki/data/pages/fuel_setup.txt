@@ -1,0 +1,84 @@
+-----
+===== Chrysler ECU (2D) Fuel Calculations =====
+-----
+
+==== Base Fuel Calculations ==== 
+
+In all generations of the Chrysler ECU (LM, SMEC, SBEC at least), the fuel pulsewidth is calculated every Distributor Interrupt. The base pulsewidth is looked up in 1 of 3 tables depending on the throttle condition. There is a base fuel table (no-throttle), a table for part throttle, and a table for full throttle. Then, the computer decides if it should be using starting fuel calculation or running fuel calculation. The resulting PW is multiplied by a modifier based on many factors; Coolant Temp, Air Intake Temp, O2 sensor, and Pumping Efficiency mainly. After the modifier, PW is added for accelerator pump function. The starting fuel PW, the PW modifier, and the Accelerator Pump adder are calculated during normal ECU running, not inside the Distributor Interrupt Routine.  
+The Base PW in the tables is calculated based on the Speed/Density fuel control theory. Basically, this is a calculation that estimates the Mass Airflow through the intake manifold based on the manifold pressure and air density. Here’s how the table data is calculated:   
+        
+{{ :equation.png?direct&600 |}}
+   
+In most speed density calculations, the Volumetric Efficiency is included in this calculation (and, since VolEff is RPM based, the engine speed as well – hence the name Speed-Density). But, Chrysler chose not to include Pumping Efficiency in this calculation and instead include it as a modifier to the PW.  
+
+
+==== Wide-Open-Throttle ====
+
+Wide-Open Throttle (WOT) operation because it's the easiest to tune and the easiest to understand. The simplest situation for WOT is comes after the engine is at normal operating temperature. So, simplicity sake, let's assume that the engine is up to temperature. I'll go into the temperature compensation factors in a later section.
+
+For Wide-open operation, the fuel is calculated from these values:
+
+^WOT PW=|** (WOTTBL_FuelFullThrottle) * SumOfFuelModifiers - Factor_StartFuelDecayIntoRunFuel **|
+
+WOTTBL is the Full-Throttle fuel PW table vs. MAP. The value that is stored in this table is an ideal PW vs. MAP and based on a target A/F; as well as injector size, assumed intake manifold temperature, fuel specific gravity, etc. This target A/F is hard-coded into the PW table - it's not a value that the computer uses for feedback or anything like that. It's just the value that Chrysler (or the tuner) chose when the table was created. Using the MP Tune AFR calculator, you can see the effect on the PW of changing this target A/F. P Tune draws a yellow line to represent the AFR Setup data. The user then can match the WOT fuel table to the AFR line.
+
+Also, the Factor_StartFuelDecayIntoRunFuel only comes into play during the first few seconds after starting the engine and also can be considered to be zero for most WOT applications. You definitely should not be firing the engine and going straight to WOT. But, if you did, this factor would affect the fuelling. I'll cover this factor in detail in a later section.
+
+This really leaves only the SumOfFuelModifiers and the WOTTBL PW values for WOT fuel calculation. WOTTBL is the 16-bit base PW lookup from MAP, the SumOfFuelModifiers value is a fraction (or percentage) and is calculated as follows (this is for WOT operation, there are additional factors for P/T):
+
+^SumOfFuelModifiers=| ** Cold Enrich factor  * Cold Load enrich factor  * Pumping Efficiency **|
+
+The cold enrich factor is calculated from the 3 cold start tables (A,B,C) and the time constants that phase them out. Once the engine is fully warmed up, the A and C factors go to 1 and so they will not have an effect on WOT fuel. So, we can ignore them (for now, we'll get back to them for cold enrichment).
+
+The CurveB factor is a little bit different. For CurveB there is no decay factor for time - it is always active. At normal operating temperature, the factor goes to 1. However, CurveB is also multiplied by a factor (FCRCVB) at WOT. This value comes from a lookup table vs. RPM and the scale is 100-200%. In many stock cals, this table is set to 100% meaning it has no effect.
+
+The Cold Load Enrichment factor only comes into play during warm-up. The Pumping Efficiency table is always used.
+So, at WOT, and under normal operating conditions (ie, post warm-up period), there are only 3 values that affect fuel:
+
+^ WOT PW=|** WOTTBL  (the main PW lookup) * PEFTBL (Pumping Efficiency) * CurveB * FCRCVB  (the CurveB WOT Multiplier) **|
+
+The only inputs to these tables are MAP, RPM, and Coolant temp.
+
+WOT Tuning  notes:
+
+When tuning for WOT, typically you set the target A/F using the main fuel table (WOTTBL). Use the MP Tune ARR calculator to help you set your target A/F values. If the actual WOT A/F is very far from this target, you should then make adjustments using the PumpEff table. MP Tune also has a utility to take AFR data vs. RPM and use it to apply a correction to the PupEff table (it displays a yellow correction line, much like the AFR setup line). It is very sensitive to the input data, however. Make sure the data you use is from WOT.
+
+I would advise caution when adjusting the CurveB or FCRCVB tables unless you are working with a highly modified cylinder head or intake system.
+
+In setting up the Pumping Efficiency table, I would start with a stock table appropriate for your engine (is, use a 2.2 table for a 2.2 engine, 2.5 Masi, etc.). Generally speaking, cylinder head porting and/or high-lift cams tend to rotate the Pump Eff table counter-clockwise about the peak. //pic// So, the higher RPM range increases efficiency and the lower RPM range loses efficiency. It's also worth noting that Chrysler left the beginning and end of this table open. It's not realistic that the pumping efficiency is constant above 6000rpm. But, in setting the table up this way, they ensure that there is an excess of fuel. This helps keep cylinder temperatures and pressures down at these limits. This helps headgasket durability, but it kills power.
+
+==== Part Throttle (Cruise) ====
+
+Part throttle cruise is calculated similarly to WOT except that the adaptive memory and O2 feedback come into play. At idle, you have additional factors related to spark scatter. For P/T fuel:
+
+^P/T PW=|** (BasePWLookup + SparkScatterFuelStabilizationValue )* SumOfFuelModifiers - Factor_StartFuelDecayIntoRunFuel **|
+
+Where the BasePWLookup is the lowest of these 2 values:
+
+** (MAPTBL_FuelPartThrottle * Timer_OpenLoopFraction) or WOTTBL_FuelFullThrottle **
+
+The SparkScatterFuelStabilizationValue will be zero except at idle, and Factor_StartFuelDecayIntoRunFuel should be zero a few seconds after starting. So, I'll ignore those 2 for now for simplicity's sake.
+
+The 'SumOfFuelModifiers' value is calculated the same as for WOT with one exception: At part throttle, the adaptive memory value is included. The adaptive memory value can be +/- 25%. I'll show how the O2 controller works and how adaptive memory is calculated in the next chapter. For P/T operation, the 'SumOfFuelModifiers' value is calculated as:
+
+^SumOfFuelModifiers =|** Cold Enrich factor  * Cold Load enrich factor  * Pump  Eff * 1 +/- ValueFromAdaptiveMemory **|
+
+The Cold Enrich, Cold Load Enrich, and Pumping Efficiency factors are the same as for WOT and will be zero if the engine is at normal operating temperature. 
+
+The adaptive memory value depends on the operating parameters of the engine and the O2 correction. There are 12 'cells' separated by RPM and MAP:
+
+In this chart, MAP is absolute (IE, 0 MAP is pure vacuum).
+
+^MAP AXIS|8160| 1 | 3 | 5 | 7 | 9 | 11 |
+^::::| R1| 0 | 2 | 4 | 6 | 8 | 10 |
+^::::|0|MP1|MP2|MP3|MP4|MP5|14.7|
+^::::|MAP AXIS |||||||
+
+Cell 12 (not shown above) is used only for idle.
+
+R1 and MP1 thru MP5 are all constants and can be changed by the tuner (if desired). // pic showing these values in MPT // Really, tuning these points should not normally be necessary. The MAP values are scaled by MP Tune automatically if they are ID'd correctly in the template.
+
+The value stored in the cells comes from the O2 controller. Basically, if the O2 does not toggle soon enough, then the adaptive cell gets updated with a new value. The value is signed and can be +/- 25%. The adaptive memory value is a RAM variable calculated by the O2 Ramp
+Controller. So, these values cannot be tuned directly. However, they can be logged using MP Scan and used to indicate if the P/T fuel table is off. For example, if a cell is at 25%, it is 'pegged' rich. This means that the base PW in this area is too lean and the O2 Controller is compensating as much as it can. The base fuel table in this area should then be richened up. 
+
+

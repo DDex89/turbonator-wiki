@@ -1,0 +1,55 @@
+====== What are Turbonator and MP Tune/MP Scan? ======
+
+==== Turbonator code overview ====
+
+Turbonator is custom source code for LM, SMEC, SBEC equipped cars. This is a source code+template format – meaning that the calibration data is stored in a separate file from the actual code. If you’re new to this format, it is different from D-Cal and CHeM in that they edited the actual Chrysler binary file directly. While, with MP Tune and Turbonator, we create a completely new binary file from the source code. After compilation, MP Tune still allows the user to edit the binary directly if you choose.
+ 
+Turbonator is based on the stock Chrysler code and calibrations. But, with the additional features listed. These features are unique to the Turbonator codebase. The calibration data is completely opened up to the tuner for adjustment in MP Tune. 
+
+Each of these features can be turned on/off thru the use of a calibration 'switch' or flag. If you want no special features enabled, you can build the cal this way, too, by simply not enabling any of them.
+
+[[https://drive.google.com/open?id=0BwcPBhg2fwrIUndXcm9SNlJSUXM&authuser=0|Download the latest release of the Turbonator codebase.]] \\
+For information on the different file types included in the Turbonator download, see [[other_info|here]].
+ 
+^ **Turbonator Features:** ^
+|**1) Knock Indicator** – [ALL] This feature flashes the ‘Check Engine’ lamp whenever the timing is being retarded due to knock. It’s a useful feature to feedback to the driver when you should back off to save your engine.|
+|**2) Switchable boost** – [ALL] This allows a ‘LOW’ boost setting to be used when a switch is applied. Unfortunately, it must be one of the existing inputs to the SMEC (Cruise, A/C, P/N switch, etc.). But, these can be ‘doubled up’ – IE, you can have the cruise on/off switch work for both hi/lo boost as well as cruise. This is similar in operation to the S60 boost switch feature, though without the timing adjustment for low octane fuel.|
+|**3) Staging Limiter (2-Step)** – [ALL] This feature allows a lower than normal rev limit to be set. This lower limit can be enabled by a low speed cutoff (usually 2-10mph), and/or a switch (usually the brake switch for auto cars). The lower rev limit is useful for launching the car in a drag race.|
+|**4) Spark-Cut Rev Limiter** – [SMEC/SBEC Only] Added the ability to specify a spark-cut to be used for the rev limit instead of a fuel-cut (which is the stock operation). When used in conjunction with the staging limiter, this gives much more precise control of the RPM while staging. The fuel-cut typically has a ~500rpm swing. The spark-cut staging limiter can get down to ~200rpm. If desired, it is also possible to configure the spark-cut limiter for 'bang-bang' operation.|
+|**5) Anti-lag Retard** – [ALL] Anti-Lag is a feature that helps spool the turbo. For the latest release of T/SMEC and T/SBEC, anti-lag has been completely re-written. Previously, anti-lag retarded the timing proportionally to the difference from boost target. Now, the Anti-lag timing is a pre-set value and it only works during staging (though, it will work with either the spark-cut or fuel-cut limiters). The anti-lag/staging advance can be set anywhere from -16 to +16 degrees.|
+|**6) Alky Injection** – This feature is available, but not included in the standard build. Please PM me if you are interested in using it. Due to space and time limitations, I commented it out. But, it can easily be re-enabled for those that are interested.|
+|**7) Customized Boost Control** – [SMEC Only] Added some custom code and an additional table to modify the WG duty Cycle as an anti-lag measure. Basically, the WGDC is set to 100% during transients to keep the WG from seeing the manifold pressure and releasing the exhaust gases early.|
+|**8) Modified Dwell Calculation** - [SMEC/SBEC] Added Dwell compensation for battery volts. This will maintain better dwell control than the stock code. Should improve ignition performance at WOT (when the alternator shuts off and battery voltage can drop). This feature is enabled in all cals. |
+|**9) Lock-up solenoid operation** – [SMEC/SBEC] Added PTU capability to the SMEC codebase. This is the exact same functionality as the stock 3.0 and later 4-cylinder turbo and TBI ECU’s. (included on the factory cals for the SBEC)|
+|**10) Decel Fuel Cut** - [SMEC/SBEC] This will cut fuel (completely) on decel for fuel economy improvement. Currently only works on MT trans cals.(included on the factory cals for the SBEC)|
+|**11) WB2NB** - [SMEC/SBEC] This is a feature that will allow you to feed a 0-5v WB signal directly into the SMEC thru the existing O2 sensor input. The code will automatically convert the signal to a NB range for use in the stock feedback mechansim. The WB AFR is stored in RAM so that it can be read and logged using MP Tune. There is also a constant value that can be used to offset the entire NB signal to force the engine to run richer or leaner in feedback mode.|
+
+==== MP Tune/MP Scan ====
+
+MP Tune is the latest tuning program available for tuning OBD-I era Chrysler calibrations. MP Scan is the companion datalogger/scantool emulator program.
+
+MP Tune and MP Scan (as well as MP ScanDroid) are written and maintained by Morris Terveen (aka wowzer).
+
+The latest downloads for MP Tune and MP Scan can be found here: \\
+https://dl.dropboxusercontent.com/u/65623639/mpsuite/MPTuneSetup/MPTune.zip \\
+https://dl.dropboxusercontent.com/u/65623639/mpsuite/MPScanSetup/MPScan.zip \\
+
+what you need to do:
+  * download the zip file to a temp directory
+  * unzip and run setup.exe
+  * this creates a MP Suite directory under the Program Files (<=win XP) or Program Files (x86) (> win XP) directory. Another directory will be created in the MP Suite directory called MPTune. This is where all the programs will reside. The data files will be located under the C:\Users\"username"\AppData\Roaming\MPTune for windows versions > Win XP.
+
+When MPTune2 is started, it will check if a newer version is available. If so, it will download it (message displayed on the status line) and then install it AFTER you exit the program. Give the update 10 seconds or so to get everything updated. The program should then be on the most current version when you restart it. If you are on windows vista or later, the user access control system will prompt you for permission to update the program; click allow.
+
+==== Turbonator History ====
+
+The beginnings of the Turbonator codebase go back to the old CHeM and DCal mail lists and Yahoo groups (and the 'Crystal Project' before them - started by Gary Donovan and others). Originally, cals were edited using a hex editor only. The first big step came with the creation of the binary editors - DCal and CHeM. These were only capable of modifying the factory cal. They were limited, however, in that they could only edit tables that had been found thru dis-assembly (and in those days, we did not have any complete dis-assemblies). Though, D-Cal could also identify most of the tables and constants in a binary file based on the data formats. But, it wasn't perfect. Another problem was that you could not always add points to a table, and you could not add new code with them at all. That had to be done by hand. The first code mods were the Flash CE and switchable boost. But these were done by hand-assembled hacks onto the 'dead space' at the end of a stock cal. Not exactly a bullet-proof solution.
+
+CHeM2 introduced the idea of a 'relocatable' source code created by fully dis-assembling the factory cal back into a compiler-ready source code. Geoff Allan is the author of CHeM; he also created the Blueberry and Ladybug source codes, which were the first relocateable source codes with added features. These were for the '87 LM and '89 T2 SMEC respectively. 
+
+I (shelgame, Rob Lloyd) took it on myself to fully dis-assemble the '89 T1 using the LB source as a 'key'; copying many of the naming conventions. Eventually, I started to add more and more new code features; and still am to this day. I expanded the library by creating Turbonator versions of the SBEC, TII, and even the '87 T2 and GLHS LM's (with significant differences from Geoff's original code).
+
+CHeM2 edited the complete source code only. In order to change MAP scales, the file itself was hard-coded with assembler directives to use different data for a 2-bar or 3-bar MAP. But, this format made if clunky to add additional MAP sensors (such as 2.5 BAR or 4 BAR) and still required hand-scaling of the values by the user. Injector scaling was more automated by using an external utility called at compile time. 
+
+Geoff exited the hobby before CHeM2 was completely finished. Geoff opened up the source code to CHeM2 and a year or so later, Morris and I stared working on a new concept for cal editing - the template + code model. With this model, we separated the calibration data from the code, and we made it possible to scale for essentially any MAP scale or injector size through the editor. Separating the cal data from the code allowed many different stock cals to be built, and it allowed code updates and feature additions, theoretically without affecting the users calibration data. The latest version of MP Tune includes features to help you set the AFR for your cal and tune it in.
+

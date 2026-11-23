@@ -1,0 +1,170 @@
+{{howhard>5}}
+
+----
+====== SBEC3: TunerPro, porting and open questions ======
+----
+
+See also [[sbec3_overview|SBEC3 overview]] and [[sbec3_calibration|calibration]].
+
+===== TunerPro definitions =====
+
+''xdf/<part number>.xdf'' is a TunerPro definition for each of the eleven images, generated from
+the annotations by ''tools/xdf.py''. Open the matching ''.bin'' in TunerPro and select the XDF of the
+same part number: addresses differ between families, and the row labels are computed from that
+image.
+
+**Status: generated, not yet tried in TunerPro.** The files are well-formed XML (checked by CI) and
+follow the XDF 1.60 layout that other generators use, but the layout of the 2D tables (interleaved
+x/y pairs, read with a 16-bit stride) and the category numbering have not been checked in the
+program yet. Please report what does not open or shows wrong values.
+
+==== What is in the XDF ====
+
+^ Category ^ Content ^
+| Fuel | main and WOT fuel tables (as % change of the MAP-based pulse width), MAP scales, dead time, baro and air-temperature corrections, acceleration, after-start and cranking enrichment, fuel cut-off |
+| Spark | main and WOT spark (degrees), corrections, dwell |
+| Knock | knock control |
+| Idle | idle speed control, including ''IdleTargetRpm'' |
+| Closed loop | oxygen-sensor feedback |
+| Sensors | thermistor curves, throttle limp-in, sensor processing |
+| Diagnostics | misfire monitor and other OBD monitors |
+| Speed control | cruise control (probable) |
+| Cooling fan | radiator fan, relay and PWM variants |
+| EGR | EGR control (probable) |
+| A/C | A/C clutch control (probable) |
+| EVAP purge | purge control and vapour learning (probable) |
+| Startup | values set at reset |
+| Options | option bytes $0328-$0340, one flag per bit used |
+| Faults | ''FaultTable'': one row per fault, P-code in the row label |
+| Other | tables of subsystems not identified yet |
+
+In the reference image every table has a name given by hand from the code (see
+[[sbec3_calibration|calibration.md]]); the description of each says which routine
+reads it, its inputs and where the result goes. The other images get the names that the port can
+carry over (from 131 tables in family A to 403 in family E); the rest keep their generated ''Tab...''
+name. Units come from the annotations or from the inputs where those are known (rpm, deg C, kPa,
+volts).
+
+The XDF also holds the 1,451 constants of the reference image (thresholds, limits,
+times, gains) as XDFCONSTANT, with the unit where it is known, and each used bit of the option bytes
+as an XDFFLAG (see [[sbec3_calibration|calibration.md]]); the other images get
+the constants the port carries over (239 in family A to 1,404 in family E).
+
+''tools/xdfcheck.py'' checks a generated XDF against its image: every element must lie inside the
+table or constant of the same name, table sizes must match the table headers, flag masks must be
+bits the code tests, no two elements may share bytes, and the unit formulas must give plausible
+values (rpm, deg C, kPa, volts, degrees) for the values stored in the image. It needs the image
+files, which are not in the repository, so it runs locally; on all eleven XDFs it reports no
+errors. The only remaining warnings are three unnamed 2D tables in the ported images whose x
+values are not in order (''Tab2D_04FB'' in family A, ''Tab2D_050D'', ''Tab2D_2C31''), which may not be
+real tables.
+
+''tools/edittest.py'' (run in CI, no image needed) edits a copy of the source: a cell of
+''PartThrottleFuelMain'', the constant ''RevLimit'' and bit 5 of ''Options0337''. It rebuilds, checks that
+exactly those three bytes changed and that they are the cells the XDF points at, then runs
+''tools/fixsum.py --fix'' and checks that only the correction byte at $0030F was added and the sum
+is right.
+
+The condition lists of the OBD monitors (see calibration.md) are in the XDF as small tables under
+Diagnostics, with the RAM variable and test named on each row.
+
+==== Axes ====
+
+  * 3D tables with a stored column axis: the axis is read from the image and editable (usually rpm).
+  * Rows of 3D tables are not stored: the row comes from a MAP scale table (''PartThrottleMapScale'',
+''WotMapScale''). The XDF labels each row with the MAP value that selects it, computed from the scale
+table **at generation time**. If you change a scale table, the row labels stay old until the XDF is
+generated again (''python3 tools/xdf.py roms/<PN>.bin xdf/<PN>.xdf'').
+  * 3D tables without a stored axis show positions 0-255.
+  * 2D tables: the x values are an editable axis, the y values the data column.
+
+==== Checksum (TunerPro does not fix it) ====
+
+TunerPro does not correct the SBEC3 checksum. After saving an edited image run
+
+<code>
+python3 tools/fixsum.py edited.bin --fix
+</code>
+
+which sets the correction byte (header + 13) so that the 8-bit sum of the image equals the last byte
+of the part number again. Without ''--fix'' it only checks.
+
+===== Porting to the other images =====
+
+The annotations are made on the reference image 05293190AC (family F). ''tools/port.py'' carries
+them over to every other image; ''tools/gen_source.py'' then uses the carried-over set, so each
+image gets names, table layouts and symbols without being annotated by hand.
+
+==== How the port works ====
+
+The two programs are matched routine by routine:
+
+  - **Anchors**: the reset entry and the handler of each exception vector.
+  - **Unique routines**: a routine whose sequence of opcodes and addressing modes (operands left
+out) occurs exactly once in each image.
+  - **Table shapes**: a routine that reads the same sequence of 3D table shapes (rows, columns,
+signed) as exactly one routine in the other image. This finds the fuel and spark routines even
+where their code changed.
+  - **Mnemonics only**: a routine whose sequence of mnemonics is unique, for code whose
+addressing modes changed between program versions.
+  - **Propagation**: two matched routines are aligned instruction by instruction (or on their
+common runs when they are at least 60 % alike); the routines they call are matched in turn.
+The lookups inside two matched routines are paired in call order when the table kinds agree.
+
+The aligned instructions give the address map for code labels. Their operands give the maps for
+RAM offsets (''$xxxx,Z'') and calibration addresses (''LDX #table'', ''$xxxx''); a name is carried over
+only when at least 80 % of the aligned instructions agree on the new address.
+
+The result is written to ''annotations/ports/<part number>/'' (labels, RAM, tables, analysis) with
+''stats.json'', which also holds the SHA-256 of the image so that the set is never applied to the
+wrong file. These files are generated: change the reference annotations and re-run the port.
+
+==== Results by family ====
+
+^ Image ^ Family ^ Size ^ Routines matched ^ Instructions mapped ^ Labels ^ RAM names ^ Tables ^ Constants ^
+| 05269833AI, 05269834AJ | E | 256 KB | 654 of 657 | 42,461 of 43,370 | 651 of 680 | 1,800 of 1,871 | 402 of 410 | 1,404 of 1,451 |
+| 05269833AH | D | 256 KB | 618 | 37,929 | 615 | 1,670 | 361 | 1,244 |
+| 05032017AA | G | 256 KB | 623 | 39,434 | 621 | 1,772 | 351 | 1,329 |
+| 05007038, 05293148AA | C | 128 KB | 301 | 15,809 | 278 | 905 | 167 | 548 |
+| 05293013AC, 05293014AC | B | 128 KB | 194 | 8,103 | 170 | 521 | 134 | 253 |
+| 04887050, 04887051 | A | 128 KB | 170 | 7,042 | 146 | 442 | 131 | 239 |
+
+The 256 KB families are close relatives of the reference: almost everything carries over, and
+the RAM layout is nearly the same. The 128 KB families are an older, smaller program (30,000 to
+33,000 instructions) with a 2 KB RAM laid out differently; there the port covers the skeleton
+(reset, interrupts, scheduler counters, lookup routines) and the main fuel and spark paths:
+''CalcFuelPulse'', ''CalcBaseSpark'', both fuel and spark tables, the MAP scales, the fuel constants,
+dead time, knock threshold, the thermistor curves, ''EngineRpm'', ''Map'', ''CoolantTemp'', ''Throttle''
+and others. The lookup routines and table formats are the same in all families, so every table is
+found and laid out in every image, named or not.
+
+==== Sources in the repository ====
+
+One image per family has its source in ''src/'' and is checked by the build:
+
+^ Family ^ Image ^ Note ^
+| A | 04887050 | copyright 1995, probably 1996 model year |
+| B | 05293013AC | 1997 Eagle Talon, manual |
+| C | 05007038 | probably a Mopar Performance calibration |
+| D | 05269833AH | probably Neon |
+| E | 05269833AI | probably Neon |
+| F | 05293190AC | reference, 1999 Mitsubishi Eclipse, manual |
+| G | 05032017AA | copyright 1998 |
+
+Each has its catalogue in docs/catalogue/. The second image of a family differs
+from the first only in calibration bytes (no code byte differs); ''tools/caldiff.py'' lists those
+differences table by table:
+
+^ Comparison ^ Differing bytes ^ In tables ^ Directly read constants ^
+| 05293148AA and 05007038 (C) | 2,214 | 1,743 in 63 tables | 105 |
+| 04887050 and 04887051 (A) | 939 | 620 in 58 tables | 118 |
+| 05293013AC and 05293014AC (B) | 955 | 633 in 58 tables | 121 |
+| 05269833AI and 05269834AJ (E) | 1,021 | 683 in 69 tables | 122 |
+
+In family C, 05007038 rewrites both fuel tables and both spark tables almost completely compared
+with 05293148AA, plus about 60 smaller tables; that fits a performance calibration for the same
+program.
+
+===== Open questions =====
+
+The uncertain readings ($032x$-$033x$ option bits still marked "probably", data blocks not decoded yet, bit positions with no text) are tracked in the repository and updated as they are settled; see [[https://github.com/DDex89/neon-sbec3-firmware/blob/main/docs/en/open-questions.md|open-questions.md]] for the current list. Two settled this round, as examples: `MonFlags09D`-`09F` are the two-trip pending bits (not "test not passed yet"), and the curve formerly called `FlexSensorCurve` is the catalyst temperature sensor curve, shared with the flex-fuel input.

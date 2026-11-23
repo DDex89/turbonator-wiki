@@ -1,0 +1,13 @@
+**Staging Limiter (2-Step)**
+
+This feature allows a lower than normal rev limit to be set. This lower limit can be enabled by a low speed cutoff (usually 2-10mph), and/or a switch (usually the brake switch for auto cars). The lower rev limit is useful for launching the car in a drag race.
+
+**Spark-Cut Rev Limiter**
+
+Added the ability to specify a spark-cut to be used for the rev limit instead of a fuel-cut (which is the stock operation). When used in conjunction with the staging limiter, this gives much more precise control of the RPM while staging. The fuel-cut typically has a ~500rpm swing. The spark-cut staging limiter can get down to ~200rpm. If desired, it is also possible to configure the spark-cut limiter for 'bang-bang' operation.
+
+**Anti-lag Retard**
+
+Anti-Lag is a feature that helps spool the turbo. For the latest release of T/SMEC and T/SBEC, anti-lag has been completely re-written. Previously, anti-lag retarded the timing proportionally to the difference from boost target. Now, the Anti-lag timing is a pre-set value and it only works during staging (though, it will work with either the spark-cut or fuel-cut limiters). The anti-lag/staging advance can be set anywhere from -16 to +16 degrees.
+
+The 3 features above can be used together for the SMEC and SBEC cals to create a very comprehensive launch control feature.

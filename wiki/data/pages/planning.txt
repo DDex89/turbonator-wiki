@@ -1,0 +1,64 @@
+{{howhard>2}}
+-----
+====Logging and monitoring====
+-----
+
+=== Logging data from the Chrysler ECU ===
+
+The Chrysler ECU has many sensors connected to it, some of which could be very useful to monitor and log during vehicle tuning or for troubleshooting.
+
+The ECU also has many internal "variables" that are used internally for calculation, or indicate an operating state that doesn't have a sensor connected directly to it, but is still something that is "known" by the ECU, such as injector pulse width.
+
+In order to monitor and/or log these things, you will need some kind of interface that connects the ECU diagnostic connector (SCI bus) to whatever you will read/log with. 
+
+Scan tools such as the Chrysler DRBII and OTC have the interface and the reading/logging device combined into one unit. 
+
+A laptop needs a separate device, typically a USB to SCI cable.
+
+BoostButton offers a USB to SCI device which has many important features and is preconfigured out of the box, requiring minimal additional setup - [[http://www.boostbutton.com/store/en/data-cables/13-sci-usb-cable.html|BoostButton SCI Cable]]
+
+
+=== Logging data from a wideband O2 sensor ===
+
+There are 2 options for logging wideband data.
+
+1. A wideband O2 sensor may be logged simply by using the software came with it. For instance, with Innovate wideband O2 sensors, a program called LogWorks allows logging the wideband O2 sensor. So to log the Chrysler ECU data and the wideband, you would need to have MPSCAN and LogWorks running simultaneously. And then when logging is complete, you would need to manually combine and synchronize the two datasets, which can be a tedious and complex process.
+
+2. It is also possible to connect your wideband O2 sensor directly to the Chrysler ECU, in place of the stock O2 sensor, using a Turbonator cal that has been setup to take a WB input in place of the NB input. The cal internally converts the WB signal into a NB signal for fuel control feedback purposes and allows the user to log both the WB and NB values, if desired. In this case, the WB data is perfectly aligned with the rest of the engine operating data such as MAP and RPM.
+
+More info here: [[wb2nb_setup|WB2NB Setup]] 
+
+----
+====Getting custom cals into the ECU====
+----
+
+There are a couple of options for getting your cal into the ECU.
+
+**Swapping Chips**
+
+For all generations of Chrysler ECU, you can simply socket the computer and swap chips to change the calibration data. This usually requires removing the ECU from the car and physically changing the chip. But, it is also possible to use a remote socket as offered by Moates.com.
+
+For more info, see the [[chip_burning_basics|article on socketing and burning chips]].
+
+**Real-time tuning**
+
+With a socketed ECU, you can also use the Ostrich (also offered by Moates.com). The Ostrich allows for real-time tuning while the engine is running. But, it is not recommended for long-term use. Basically, it is used for tuning, and then a chip is burned when the tuning is complete.
+
+The SBEC will require a special adapter - [[http://www.boostbutton.com/store/en/ecu-chips/18-latch-board.html|a latch board]] - to use the Ostrich. 
+
+**Flash ECU Conversion**
+
+Finally, if your car uses a SMEC (88-89) or and SBEC/SBECII (90-93), it can be made 'flashable'. That is, the ECU is modified with a memory module that can be re-flashed in-car with a data cable attached to the SCI port. While the engine does have to be turned off to change the cal, the ECU itself does not have to be removed, and the flash process itself takes less than 1 minute in most cases.
+
+For the SMEC, a pin must be added to the 60-way and a switch wired to constant 12v. For the SBEC, the wire is added to the SCI connector, which is also then switched to 12v constant.
+
+See the [[how_to_flash_a_cal|flashing instructions]] for more details on the flash process. 
+
+See the [[add_a_pin|adding a pin to the 60-way]] instructions for more details on that process.
+
+----
+====Tuning and editing cals====
+----
+
+For more information about the Turbonator cals and some history of the various tuning packages that have been used, see the [[turbonator_and_mptune|Turbonator/MP Tune/MP Scan]] page.
+

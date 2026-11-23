@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>pumpshot_details [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="pumpshot_details" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+<div class="page" role="main">
+
+<hr/>
+<h3 class="sectionedit1" id="pumpshot_calculation_and_operation">PumpShot Calculation and Operation</h3>
+<div class="level3">
+<hr/>
+<p>
+PumpShot is basically a way to mimic the accelerator pump function of a carburetor. That is, it gives a little extra fuel when the throttle is opened or the load is increased to prevent the engine going lean during these times. In the Chrysler ECU's, there are usually 2 Pumpshot calculations: MAP-based and TPS-based.
+</p>
+<p>
+For most applications, these table do not need to be adjusted. 
+</p>
+<p>
+For very large throttle bodies and heavily ported heads/intakes, there may be some adjustment necessary.
+</p>
+<p>
+<a class="media" href="_media/trans_fuel.jpg" rel="noopener" target="_blank" title="trans_fuel.jpg"><img alt="" class="media" loading="lazy" src="_media/trans_fuel.jpg"/></a>
+</p>
+<p>
+<strong>MAP-Based PumpShotPW:</strong>
+</p>
+<p>
+The PumpShot calculation for MAP is based on a time-averaged MAP calculation. If this average MAP has changed by a certain amount, then fuel is added based on the level of change.
+</p>
+<ul>
+<li class="level1"><div class="li"> AvgMAP –&gt; EnrichmentTimefromTemp_MAP (AETIME) is the time constant for the AvgMAP calculation. A higher time constant gives a longer-term average (and usually a lower DeltaMAP - see the next definition). </div>
+</li>
+<li class="level1"><div class="li"> DeltaMAP –&gt; DeltaMAP is the difference between the current MAP value and the calculated average MAP (AvgMAP). [DeltaMAP = MAP - AvgMAP]</div>
+</li>
+</ul>
+<p>
+MAP PumpShotPW Calculation:
+</p>
+<p>
+If DeltaMAP is calculated to be less than DeltaMAPTriggerLevel (MAPTRG) then there is no MAP-based PumpShot; If DeltaMAP is greater than MAPTRG and lower than MaxDeltaMAPAllowed (MAPMAX), then use DeltaMAP in the PW calculation; If DeltaMAP is greater than MAPMAX, then used MAPMAX in the PW calculation instead (DeltaMAP = MAPMAX); Lookup the value from the DeltaMAPEnrichmentfromTemp (AESLOP) table (from coolant temp); [PumpShotPW(MAP) = AESLOP_valule X DeltaMAP]
+</p>
+<p>
+The simplest way to tune the MAP-based PumpShot is with the AESLOP table. Higher is more fuel, lower is less fuel.
+</p>
+<p>
+<strong>TPS-Based PumpShotPW:</strong>
+</p>
+<p>
+The PumpShot calculation for TPS is based on a time-averaged TPS calculation. If this average TPS has changed by a certain amount, then fuel is added based on the level of change.
+</p>
+<ul>
+<li class="level1"><div class="li"> AvgTPS –&gt; EnrichmentTimefromTemp_TPS (THRTCN) is the time constant for the AvgTPS calculation. A higher time constant gives a longer-term average (and usually a higher DeltaTPS - see the next definition). </div>
+</li>
+<li class="level1"><div class="li"> DeltaTPS –&gt; DeltaTPS is the difference between the current TPS value and the calculated average TPS (AvgTPS). [DeltaTPS = TPS - AvgTPS]</div>
+</li>
+</ul>
+<p>
+PumpShotPW Calculation:
+</p>
+<p>
+If DeltaTPS is less than PositiveTransientTriggerLevel (POSTRG) then there is no TPS PumpShot; If DeltaTPS is greater than POSTRG and lower than MaxDeltaThrottle (THRMAX), then use DeltaTPS in the PW calculation; If DeltaTPS is greater than THRMAX, then use THRMAX instead in the PW calculation (DeltaTPS = THRMAX); Lookup the value from the EnrichmentFromTemp (POSSLP) table; [PumpShotPW(TPS) = POSSLP_valule X DeltaTPS]
+</p>
+<p>
+For a bigger TB, I would actually start with the POSSLP table. Add PW in the operating temp range.
+</p>
+<p>
+Reducing THRTCN would actually have the effect of increasing the pumpshot, because it will allow filter TPS changes less resulting in a larger DeltaTPS value. Increasing THRTCN should also increase the PumpShot, as would increasing THRMAX.
+</p>
+<p>
+If increasing POSSLP doesn't seem to help, try increasing THRMAX, too.
+</p>
+<p>
+Similarly, for a heavily ported head, I would adjust the AESLOP table. Add PW in the operating temp range.
+</p>
+<p>
+Reducing AETIME would actually have the effect of reducing the pumpshot, because it would reduce the DeltaMAP value. Increasing AETIME should also increase the PumpShot, as would increasing MAPMAX.
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>pumpshot_details.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

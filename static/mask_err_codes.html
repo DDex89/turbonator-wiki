@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>Error Code masking [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="mask_err_codes" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body">
+<ul class="">
+<li class="level1"><a href="#error_code_masking">Error Code masking</a></li>
+<li class="level1"><a href="#t_glhs_and_t_lm">T/GLHS and T/LM</a></li>
+<li class="level1"><a href="#t_smec_and_t_sbec_and_later">T/SMEC and T/SBEC (and later)</a></li>
+</ul>
+</div></div></div>
+
+<div class="page" role="main">
+
+<hr/>
+<h1 class="sectionedit1" id="error_code_masking">Error Code masking</h1>
+<div class="level1">
+<hr/>
+</div>
+<h1 class="sectionedit2" id="t_glhs_and_t_lm">T/GLHS and T/LM</h1>
+<div class="level1">
+<p>
+Not done yet.
+</p>
+</div>
+<h1 class="sectionedit3" id="t_smec_and_t_sbec_and_later">T/SMEC and T/SBEC (and later)</h1>
+<div class="level1">
+<p>
+Error code “masking” is implemented differently in the SMEC/SBEC than in the earlier code. Instead of masking bits for the individual codes, an internal code is used to mask up to 7 different code bytes. This is because there are in some cases 2 or more different diagnostic methods to set a given code. The mask bytes are used to prevent the code being set by a specific diagnostic routine.
+</p>
+<p>
+The code bytes are as follows:
+</p>
+<div class="table sectionedit4"><table class="inline">
+<tr class="row0">
+<th class="col0">Code #</th><td class="col1">Code</td><td class="col2">Offset (masking code)</td>
+</tr>
+<tr class="row1">
+<th class="col0">61</th><td class="col1">Baro sensor open or shorted</td><td class="col2">31</td>
+</tr>
+<tr class="row2">
+<th class="col0">62</th><td class="col1">EMR mileage cannot be stored in EEPROM</td><td class="col2">30</td>
+</tr>
+<tr class="row3">
+<th class="col0">63</th><td class="col1">Controller cannot write to EEPROM</td><td class="col2">2f</td>
+</tr>
+<tr class="row4">
+<th class="col0">44</th><td class="col1">Loss of FJ2</td><td class="col2">08,2c</td>
+</tr>
+<tr class="row5">
+<th class="col0">45</th><td class="col1">Nothing (overboost)</td><td class="col2">07</td>
+</tr>
+<tr class="row6">
+<th class="col0">46</th><td class="col1">Battery Volts High</td><td class="col2">06</td>
+</tr>
+<tr class="row7">
+<th class="col0">47</th><td class="col1">Battery Volts Low</td><td class="col2">05</td>
+</tr>
+<tr class="row8">
+<th class="col0">51</th><td class="col1">Lean condition</td><td class="col2">04</td>
+</tr>
+<tr class="row9">
+<th class="col0">52</th><td class="col1">Rich Condition</td><td class="col2">03,2d</td>
+</tr>
+<tr class="row10">
+<th class="col0">53</th><td class="col1">Prom Checksum</td><td class="col2">02</td>
+</tr>
+<tr class="row11">
+<th class="col0">54</th><td class="col1">Distributor Sync</td><td class="col2">01</td>
+</tr>
+<tr class="row12">
+<th class="col0">33</th><td class="col1">AC Cutout Relay</td><td class="col2">10</td>
+</tr>
+<tr class="row13">
+<th class="col0">34</th><td class="col1">Speed Ctl Solenoid</td><td class="col2">0f</td>
+</tr>
+<tr class="row14">
+<th class="col0">35</th><td class="col1">Radiator Fan Relay</td><td class="col2">0e</td>
+</tr>
+<tr class="row15">
+<th class="col0">36</th><td class="col1">Wastegate Solenoid</td><td class="col2">0d</td>
+</tr>
+<tr class="row16">
+<th class="col0">37</th><td class="col1">Barometric Read Solenoid</td><td class="col2">0c</td>
+</tr>
+<tr class="row17">
+<th class="col0">41</th><td class="col1">Charging System</td><td class="col2">0b</td>
+</tr>
+<tr class="row18">
+<th class="col0">42</th><td class="col1">Auto Shutdown Relay</td><td class="col2">0a</td>
+</tr>
+<tr class="row19">
+<th class="col0">43</th><td class="col1">Ignition Coil Control</td><td class="col2">09,28,29,2b</td>
+</tr>
+<tr class="row20">
+<th class="col0">22</th><td class="col1">Coolant Temp Sensor</td><td class="col2">1e,1f</td>
+</tr>
+<tr class="row21">
+<th class="col0">23</th><td class="col1">Charge Temp Sensor</td><td class="col2">1c,1d</td>
+</tr>
+<tr class="row22">
+<th class="col0">24</th><td class="col1">Throttle Position</td><td class="col2">1a,1b</td>
+</tr>
+<tr class="row23">
+<th class="col0">25</th><td class="col1">AIS Motor</td><td class="col2">19</td>
+</tr>
+<tr class="row24">
+<th class="col0">26</th><td class="col1">Injector Current Limit Not Achieved</td><td class="col2">16,17,18</td>
+</tr>
+<tr class="row25">
+<th class="col0">27</th><td class="col1">Injector Driver interface</td><td class="col2">13,14,15</td>
+</tr>
+<tr class="row26">
+<th class="col0">31</th><td class="col1">Purge Solenoid</td><td class="col2">12</td>
+</tr>
+<tr class="row27">
+<th class="col0">32</th><td class="col1">Exh Gas Recirc Solenoid</td><td class="col2">11,2e</td>
+</tr>
+<tr class="row28">
+<th class="col0">11</th><td class="col1">Engine Not Cranked Since Battery Disconnected</td><td class="col2">28</td>
+</tr>
+<tr class="row29">
+<th class="col0">12</th><td class="col1">Memory Standby Power Lost</td><td class="col2">00</td>
+</tr>
+<tr class="row30">
+<th class="col0">13</th><td class="col1">MAP Pneumatic</td><td class="col2">26,27</td>
+</tr>
+<tr class="row31">
+<th class="col0">14</th><td class="col1">MAP Electrical</td><td class="col2">24,25</td>
+</tr>
+<tr class="row32">
+<th class="col0">15</th><td class="col1">Vehicle Distance Sensor</td><td class="col2">23</td>
+</tr>
+<tr class="row33">
+<th class="col0">16</th><td class="col1">Battery Voltage Sense</td><td class="col2">22</td>
+</tr>
+<tr class="row34">
+<th class="col0">17</th><td class="col1">Engine Running Too Cool (thermostat)</td><td class="col2">21</td>
+</tr>
+<tr class="row35">
+<th class="col0">21</th><td class="col1">Oxygen Sensor</td><td class="col2">20</td>
+</tr>
+</table></div>
+<p>
+The last byte MUST be 0x00, otherwise the code will result in an error. I think the original intent was to allow the factory calibrators to mask specific internal codes to try and debug errors. Previously, only the final error code could be masked - making the cause unclear in the case where multiple internal codes set the same error code.
+</p>
+<p>
+It should be possible to increase the size of the list by adding additional code bytes after “FLTMSK7_ErrorBitsMask7”. Just make sure that the byte after the last one in the list remains 0x00. The mask checking routine looks for this to mark the end of the list. Also, if the list is too long, it may cause lack of space for other items. So, be careful if adding to this list.
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>mask_err_codes.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

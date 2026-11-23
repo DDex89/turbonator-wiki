@@ -1,0 +1,51 @@
+{{howhard>4}}
+-----
+===== Socketing the ECU ===== 
+-----
+
+
+
+Overall, socketing your own ECU is not an easy task. If you have some experience soldering, it can be done. The LM's are easier than the SMEC/SBEC due to the latter having the board and components fully sealed in a potting compound. If this will be your first attempt at soldering anything, it's recommended that you get help or at least practice on something other than your main computer.
+
+----
+====Getting at the chip:====
+----
+
+**Required tools/materials:**
+  * Exacto knife or razor blade
+  * Small nylon/plastic scraper (SMEC or SBEC only)
+
+LM - In the case of the LM, the modifications are limited and relatively simple. The LM has no potting compound and the EPROM is exposed. But, you still must remove the EPROM and replace it with a socket. If you have an LM, you can skip below to 'Removing the chip:'.
+
+For both the SMEC and SBEC, the potting compound will need to be cut away from the EPROM so that it can be de-soldered and removed. Be sure to remove the potting from both sides of the board. Use an Exacto knife or razor blade to carefully cut an outline of the chip about 1/8" larger than the pin footprint. The potting compound is relatively soft and easy to remove. I use a small screwdriver and a nylon scraper to carefully remove the potting compound from the chip and board (both sides). Then, I cut the chip leads with the Dremel and remove it. If you are very careful, you can remove the chip intact. But, I find it faster to simply cut the leads.
+
+----
+====Removing the chip:====
+----
+
+**Required tools/materials:**
+  * Soldering Iron 
+  * Solder sucker or solder wick 
+  * Dremel (optional) with cutoff wheel
+  * Small pliers or hemostat 
+
+Now, you can remove the chip. The simplest method is to cut the EPROM leads with a Dremel cutoff wheel (being careful not to damage the computer board, which may render it useless), remove the chip from the board, and then de-solder the individual pins. You will need to use a solder sucker or solder wick to remove all of the solder from the thru holes. The 2nd option is to carefully de-solder the pins while still attached to the EPROM. Again, you will need to use a solder sucker or wick. The 2nd method is slightly more difficult and time-consuming simply because it is more difficult to remove the solder with the chip in the way. With either method, be careful not to overheat the ECU board. Otherwise you could risk damaging the solder pads and/or traces - meaning at best a difficult repair; at worst a useless LM.
+
+Personally, after cutting the pins with the Dremel and removing the chip, I clamp a hemostat to the pin, and hit it with the soldering iron. When the solder gets soft, I pull the pin out. After removing all of the pins, I go back and heat up the thru holes and suck the solder out from the opposite side with the solder sucker.
+
+Once you have the chip removed, make sure to clean up any remaining potting compound and/or solder rosin/debris. I use a plastic brush attached to my Dremel, on the low speed setting. It removes the potting compound very nicely and cleans everything up.
+
+----
+====Adding the socket:====
+----
+
+**Required tools/materials:**
+  * Soldering iron
+  * Solder
+  * 28-pin socket
+
+First, let's start with socket choice. There socket needed is a 28-pin DIP. You can get a socket at Radio Shack, but these sockets are typically not suitable for high-vibration environments. The risk is that the chip will vibrate loose while going down the road causing the engine to misfire or stall; possibly damaging the chip in the process. But, they have been used with success. A better choice would be a machine-pin socket. These are available from every electronics supply (Mouser.com and Digi-key.com likely being the least expensive). These have a more precise fit to the pins on the 28-pin chip and will not vibrate loose. On the other hand, the socket or pins can wear out if you plan to insert/remove the chip many times. If you think you will be swapping chips regularly, then I'd suggest a ZIF (Zero-Insertion-Force) socket. These are more expensive than the Radio Shack or machine-pin sockets, but they will allow you to install the chip as many times as you want without damaging the socket or chip, and they hold the chip very securely.
+
+Ok, now that you have the socket, you simply need to install it and solder it onto the board. The thru holes in the board should be clean and clear and the socket should drop right in. If it doesn't - don't force it; go back over the holes with the soldering iron and sucker. There is usually a notch in the socket to denote which pin is #1. There should be a '1' printed onto the ECU circuit board. Align the socket to the '1' to avoid future confusion.
+
+OK, now you have a socketed computer. What to do with it? Well, it's kind of useless without a chip in it.

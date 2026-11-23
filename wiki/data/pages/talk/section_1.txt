@@ -1,0 +1,12 @@
+Suggestion:
+
+Split into two articles: "What is Turbonator" and "Special features of Turbonator"
+
+Reasoning: Most people dont understand how the cal is even edited or where Turbonator fits in. A more detailed explanation with a diagram showing how the cal is stored in the stock ecu, along with how turbonator is different as far as the source code being written (how was that done?) and why its superior to editing a stock .bin file, would help people know why they should go to Turbonator, besides just giving them more confidence about whats going on.
+
+Also I think you should have a separate article for each Turbonator special feature so that it can be discussed in great detail.
+
+Suggestion:
+
+I think a totally seperate article should be created: "Using a wideband with MPSCAN and the stock ECU". Its so important it deserves its own article.
+

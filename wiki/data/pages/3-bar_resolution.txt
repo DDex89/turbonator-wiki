@@ -1,0 +1,9 @@
+-----
+===== 3-Bar (and larger) MAP sensor resolution issues =====
+----
+
+It's often stated that 3-bar (and higher) MAP sensors can have issues with 'resolution'. Maybe you're wondering what that is all about.
+
+The resolution issue is related to the limitations of an 8-bit computer. The analog 0-5v MAP signal is digitized by the ECU into 8-bits. That gives 256 'steps' for each 5v signal. So, if you have a 2-bar MAP, that is 29.4psi (total) divided into 256 steps, gives //**0.115psi per step**//. This is the smallest increment of MAP change the computer can 'see'.
+
+With a 3-bar MAP, that smallest step is larger. 44.1psi / 256 = //**0.172psi per step**//. The concern is really in vacuum, not boost. As this change in step size (or resolution), means that small vacuum changes can be missed; resulting in fueling errors and drive-ability problems. This effect can be worse for engines with 'big' cams and porting work. The resolution issue can usually be 'fixed' by making small adjustments in the O2 feedback values so that the cell limits are not near the idle vacuum for your engine.

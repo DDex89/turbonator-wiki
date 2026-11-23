@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>Basic Calibration Setup [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="base_cal_setup" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body"><li class="level2"><a href="#basic_calibration_setup">Basic Calibration Setup</a></li>
+<li class="level2"><a href="#chapter_1_-_calibration_configuration">Chapter 1 - Calibration configuration</a>
+<ul class="">
+<li class="level3"><a href="#getting_ready">1.1 - Getting ready</a></li>
+<li class="level3"><a href="#configuration_flags">1.2 - Configuration Flags</a></li>
+<li class="level3"><a href="#basic_map_and_injector_scaling">1.3 - Basic MAP and Injector Scaling</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#chapter_2_-_fuelling_setup">Chapter 2 - Fuelling Setup</a>
+<ul class="">
+<li class="level3"><a href="#afr_setup">2.1 - AFR Setup</a></li>
+<li class="level3"><a href="#batoff_setup">2.2 - BatOff Setup</a></li>
+<li class="level3"><a href="#peftbl_setup">2.3 - PefTbl Setup</a></li>
+<li class="level3"><a href="#wb_o2_sensor_use">WB O2 Sensor Use</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#chapter_3_-_ignition_timing_setup">Chapter 3 - Ignition Timing Setup</a></li>
+<li class="level2"><a href="#chapter_4_-_boost_control_setup">Chapter 4 - Boost Control Setup</a></li>
+<li class="level2"><a href="#chapter_5_-_overboost_rev_speed_limiter_setup">Chapter 5 - Overboost, Rev, Speed limiter setup</a></li>
+<li class="level2"><a href="#chapter_6_-_fan_control">Chapter 6 - Fan Control</a></li>
+<li class="level2"><a href="#chapter_7_-_compile_into_binary">Chapter 7 - Compile into binary</a></li>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Medium" src="_static/lib/plugins/howhard/images/style1/3.png"/></div><div class="howhard_txt">Medium</div></div><hr/>
+<h2 class="sectionedit1" id="basic_calibration_setup">Basic Calibration Setup</h2>
+<div class="level2">
+<hr/>
+<p>
+This section will walk thru the process of getting a base cal setup. For most users, following these instructions will get you to a 90% cal. For many users this will be good enough. Others should follow up with the 'Fine Tuning' section to understand datalogging and how to use it to fully tune in the cal.
+</p>
+</div>
+<h2 class="sectionedit2" id="chapter_1_-_calibration_configuration">Chapter 1 - Calibration configuration</h2>
+<div class="level2">
+</div>
+<h3 class="sectionedit3" id="getting_ready">1.1 - Getting ready</h3>
+<div class="level3">
+<ol>
+<li class="level1"><div class="li"> Download and install MP Tune. You can get it <a class="urlextern" href="https://sites.google.com/site/mpsuite/mptune2" rel="ugc nofollow noopener" target="_blank" title="https://sites.google.com/site/mpsuite/mptune2">here</a>.</div>
+</li>
+<li class="level1 node"><div class="li"> Download and unzip one of the Turbonator code bases. You can get them <a class="urlextern" href="https://drive.google.com/open?id=0BwcPBhg2fwrIUndXcm9SNlJSUXM&amp;authuser=0" rel="ugc nofollow noopener" target="_blank" title="https://drive.google.com/open?id=0BwcPBhg2fwrIUndXcm9SNlJSUXM&amp;authuser=0">here</a>.</div>
+<ul>
+<li class="level2"><div class="li"> T/GLHS - for the '86 GLHS or other cars running L-Body type wiring</div>
+</li>
+<li class="level2"><div class="li"> T/LM - for the non L-Body T2 LM cars ('87) </div>
+</li>
+<li class="level2"><div class="li"> T/SMEC - for cars equipped with a SMEC ('88-89)</div>
+</li>
+<li class="level2"><div class="li"> T/SBEC - for cars equipped with an SBEC ('90-91) </div>
+</li>
+<li class="level2"><div class="li"> T/TIII - for TIII cars, ('91-93) with SBEC or SBECII </div>
+</li>
+<li class="level2"><div class="li"> Early Log T1 cars - there is no Turbonator cal for these vehicles.</div>
+</li>
+</ul>
+</li>
+<li class="level1 node"><div class="li"> Open the zip file and copy all of the files to a folder you intend to use to keep your tuning files in.</div>
+<ul>
+<li class="level2"><div class="li"> If you decide to put your template file in a unique folder from the 'base' templates, make sure to copy the .asm file into the same folder. MP Tune will look for it there; if it doesn't find it it will prompt you to tell it where to look.</div>
+</li>
+<li class="level2"><div class="li"> <a class="wikilink1" data-wiki-id="template_file" href="template_file.html" title="template_file">Wait, what is a Template file anyway?</a> </div>
+</li>
+</ul>
+</li>
+<li class="level1 node"><div class="li"> Pick a template to use.</div>
+<ul>
+<li class="level2"><div class="li"> Picking a template to use is pretty simple. There are usually only minor differences from cal to cal. If possible, pick the template that matches your cars original calibration. If in doubt, just pick a template that matches your car setup (ECU + displacement + trans type). </div>
+</li>
+<li class="level2"><div class="li"> The 3 digits you see in the file names are the same as the last 3 digits of the (stock) ECU PN. Or, the Calibration ID of the factory cal. These templates contain the stock cal data from those ECU's.</div>
+</li>
+<li class="level2"><div class="li"> There are also pre-made <a class="urlextern" href="https://drive.google.com/open?id=0BwcPBhg2fwrIMUEtem9QUU1LRDA&amp;authuser=0" rel="ugc nofollow noopener" target="_blank" title="https://drive.google.com/open?id=0BwcPBhg2fwrIMUEtem9QUU1LRDA&amp;authuser=0">BoostButton 'Stage' cals</a> available for download and use. These cals have some generic setup already performed on them (such as injector/MAP scaling, timing and boost control). One of these may also be a viable starting point for your tuning efforts.   </div>
+</li>
+<li class="level2"><div class="li"> If you want to run AC, you should also pick a template that has AC enabled already. Turning on the AC function is not as easy as simply enabling the option flag. </div>
+</li>
+</ul>
+</li>
+<li class="level1"><div class="li"> Copy the chosen template and re-name to something meaningful to you.</div>
+</li>
+<li class="level1"><div class="li"> Open MP Tune, and open the template file you just copied.</div>
+</li>
+</ol>
+<p>
+<a class="media" href="_media/mpt_editor_win.jpg" rel="noopener" target="_blank" title="mpt_editor_win.jpg"><img alt="//MP Tune cal editor//" class="media" loading="lazy" src="_media/mpt_editor_win.jpg" title="//MP Tune cal editor//"/></a>
+</p>
+</div>
+<h3 class="sectionedit4" id="configuration_flags">1.2 - Configuration Flags</h3>
+<div class="level3">
+<p>
+The configuration flags set the cal to enable various features of the code. There is 1 factory config flag register, and 2 Turbonator Option registers.
+</p>
+<p>
+<a class="media" href="_media/turbn_config_flags.jpg" rel="noopener" target="_blank" title="turbn_config_flags.jpg"><img alt="" class="media" loading="lazy" src="_media/turbn_config_flags.jpg"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> Select the options you wish to enable. </div>
+</li>
+<li class="level1"><div class="li"> Be sure to hit 'save' when finished.</div>
+</li>
+</ul>
+<div class="table sectionedit5"><table class="inline">
+<tr class="row0">
+<th class="col0"><strong>If you wish to use an auto transmission, select a template that has that enabled and calibrated in the template. It's much more involved to convert a cal to auto than simply selecting the option. Many calibration values (idle control, as a primary example) must be changed in conjunction with the flag.</strong></th>
+</tr>
+<tr class="row1">
+<th class="col0"><strong>Similarly, if you wish to enable AC, be sure to choose a template that already has it enabled. There is much more to enabling AC than just the option flag. There are many calibration values that need to change for AC to work correctly. In the cals that did not have AC enabled, these are not necessarily set from the factory.</strong></th>
+</tr>
+</table></div>
+<p>
+For more info on what the Turbonator options can do, see the <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">Turbonator</a> codebase explanation.
+</p>
+</div>
+<h3 class="sectionedit6" id="basic_map_and_injector_scaling">1.3 - Basic MAP and Injector Scaling</h3>
+<div class="level3">
+<p>
+One of the main advantages of MP Tune over it's predecessors is that it can more easily scale the calibration for MAP or injector size. 
+</p>
+<p>
+The template contains some data that allows MP Tune to scale those tables for MAP size and injector size. To see a list of the affected tables, select the 'Tables' item under the 'Scaling', 'Injectors' submenu. To see what tables are scaled for MAP, select the 'Tables' item under the 'Scaling', 'MAP' submenu.
+</p>
+<ul>
+<li class="level1"><div class="li"> To scale for Injectors, select 'Scaling', 'Injectors', 'Size', and then your injector size. </div>
+</li>
+<li class="level1"><div class="li"> To scale for MAP, select 'Scaling', 'MAP', 'Pressure', and then select the appropriate MAP range. </div>
+</li>
+<li class="level1"><div class="li"> MP Tune will scale all of the tables listed by the appropriate method automatically.</div>
+</li>
+</ul>
+<p>
+<a class="media" href="_media/mpt_scaling.jpg" rel="noopener" target="_blank" title="mpt_scaling.jpg"><img alt="" class="media" loading="lazy" src="_media/mpt_scaling.jpg"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> If your injector size is not shown in the list, select 'Setup', 'Injector Sizes'; a menu will come up.</div>
+</li>
+<li class="level1"><div class="li"> Press 'Add', then input your new injector size, and hit 'Save'.</div>
+</li>
+<li class="level1"><div class="li"> You will need to re-load your template for the new injector size to be visible in the list.</div>
+</li>
+</ul>
+<p>
+<a class="media" href="_media/mpt_add_inj.jpg" rel="noopener" target="_blank" title="mpt_add_inj.jpg"><img alt="" class="media" loading="lazy" src="_media/mpt_add_inj.jpg"/></a>
+</p>
+</div>
+<h2 class="sectionedit7" id="chapter_2_-_fuelling_setup">Chapter 2 - Fuelling Setup</h2>
+<div class="level2">
+</div>
+<h3 class="sectionedit8" id="afr_setup">2.1 - AFR Setup</h3>
+<div class="level3">
+</div>
+<h4 id="d_cal_t1_t2_setup">2.1.1 - 2D Cal (T1/T2) Setup</h4>
+<div class="level4">
+<p>
+Using MP Tune, you can easily set the 'target' AFR at any MAP setting. The 'target' AFR in this case refers to the AFR used to calculate the theoretical injector pulsewidth at a given MAP setting. It is not a target for the ECU to try and reach via O2 or WB feedback. For more detail on how the Chrysler code calculates the PW, see the <a class="wikilink1" data-wiki-id="fuel_setup" href="fuel_setup.html" title="fuel_setup">fuel tuning section</a>. 
+</p>
+<p>
+The AFR guidlines and setup is important at this point. You will need it later when you start to fine tune the PefTbl. MP Tune has a utility that can take in logged AFR, MAP, and RPM data to help you <a class="wikilink1" data-wiki-id="afr-peftbl_tuning" href="afr-peftbl_tuning.html" title="afr-peftbl_tuning">fine-tune the PefTbl</a> when needed. 
+</p>
+<p>
+MP Tune will draw yellow 'guidelines' (seen in the screenshot) in the background of the 3 main fuel tables to represent the calculated AFR that you input. To setup the AFR guidelines, select 'Settings', 'AFR Settings'.
+</p>
+<p>
+<a class="media" href="_media/afr_setting_menu.jpg" rel="noopener" target="_blank" title="afr_setting_menu.jpg"><img alt="" class="media" loading="lazy" src="_media/afr_setting_menu.jpg"/></a>
+</p>
+<p>
+This will open the AFR guideline editor. The MAP axis is in absolute; so 0psi = -14.7psi (vacuum). Set your desired AFR for each MAP point. If you want to make a straight line between 2 different AFR settings, use the 'INT' button on the menu to interpolate between the 2 points. Also be sure to set the engine and fuel parameters on the right side of the editor. These are just as important to the AFR setting as the injector size (the AFR calculator takes the injector size from the cal setup, you don't need to input it here).
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>The 3 main fuel tables are not directly affected by this guideline. MP Tune leaves it up to the user to move the table breakpoints to match the guideline, if you choose.</strong></div>
+</li>
+</ul>
+<p>
+Turbonator cals should come with the AFR settings pre-set to be 13.6 in vacuum @ WOT, ramping to 11.5 in boost (as shown below). Part Throttle is set to 14.9 in vacuum, and matching the WOT table in boost. The baseline table usually doesn't need to be edited as it is only used at idle, and the adaptives control the AFR. 
+</p>
+<p>
+<a class="media" href="_media/afr_editor.jpg" rel="noopener" target="_blank" title="afr_editor.jpg"><img alt="" class="media" loading="lazy" src="_media/afr_editor.jpg"/></a>
+</p>
+<div class="table sectionedit9"><table class="inline">
+<tr class="row0">
+<th class="col0" rowspan="2">TIP</th><td class="col1">If you're running an Intake Air Temp Sensor, it is probably best to set the intake air temp to 90C. This is the point in the IAT compensation table where the enrichment is zero.</td>
+</tr>
+<tr class="row1">
+<td class="col0">If no IAT is installed, then you should use 60C. It may seem counter intuitive, but if you set it up this way, your engine will be protected for the lowest possible intake temp, and will run slightly rich when the temp is actually hotter than this.</td>
+</tr>
+</table></div>
+<div class="table sectionedit10"><table class="inline">
+<tr class="row0">
+<th class="col0">TIP</th><td class="col1">You can copy/paste data to and from Excel into the AFR data table. You can also use the 'Int' button to interpolate between 2 AFR values. For example, if you want a straight line from 15psi and 12.5AFR to 30psi and 11AFR</td>
+</tr>
+</table></div>
+<ul>
+<li class="level1"><div class="li"> Once the AFR Guidelines are setup as you want, you can edit the 3 main fuel tables (FuelBaselineFromMAP, FuelFullThrottle, and FuelPartThrottle) to match the guidlines.</div>
+</li>
+<li class="level1"><div class="li"> Be sure to save when you're done before moving on to the next edit (MP Tune has an 'undo' feature but it currently will 'undo' everything until your last save, not just the last edit).</div>
+</li>
+<li class="level1"><div class="li"> The purple line represents the 80% Duty Cycle @ 100% PumpEff and is provided as a reference so that you have an indication of how much of your available fuel is being used.</div>
+</li>
+</ul>
+<p>
+<a class="media" href="_media/fuel_tables.jpg" rel="noopener" target="_blank" title="fuel_tables.jpg"><img alt="" class="media" loading="lazy" src="_media/fuel_tables.jpg"/></a>
+</p>
+</div>
+<h4 id="d_cal_tiii_setup">2.1.2 - 3D Cal (TIII) Setup</h4>
+<div class="level4">
+<p>
+This is much more complicated and will require a very detailed explanation. TBC.
+</p>
+</div>
+<h3 class="sectionedit11" id="batoff_setup">2.2 - BatOff Setup</h3>
+<div class="level3">
+<p>
+The BatOff (FuelBatteryOffset) table represents the injector latency. The injectors are an electro-mechanical device. As such, they need time to open and close. As they are opening, they do not flow the full amount of fuel. The latency is the amount of time after the injector is powered, until it can be considered to be flowing at full rate. This open/close time is then added to the total Injector pulsewidth to compensate for the loss in flow.
+</p>
+<p>
+The latency is mostly dependent on battery voltage; though it can also vary with fuel pressure (That's why it's best not to stray too far from the manufacturers fuel pressure rating for an injector).
+</p>
+<p>
+For stock injectors, of course the table needs no adjustment. Even for +20's, the stock BatOff table seems to work well. For +40's, I recommend scaling the table by 40%-50% (right-click on the table name; then select 'Scale Table'). Or, simply copy the BatOff table from the S60 template (which uses +40 injectors). Other injectors you should try to get the latency from the manufacturer. There are also latency tables published on the internet for various popular injectors. Guessing at the latency is not a good idea. As you can see, the latency is on the order of 2mSec at normal battery voltage. For very large injectors (72pph+), this may be very close to the total required PW for idle. In that case, you can imagine that a small error in the latency can result in a big change in actual idle fuel.
+</p>
+<p>
+<a class="media" href="_media/batoff.jpg" rel="noopener" target="_blank" title="batoff.jpg"><img alt="" class="media" loading="lazy" src="_media/batoff.jpg"/></a>
+</p>
+</div>
+<h3 class="sectionedit12" id="peftbl_setup">2.3 - PefTbl Setup</h3>
+<div class="level3">
+<p>
+The PefTbl (PumpingEfficiency) is the table used to compensate for the differences in flow vs. RPM. It is similar to, but slightly different from, the Volumetric Efficiency used by other engine control systems (For details on how the Chrysler PefTbl is different from a typical VolEff table, see the <a class="wikilink1" data-wiki-id="fuel_setup" href="fuel_setup.html" title="fuel_setup">detailed fuel explanation</a>).
+</p>
+<p>
+For a stock head/intake; or even for a very mildly ported head, you shouldn't need to touch this table until you have some AFR data you can use to re-tune it.
+</p>
+<p>
+The 3 Main fuel tables are calculated based on 100% Pumping efficiency. That is, the PW calculated assumes that the engine will pump it's full displacement every revolution, regardless of engine speed. But, in reality, the engine cannot pump is complete displacement due to flow losses in the throttle, intake manifold, intake and exhaust ports, and exhaust manifold. This flow loss is heavily dependent on RPM. The PefTbl represents this flow loss and allows the ECU to reduce the amount of fuel injected accordingly.
+</p>
+<p>
+<a class="media" href="_media/peftbl.jpg" rel="noopener" target="_blank" title="peftbl.jpg"><img alt="" class="media" loading="lazy" src="_media/peftbl.jpg"/></a>
+</p>
+</div>
+<h4 id="porting_effects">Porting Effects</h4>
+<div class="level4">
+<p>
+It's almost impossible to say <em class="u">exactly</em> what effect porting a cylinder head or intake/exhaust manifolds will have on the PefTbl without testing and hard data. 
+</p>
+<p>
+In general, though, porting will increase the flow at higher rpm, but can reduce flow slightly at low RPM. The effect on the PefTbl is to 'rotate' the table counter clockwise; generally about the peak. In my experience, a basic ported head will move the PefTbl up about 5 percentage points in the highest RPM (~6k), and drop it about 2 points in the low RPM (~2k). Heavily modified heads or custom intake manifolds with significant changes in runner length will have a much bigger impact. How tune re-tune the PefTbl using real measured AFR data will be covered in a fine-tuning article later.
+</p>
+<p>
+Example of a typical 'rotated' PefTbl. The dotted line is the new position; while the thin line is the original.
+</p>
+<p>
+<a class="media" href="_media/peftbl_rot.jpg" rel="noopener" target="_blank" title="peftbl_rot.jpg"><img alt="" class="media" loading="lazy" src="_media/peftbl_rot.jpg"/></a>
+</p>
+</div>
+<h3 class="sectionedit13" id="wb_o2_sensor_use">WB O2 Sensor Use</h3>
+<div class="level3">
+<p>
+Turbonator cals for the SMEC and SBEC can be setup to use a WB signal input instead of the NB. Basically, the ECU emulates the NB signal internally for use in the feedback control. However, using the WB in this way allows you to log the actual WB AFR using MP Scan and sync that data with RPM and MAP. This data will be very useful later for tuning in the PEFTBL using the <a class="wikilink1" data-wiki-id="afr-peftbl_tuning" href="afr-peftbl_tuning.html" title="afr-peftbl_tuning">PEFTBL Tuning tool</a> built into MP Tune. 
+</p>
+<p>
+It's a more advanced topic, but if you wish to enable this feature in your 'base' cal to make tuing easier, check this article - <a class="wikilink1" data-wiki-id="wb2nb_setup" href="wb2nb_setup.html" title="wb2nb_setup">WB2NB Setup</a>. <em>red link means the article isn't written yet</em>
+</p>
+</div>
+<h2 class="sectionedit14" id="chapter_3_-_ignition_timing_setup">Chapter 3 - Ignition Timing Setup</h2>
+<div class="level2">
+<p>
+For ignition timing, MP Tune scales all of the relevant tables for MAP for you. So, there's actually very little to do in terms of setup (before you really start tuning).
+</p>
+<p>
+There is 1 adjustment I recommend making to the timing before you run the car at higher boost - reduce the timing in high boost. This is really just to be safe. While MP Tune can scale the tables for MAP, it won't make any adjustments for you. So, with no adjustments for higher boost, you will have the same timing at 29psi boost that you previously had at 14psi boost. That's probably not realistic for most applications.
+</p>
+<p>
+There are only 2 tables that need to be adjusted - AdvanceFromMAPWarmFull and AdvanceFromMAPWarmPart. 
+</p>
+<p>
+To add a data point to each table (AdvanceFromMAPWarmFull shown, but do this to both tables):
+</p>
+<ol>
+<li class="level1 node"><div class="li"> Right-click on any existing data point and select 'Insert Point' from the pop-up menu.</div>
+<ul>
+<li class="level2"><div class="li"> <a class="media" href="_media/timing_add_point.jpg" rel="noopener" target="_blank" title="timing_add_point.jpg"><img alt="" class="media" loading="lazy" src="_media/timing_add_point.jpg"/></a></div>
+</li>
+</ul>
+</li>
+<li class="level1 node"><div class="li"> Enter the number that is 1 higher than the last point in the table list to the right (In this case, the highest point in the table is #5, so enter '6').</div>
+<ul>
+<li class="level2"><div class="li"> <a class="media" href="_media/timing_add_point_6.jpg" rel="noopener" target="_blank" title="timing_add_point_6.jpg"><img alt="" class="media" loading="lazy" src="_media/timing_add_point_6.jpg"/></a></div>
+</li>
+</ul>
+</li>
+<li class="level1 node"><div class="li"> Move your new data point to at least 20psi, and remove 2-4degrees of timing (it's just a guess at this point).</div>
+<ul>
+<li class="level2"><div class="li"> <a class="media" href="_media/timing_new_point.jpg" rel="noopener" target="_blank" title="timing_new_point.jpg"><img alt="" class="media" loading="lazy" src="_media/timing_new_point.jpg"/></a></div>
+</li>
+</ul>
+</li>
+<li class="level1"><div class="li"> When you're finished, hit 'save' to save your data and you're all done. </div>
+</li>
+</ol>
+<p>
+One more note about the ignition timing in MP Tune. MP Tune has a feature that will combine the relevant tables and show you the total timing map in 3D (Timing Vs. RPM and MAP). These tables are not editable, they are just a representation of the timing of 3-4 (depending on the code version) different tables that combine to give the total final timing. 
+</p>
+<p>
+As you can see in the calibration below, the total timing in boost and at high RPM is 16 degrees. Always use the 3D tables to check your total (final) timing in boost. For most engines, total timing between 16 and 22 degrees (depending on fuel octane, combustion chamber, etc.) will be about right.
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="media" href="_media/timing_3d.jpg" rel="noopener" target="_blank" title="timing_3d.jpg"><img alt="" class="media" loading="lazy" src="_media/timing_3d.jpg"/></a></div>
+</li>
+</ul>
+</div>
+<h2 class="sectionedit15" id="chapter_4_-_boost_control_setup">Chapter 4 - Boost Control Setup</h2>
+<div class="level2">
+</div>
+<h2 class="sectionedit16" id="chapter_5_-_overboost_rev_speed_limiter_setup">Chapter 5 - Overboost, Rev, Speed limiter setup</h2>
+<div class="level2">
+<p>
+All of the stock-type limiters in the Turbonator calibrations use the factory fuel-cut logic. They are all basically the same limiters, just triggered by different events; such as Overboost, Rev Limiters, Speed limiter, or one of the various limp-mode limiters.
+</p>
+</div>
+<h4 id="overboost">Overboost</h4>
+<div class="level4">
+<p>
+Overboost control is used to prevent the engine from going too far beyond the intended boost range and causing engine damage. 
+</p>
+<p>
+There are 4 overboost constants:
+</p>
+<p>
+<em>list names and uses, show a screenshot</em>
+</p>
+<p>
+To effectively turn off overboost completely, set all 4 values to the maximum.
+</p>
+</div>
+<h4 id="rev_limiter">Rev Limiter</h4>
+<div class="level4">
+<p>
+The main rev limiter has 2 values; a fuel 'Off' value and a fuel 'On' value. The 'On' should always be lower than the 'Off' setting. Set the values closer together to hold the RPM more precisely.
+</p>
+<p>
+There is no way to effectively turn off the rev limiter. The maximum setting is 8160rpm. This is the highest RPM that the ECU can calculate. 
+</p>
+</div>
+<h4 id="speed_limiter">Speed Limiter</h4>
+<div class="level4">
+<p>
+The Speed limiter is only available in the SMEC and SBEC and later. The LM has no speed limiter. 
+</p>
+<p>
+Similar to the rev limiter, the speed limiter has a fuel 'Off' and a fuel 'On' value. The 'On' should be set lower than the 'Off' setting. There is no way to turn off the speed limiter completely. But, if you set both values to 254, it will effectively be turned off (unless you have a FWD Chrysler that can actually go that fast).
+</p>
+</div>
+<h2 class="sectionedit17" id="chapter_6_-_fan_control">Chapter 6 - Fan Control</h2>
+<div class="level2">
+<p>
+Fan control setup is fairly straightforward. If you are ruining a stock thermostat; there's no reason to change anything here. If you are running a 185F or 180F thermostat, you will likely want to reduce the fan on/off temperatures accordingly to get the full advantage of the lower thermostat temperature.
+</p>
+<p>
+The fan operation has 2 different settings: Low speed and high speed. There is an on and an off setting for each speed range. The 'on' temperature should always be higher than the 'off' temperature. Otherwise, the fan will never come on. For example, at high speed, the fan turns on at ~220F and off at 195F.
+</p>
+<p>
+There are also settings to turn on the fan when boosting. For the stock T2 setup, this was intended to improve the efficiency of the intercooler by preventing any reverse flow through it.
+</p>
+<p>
+<em>pic of fan settings in MP Tune</em>
+</p>
+</div>
+<h2 class="sectionedit18" id="chapter_7_-_compile_into_binary">Chapter 7 - Compile into binary</h2>
+<div class="level2">
+<p>
+The very last step in creating a base cal is to compile the cal into a binary file. The binary file is the file that is actually used by the ECU (<a class="wikilink1" data-wiki-id="file_types" href="file_types.html" title="file_types">see here for more info on file types</a>).
+</p>
+<p>
+Simply press the 'compile' button in the MP Tune editor window. Your template file is saved, and a .bin will be created using the same file name (my_cal_file.tpl becomes my_cal_file.bin). 
+</p>
+<p>
+You are now ready to load the .bin file into your ECU either by <a class="wikilink1" data-wiki-id="how_to_flash_a_cal" href="how_to_flash_a_cal.html" title="how_to_flash_a_cal">flashing</a>, or <a class="wikilink1" data-wiki-id="chip_burning_basics" href="chip_burning_basics.html" title="chip_burning_basics">burning a chip</a>.
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>base_cal_setup.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

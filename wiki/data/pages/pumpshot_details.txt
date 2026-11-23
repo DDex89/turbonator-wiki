@@ -1,0 +1,45 @@
+-----
+==== PumpShot Calculation and Operation ====
+-----
+
+PumpShot is basically a way to mimic the accelerator pump function of a carburetor. That is, it gives a little extra fuel when the throttle is opened or the load is increased to prevent the engine going lean during these times. In the Chrysler ECU's, there are usually 2 Pumpshot calculations: MAP-based and TPS-based.
+
+For most applications, these table do not need to be adjusted. 
+
+For very large throttle bodies and heavily ported heads/intakes, there may be some adjustment necessary.
+
+{{::trans_fuel.jpg|}}
+
+**MAP-Based PumpShotPW:**
+
+The PumpShot calculation for MAP is based on a time-averaged MAP calculation. If this average MAP has changed by a certain amount, then fuel is added based on the level of change.
+
+  * AvgMAP –> EnrichmentTimefromTemp_MAP (AETIME) is the time constant for the AvgMAP calculation. A higher time constant gives a longer-term average (and usually a lower DeltaMAP - see the next definition). 
+  * DeltaMAP –> DeltaMAP is the difference between the current MAP value and the calculated average MAP (AvgMAP). [DeltaMAP = MAP - AvgMAP]
+
+MAP PumpShotPW Calculation:
+
+If DeltaMAP is calculated to be less than DeltaMAPTriggerLevel (MAPTRG) then there is no MAP-based PumpShot; If DeltaMAP is greater than MAPTRG and lower than MaxDeltaMAPAllowed (MAPMAX), then use DeltaMAP in the PW calculation; If DeltaMAP is greater than MAPMAX, then used MAPMAX in the PW calculation instead (DeltaMAP = MAPMAX); Lookup the value from the DeltaMAPEnrichmentfromTemp (AESLOP) table (from coolant temp); [PumpShotPW(MAP) = AESLOP_valule X DeltaMAP]
+
+The simplest way to tune the MAP-based PumpShot is with the AESLOP table. Higher is more fuel, lower is less fuel.
+
+**TPS-Based PumpShotPW:**
+
+The PumpShot calculation for TPS is based on a time-averaged TPS calculation. If this average TPS has changed by a certain amount, then fuel is added based on the level of change.
+
+  * AvgTPS –> EnrichmentTimefromTemp_TPS (THRTCN) is the time constant for the AvgTPS calculation. A higher time constant gives a longer-term average (and usually a higher DeltaTPS - see the next definition). 
+  * DeltaTPS –> DeltaTPS is the difference between the current TPS value and the calculated average TPS (AvgTPS). [DeltaTPS = TPS - AvgTPS]
+
+PumpShotPW Calculation:
+
+If DeltaTPS is less than PositiveTransientTriggerLevel (POSTRG) then there is no TPS PumpShot; If DeltaTPS is greater than POSTRG and lower than MaxDeltaThrottle (THRMAX), then use DeltaTPS in the PW calculation; If DeltaTPS is greater than THRMAX, then use THRMAX instead in the PW calculation (DeltaTPS = THRMAX); Lookup the value from the EnrichmentFromTemp (POSSLP) table; [PumpShotPW(TPS) = POSSLP_valule X DeltaTPS]
+
+For a bigger TB, I would actually start with the POSSLP table. Add PW in the operating temp range.
+
+Reducing THRTCN would actually have the effect of increasing the pumpshot, because it will allow filter TPS changes less resulting in a larger DeltaTPS value. Increasing THRTCN should also increase the PumpShot, as would increasing THRMAX.
+
+If increasing POSSLP doesn't seem to help, try increasing THRMAX, too.
+
+Similarly, for a heavily ported head, I would adjust the AESLOP table. Add PW in the operating temp range.
+
+Reducing AETIME would actually have the effect of reducing the pumpshot, because it would reduce the DeltaMAP value. Increasing AETIME should also increase the PumpShot, as would increasing MAPMAX.

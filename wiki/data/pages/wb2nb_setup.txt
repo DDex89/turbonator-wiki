@@ -1,0 +1,17 @@
+**WB2NB**
+
+This is a feature that will allow you to feed a 0-5v WB signal directly into the SMEC thru the existing O2 sensor input. The code will automatically convert the signal to a NB range for use in the stock feedback mechansim. The WB AFR is stored in RAM so that it can be read and logged using MP Tune. There is also a constant value that can be used to offset the entire NB signal to force the engine to run richer or leaner in feedback mode.
+
+Hardware Setup:
+
+  * No specific hardware setup is required. Simply attach the wideband signal output from your wideband controller to the original O2 sensor input on the SMEC or SBEC. The ECU can accept a 0-5v signal on this input without modification.
+  * Attach the signal ground reference from your WB controller to the signal ground from the original O2 sensor connector.
+  * In many cases it may be possible to use the 12v power for the original sensor heater to power the WB controller. So, the 12v power and power ground wires may be re-used. The ECU controls the power on this line. Please consult with your WB controllers documentation to be sure if this setup will work. 
+
+Calibration Setup:
+
+  * First, setup the WidebandToAFRTransferFunction table. To set this table up, you need to know the output specifics of your WB controller that will be wired to the ECU - the AFR that is represented by 0v, and by 5v. These 2 values are put into the table shown below. These values will be specific for your WB controller and should be included in your WB controllers documentation. In many cases, it may even be user-programmable. At any rate, make sure that the table below matches the WB signal your controller will be inputting to the ECU.
+    * {{::wb2nb_afrtable.jpg|}}
+  * You should not need to adjust the **WidebandAFRToO2TransferFunction** table. This table transfers the WB AFR input by the WB sensor/controller into a NB-type signal.
+  * Finally, you can configure the NB Offset. Adjustment of this table is completely optional. This value is used to shift the NB signal by a set voltage. This is useful as a simple way to make a given calibration run richer or leaner in closed loop. It will have no effect on open-loop (IE, WOT) operation since the NB signal is ignored during open-loop. 
+    * {{::wb2nb_afroffset.jpg|}} 

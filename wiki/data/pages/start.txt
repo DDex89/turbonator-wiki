@@ -1,0 +1,16 @@
+====== The Turbonator Wiki ======
+
+This is the place to learn about setting up your flashable or socketed computer; tuning a Turbonator cal using MP Tune; and setting up datalogging using MP Scan.
+
+  *  **Turbonator** is a fully relocateable custom source code for the Chrysler LM, SMEC and SBEC equipped 2.2 and 2.5L powered cars from the late 80's and early 90's.
+  *  **MP Tune** is a tuning program catering specifically to the Chrysler platform.
+  *  **MP Scan** is the companion logging program.
+  *  **MPScanDroid** is the Android version of MP Scan.
+  * **FCCFlash** is a stand-alone flash tool for programming the '95 Neon FCC.
+
+Login or Register for full (edit) access to the wiki (it's a unique login from the BoostButton store). 
+
+
+
+<sub>MP Tune, MP Scan, and MPScanDroid are created and published Morris Terveen.</sub>\\
+<sub>The Turbonator source code and template files are created and published by BoostButton, LLC.</sub>

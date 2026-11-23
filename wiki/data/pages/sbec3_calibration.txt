@@ -1,0 +1,362 @@
+{{howhard>5}}
+
+----
+====== SBEC3: calibration ======
+----
+
+See also [[sbec3_overview|SBEC3 overview]] and [[sbec3_tuning|tuning notes (TunerPro, porting, open questions)]]. The full per-image table catalogue is generated into [[https://github.com/DDex89/neon-sbec3-firmware/tree/main/docs/catalogue|docs/catalogue/]] in the repository.
+
+===== Where the calibration lies =====
+
+The calibration is in bank 0, between the header at $00202 and the start of the code at $08000. The
+reset code sets EK = 0, so the code reads it with plain extended addresses (''CMPA $19DC''). Nothing
+in the code writes there: the area is read-only.
+
+The code refers to it in two ways:
+
+  * **Tables**, passed in X to one of four lookup routines (''LDX #table'', ''JSR Lookup2D''). The lookup
+routines force XK = 0, so every table is in bank 0. 410 tables are found this way, between $0398
+and $ABD7 (two small ones lie among the bank 0 code).
+  * **Constants**, read directly: 1,449 different addresses, mostly with ''CMPA''/''CMPB'' (thresholds),
+''LDAA''/''LDAB'' and ''LDD''/''CPD'' (16-bit values). Configuration bits at $0328-$0340 are tested
+with ''BRSET''/''BRCLR''. See constants and option bits.
+
+===== Table formats =====
+
+All values are bytes. The formats follow from the lookup routines:
+
+^ Format ^ Routine ^ Layout ^ 2GNT type ^
+| 2D | ''Lookup2D'' ($0C08E) | n, flags, then n pairs (x, y), x ascending | C |
+| 2D (y, x) | ''Lookup2DRev'' ($0C36A) | n, unused, then n pairs (y, x) |  |
+| 3D | ''Lookup3D'' ($0C214) | rows, columns, signed flag, column axis (one byte per column), values row by row | A |
+| 3D, no axis | ''Lookup3DNorm'' ($0C28C) | rows, columns, signed flag, values row by row | B |
+
+Fault table: see below (2GNT type D).
+
+**2D.** The input is compared with the x values; between two points the result is interpolated
+linearly, outside the range it is the first or last y. The flags byte selects the arithmetic: $80
+unsigned (320 of the 353 tables), $20 signed y, $10 steps without interpolation, $40 a zero y counts
+as 256. Many 2D tables are followed by unused bytes up to a 12-byte slot (five points); whether a
+table may be lengthened into that space has to be checked per table.
+
+**3D.** The row input is a //position// 0-255 spread evenly over the rows (row = position x (rows-1)
+/ 256). It usually comes from a 2D scale table that converts MAP into that position: the part-throttle
+tables use ''PartThrottleMapScale'', the WOT tables ''WotMapScale''. The column input is searched on the
+stored column axis (''Lookup3D'') or is also a position 0-255 (''Lookup3DNorm''). The result is
+interpolated in both directions. Sizes in this image: 17 x 17, 9 x 17, 9 x 9, 5 x 9 and 5 x 5.
+
+The signed flag ($FF) makes the values two's complement; the source shows them as negative decimals.
+
+===== Units =====
+
+The unit names in ''annotations/tables.json'' and in the source comments:
+
+^ Unit ^ Conversion ^
+| rpm32 | rpm = x * 32 |
+| rpm8 | rpm = x * 8 |
+| kpa | kPa = x / 2.428 (2GNT: torr = x / 0.3237) |
+| spark | degrees BTDC = x / 2 |
+| tempc | deg C = x - 128 (deg F = (x - 128) * 1.8 + 32) |
+| tempdiff | deg C = x, a difference of two temperatures |
+| sparks | degrees BTDC = x / 2, x signed (compared with signed branches) |
+| volt16 | volts = x / 16.19 |
+| volt51 | volts = x / 51 |
+| pwus32 | microseconds = x * 32 |
+| mult256 | factor = x / 256 |
+| pos256 | position 0-255 over the rows of a 3D table |
+| fuelcorr | fuel factor = 1 + x / 256, x signed: -128 gives 0.5, +127 gives 1.496 |
+
+These are the same as in the 1995 FCC controller and as on the 2GNT pages.
+
+===== Known tables and constants =====
+
+^ Address ^ Name ^ Content ^
+| $08F8 | PartThrottleMapScale | MAP to row position, part throttle (spark and fuel) |
+| $0904 | WotMapScale | MAP to row position, WOT (spark and fuel) |
+| $1BFA | PartThrottleSpark | 17 x 17, rpm x MAP, spark |
+| $1FAF | WotSpark | 9 x 17, signed |
+| $0BF6 | PartThrottleFuel | 17 x 17, signed, fuel correction |
+| $0F6C | WotFuel | 9 x 17, signed, fuel correction |
+| $0B92, $0B93 | PartThrottleFuelK, PartThrottleFuelMapOffset | base pulse width constants, part throttle |
+| $0B94, $0B95 | WotFuelK, WotFuelMapOffset | the same for WOT |
+| $0B76 | InjectorDeadTime | battery voltage to dead time |
+| $0B9E | ReturnlessFuelScale | fuel multiplier of the returnless fuel system |
+| $24AB | KnockThreshold | knock sensor threshold against rpm |
+| $2684 | IdleTargetRpm | target idle speed against coolant temperature |
+| $19DC, $19DE | RevLimit, RevLimitAlt | two rev limits (6,048 and 7,008 rpm), chosen by ''DriveFlags'' ($0C31,Z) bit 5 |
+| $19E1, $19E3 | SpeedLimit, SpeedLimitMinRpm | speed limiter, enabled by calibration bit $0337.5 |
+| $4052 | FaultTable | 256 fault rows |
+
+All of these were checked against the code: each is read where 2GNT says, with the format above. One
+correction: 2GNT shows the rev limit as two cells starting at $19DB (resume and limit), but $19DB
+holds $FF and is never read; the code compares rpm with $19DC or with $19DE.
+The 2GNT page calls the fuel tables "msec"; the code shows that they are corrections applied to a
+pulse width computed from MAP (next section).
+
+===== Table names (410 tables) =====
+
+All 410 tables of the reference image are named by hand from the code (and checked against 2GNT
+where it has them). The name says what the table does; the description in
+''annotations/tables.json'' (and in the catalogue and the XDF) says which routine reads it, its inputs
+and where the result goes. Where the meaning of a RAM variable is still open, the name keeps its
+address (''FlexLearnLimitPurgeTrim''), and readings that rest only on how the code uses a value say
+"probably".
+
+^ Category ^ Tables ^ Main prefixes ^
+| Fuel | 115 | ''Fuel'', ''PartThrottleFuel'', ''AccelFuel'', ''AfterStartFuel'', ''CrankFuel'', ''FuelCut'', ''Flex'', ''FlexLearn'' |
+| Idle | 92 | ''IdleTarget'', ''Idle'', ''Iac'', ''IdleMap'', ''ShiftIdle'', ''ThrottleClose'' |
+| Spark | 78 | ''Spark'', ''Surge'', ''TipInRetard'', ''SpeedDamp'', ''AcSpark'', ''EgrSpark'', ''Dwell'' |
+| Diagnostics | 36 | ''Misfire'', ''ExpectedMap'', ''LimpRpm'', ''FuelSys'', ''Diag'' |
+| Sensors | 20 | sensor curves, ''BattTemp'', ''ChargeVolts'', ''MapHigh'', ''BaroUpdate'' |
+| EVAP purge | 15 | ''Purge'' (probable) |
+| Knock | 11 | ''Knock'' |
+| Speed control | 11 | ''SpeedCtl'' (probable) |
+| EGR | 8 | ''Egr'' |
+| Closed loop | 7 | ''O2'' |
+| Cooling fan | 6 | ''Fan'' |
+| A/C | 4 | ''AcThrottle'' |
+| Other | 4 | ''FieldRampFactor'', ''RpmFilterAboveIdle'', ''EventTimingLimit'', ... |
+| Startup | 3 | ''ResetCoolant'' |
+
+''tools/autoname.py'' merges the hand names (''python3 tools/autoname.py hand.json'') and still gives a
+**structural name** to any table found later without a hand name: the subsystem prefix (taken from
+the routine that reads the table and the scheduled routine above it), then the inputs (''Coolant'',
+''Rpm'', ''Map'', ''V0A91'' for an unnamed RAM variable, ...) and a number when the name repeats. Such
+entries are marked ''"auto": true'' and get a * in the catalogue.
+
+===== Idle and spark control =====
+
+The idle air valve is driven by several routines that all end in the step routine ''IacSetTarget'':
+
+^ Routine ^ What it does ^ Tables ^
+| ''IdleRpmTarget'' | idle target (''IdleTarget'' ($0300,Z)): coolant table (P/N variant), additions for an rpm dip in gear, hot intake air, and a ramped target against battery temperature and run time | ''IdleTargetRpm//'', ''IdleTargetDip//'', ''IdleTargetHotAirAdder'', ''IdleBattTemp*'' |
+| ''IdleRpmLoop'' | closed loop on rpm: error term (coarse/fine, P/N), rate filter, deadband from MAP and coolant, integrator that takes opening or closing IAC steps | ''IdleErrorTerm//'', ''IdleRateFilterCoolant'', ''IdleDeadband//'', ''IdleStep*'' |
+| ''IdleMapTargetCalc'' | closed loop on MAP: idle MAP target ($031E,Z) from base, time, coolant, rpm and baro, then IAC steps against the MAP error | ''IdleMap//'', ''IacMap//Step*'' |
+| ''IacBaseCalc'' | base IAC position against baro and idle target, coasting target, generator field duty, A/C engagement | ''IacBase//'', ''IacCoast//'', ''IacFieldDuty*'', ''IacAcEngageAdder'' |
+| ''IdleTargetControl'', ''GearStateUpdate'' | events: gear change (delay, duration, step; A/C and P/N variants), rpm droop and dip kicks, A/C clutch kick, rolling target | ''IacGear//'', ''IacDroop//'', ''IacDipKick//'', ''IacAcKick//'', ''IacRoll//'', ''ShiftIdle//'' |
+| ''IacChargeStepCalc'' | extra air when the battery voltage stays below the charging target | ''IacChargeStep'' |
+| ''IacCrankControl'' | IAC position while cranking and in start mode | ''IacCrankCoolant'', ''IacRunUpCoolant'' |
+
+Spark corrections besides the base tables:
+
+^ Routine ^ What it does ^ Tables ^
+| ''SurgeControl'', ''SurgeFilters'' | driveline surge: a staged retard from rpm acceleration and jerk (band-passed segment rpm), weighted by gear (rpm/speed ratio), MAP rise and coolant | ''Surge*'' |
+| ''TipInSparkControl'' | tip-in retard near idle against throttle rise and air temperature | ''TipInRetard*'' |
+| ''SpeedDampControl'' | low-speed surge damping: P, D and I terms on the deviation of rpm from an expected rpm for the vehicle speed | ''SpeedRpmRef//'', ''SpeedDamp//'' |
+| ''IdleSparkCalc'' | idle spark against the idle rpm error | ''IdleSpark*'' |
+| ''AcSparkRate'', ''AcClutchSpark'' | spark compensation around A/C clutch engagement | ''AcEngageSpark//'', ''AcClutchSpark//'', ''AcSpark*'' |
+| ''O2SparkTrimCalc'' | spark change against the short-term fuel trim deviation | ''O2SparkTrim*'' |
+| ''EgrSparkCalc'' | addition with EGR active (17x17) | ''EgrSpark'' |
+| ''DwellLookup'' | coil dwell against battery voltage | ''DwellBattery*'' |
+
+Knock control learns a noise level per rpm band (''KnockNoise*''), runs above a MAP threshold
+(''KnockMapThreshold//'') and limits the retard by rpm and MAP (''KnockRetardMax//'', ''KnockRetardLimit'').
+
+Several of these readings rest on how the code uses a variable rather than on a document: the
+battery temperature (''BatteryTemp'' ($0A5A,Z), used for the charging target), the generator field duty (''FieldDuty'' ($032E,Z),
+a duty count of CS2 input $106E bit 5) and the A/C sensor (''AcSensor'' ($0A88,Z), probably A/C
+pressure) are inferred this way.
+
+===== Constants and option bits =====
+
+''tools/constants.py'' finds every byte or word the code reads directly with extended addressing and
+that is not part of a table: 1,449 of them in 05293190AC (1,264 bytes, 181 words, 4 longs; two more,
+the row counts after ''FaultStatusMap'', are named by hand because the code reaches them through X), among
+them 21 option bytes tested with ''BRSET''/''BRCLR'' (120 bits used). They are kept with the tables in
+the ''scalars'' of ''annotations/tables.json'', so the sources show ''CMPA >IdleCoolantMin'' instead of
+''CMPA $2853'', the catalogue lists them with value and physical value, the XDF has them as constants
+(and every option bit as a flag), and the port carries them to the other images (from 239 in family
+A to 1,404 in family E).
+
+All 120 used option bits are described in ''annotations/bits.json''. The polarity was read from the
+code: most bits switch a function on (''BRCLR'' skips it when the bit is clear), a few switch it off
+(for example $033A.7 skips the idle flare check, $0328.0 the SKIM handling). Bits that only pick one
+of two code paths without a clear purpose are described as "selects a branch in ...". Settled ones
+include $032C.7 closed loop off, $032C.6 flex fuel, $032E.6 manual transmission, $032E.2 PCI bus
+instead of CCD, $032F.7-4 the O2 sensors fitted (upstream 1 and 2, downstream 1 and 2) and
+$033F.7-4 the matching heater monitors. The XDF puts the text in the description of each flag.
+
+For each constant the script looks at how it is used: what the register held before the compare,
+add or subtract (''LDAA >CoolantTemp,Z'' then ''CMPA $2853''), or what a loaded value is compared with
+or stored into. That gives the unit (temperature, rpm, kPa, volts) and a structural name: the
+prefix of the tables of the same routine or the subsystem, the variable, and the role (''Thresh'' for
+a compare, ''Adder'', ''Offset'', ''Factor'', ''Init'' for a value stored into RAM, ''Value'' otherwise),
+numbered when repeated. All 1,451 constants now have hand names from the code that reads them;
+where the purpose is not certain the description says "probably". The structural name and the *
+in the catalogue remain only for constants found in a new image and not yet named. Word rpm values use the unit ''rpmw'' (rpm = x / 8).
+
+The option bytes at $0328-$0340 are global configuration. The bits identified so far, with their
+state in 05293190AC:
+
+^ Byte ^ Bit ^ Name ^ Set ^
+| $032B | $20 | ''SparkCalcHookOn'' | 0 |
+| $032B | $40 | ''DwellBatteryOn'' | 0 |
+| $032C | $40 | ''FlexFuelOn'' | 0 |
+| $032D | $20 | ''AcClutchLogicOn'' | 1 |
+| $032E | $40 | ''ManualTransmission'' | 1 |
+| $0330 | $01 | ''BattTempModelOn'' | 0 |
+| $0330 | $04 | ''BattTempCurveAlt'' | 0 |
+| $0330 | $20 | ''TipInAirTempCheck'' | 1 |
+| $0331 | $80 | ''AcPressureSensor'' | 0 |
+| $0335 | $04 | ''EgrSparkScaled'' | 0 |
+| $0337 | $01 | ''IdleDipKickMode'' | 0 |
+| $0337 | $10 | ''SurgeSparkOn'' | 1 |
+| $0337 | $20 | ''SpeedLimitOn'' | 0 |
+| $0337 | $40 | ''SpeedDampOn'' | 0 |
+| $0337 | $80 | ''EventSparkOn'' | 0 |
+| $0338 | $02 | ''FieldControlAlt'' | 0 |
+| $0338 | $04 | ''FuelEventOffsetAlt'' | 0 |
+| $0339 | $01 | ''TipInRetardHold'' | 0 |
+| $0339 | $04 | ''PurgeDutyAltClosed'' | 0 |
+| $0339 | $08 | ''PurgeDutyAltOther'' | 1 |
+| $033A | $10 | ''AcSparkOn'' | 0 |
+| $033D | $08 | ''IacCoastOff'' | 0 |
+
+''ManualTransmission'' set means the P/N switch is ignored (the idle and spark P/N variants are never
+used), which fits the manual 05293190AC.
+
+===== Fuel pulse width =====
+
+''CalcFuelPulse'' ($11F40) runs from the input-capture 1 interrupt, that is on every reference
+event:
+
+  - Part throttle or WOT is chosen by ''FuelModeFlags'' ($0771,Z) bit 5; this selects the constants, the scale table
+and the fuel table.
+  - Base pulse width = (Map - MapOffset) x (256 + K) / 16, or zero if MAP is below the offset. With
+calibration bit $0337.2 set, MAP is first raised to the lowest point of the part-throttle scale.
+  - The fuel table gives a signed value v (rows by MAP through the scale table, columns by
+''EngineRpm'', whose high byte is rpm / 32); the base is multiplied by 1 + v / 256.
+  - ''BaroFuelAdder'' ($080E,Z) is added and the result is stored in ''FuelPulse'' ($07E2,Z) and ''Temp4F6'' ($04F6,Z).
+
+So the fuel tables work like a volumetric-efficiency correction on a linear MAP model, with the
+two constants setting the slope and the zero point. Dead time, temperature and other corrections
+are applied elsewhere (stage 5).
+
+''InjectorDeadTime'' is looked up with ''BatteryVolts2'' ($0A51,Z) as input. 2GNT lists a fix that changes this to
+''BatteryVolts'' ($0A50,Z) (''BatteryVolts''); who writes $0A51 has not been checked yet.
+
+===== Fuel corrections =====
+
+Besides the base pulse, the code builds these corrections (names as in the source):
+
+^ Part ^ Routine ^ Tables ^ Result ^
+| Warm-up enrichment | ''WarmupFuel'' | ''WarmupMapCoolant'' (MAP x coolant), ''WarmupMapCoolantLowSpeed'' (below a vehicle speed), ''WarmupRpmCoolantIdle'' (throttle closed), ''WarmupCoolantAdder'' (WOT), factors for baro, run time and rpm | ''WarmupFuelFactor'' ($07E4,Z) |
+| After-start decay | ''WarmupFuel'' | ''AfterStartTimeScale'', ''AfterStartDecay'' (time since start x cranking coolant) | part of the warm-up factor |
+| Cold-soak | ''WarmupFuel'' | ''ColdSoakMapCoolant'', used when the coolant at start is close to ''BatteryTempStart'' ($0A5E,Z) | ''ColdSoakMap'' ($07E7,Z) |
+| Cranking | ''CrankFuel'' | ''CrankBasePulse'' (ethanol x cranking coolant), reductions against rpm, ''CrankDecayIndex'' ($0769,Z) and baro, each weighted by coolant; ''CrankVacuumFactor'' | ''CrankPulse'' ($0766,Z) |
+| Throttle tip-in | ''TipInFuelControl'' | ''TipInMatrix'' (9 x 9, rows by throttle opening, columns by throttle step), coolant, air temperature and baro factors | ''TipInFuel'' ($07C6,Z) |
+| MAP-rate and throttle-rate enrichment | ''AccelEnrichFactors'' | ''AccelMapGainCoolant'', ''AccelTpsRateLimit'', ''AccelTpsCoolantFactor'', baro terms, ''AccelRpmFactor'' | ''AccelMapGain'', ''AccelTpsFuel'', ''AccelFactor'' |
+| Deceleration enleanment | ''DecelLeanControl'' | ''DecelLeanAirflow'' (rpm x throttle), coolant, time, rpm, MAP and baro factors | ''DecelLeanFuel'' ($07C2,Z) |
+| Deceleration fuel cut-off | ''FuelCutControl'' | ''DecelCutMapThreshold'', ''DecelCutDelay'', minimum rpm against coolant; rev and speed limits | ''FuelModeFlags2'' ($0770,Z) flags, ''DecelCutRpmFactor'' |
+| Deceleration fuel reduction | ''DecelFuelRampControl'' | ''DecelMapRpmLimit'' (MAP x rpm) | ''DecelFuelFactor'' ($077A,Z) |
+| WOT enrichment over time | ''WotEnrichControl'' | ''WotTimeEnrichMax'' | ''WotTimeEnrich'' ($07AA,Z) |
+| Idle enrichment | ''IdleEnrichment'' | run time, ethanol x start air temperature, engine-off time | ''IdleEnrichFactor'' ($07DA,Z) |
+| Hot-engine enrichment | ''HotEngineEnrichCalc'' | ''HotEngineEnrich'' | ''HotEnrich'' ($0811,Z) |
+| Air temperature | ''FuelCorrections'' | ''FuelAirTempCorr'' with rpm and MAP weights | multiplies the fuel |
+| MAP and throttle filters | ''MapTpsFilters'' | filter coefficients for rising and falling MAP and throttle against start coolant | ''MapFilterCoef'', ''TpsFilterCoef'' |
+
+**Flex fuel.** The program supports flexible-fuel vehicles: ''FlexSensorCheck'' checks the fuel composition
+sensor (''FlexSensorRaw'', $0A8E,Z) and the flex-fuel learning code (''FlexLearn...'', around
+''FlexLearnMain'') learns the ethanol content from the oxygen-sensor trims (''FlexEthanolLearned'' $0197,Z,
+0-170, and ''FlexEthanol'' $0198,Z). The ethanol content then selects rows in the ''Flex...'' fuel and
+spark tables and in the cranking table. Calibration bit $032C.6 enables it; in 05293190AC (a
+gasoline car) the flex tables are neutral.
+
+===== Fault monitors =====
+
+Monitors report through two routines: ''ReportFault'' ($245CC) counts a failed test and sets the
+fault bit, ''ReportPass'' ($24160) counts a passed one and clears it; both take in Y the row of
+''FaultTable''. Following ''LDY #row'' before these calls gives the code each routine reports
+(''tools/constants.py'' adds it to the descriptions of the constants the routine reads):
+
+^ Routine ^ Codes ^ Test ^
+| ''Reset'' | P1602 | PCM not programmed |
+| ''BusTimeoutCheck'' | P1687, P1695 | no cluster / body bus messages |
+| ''ChecksumCheck'' | P0601 | checksum |
+| ''VacuumLeakMonitor'' | P1299 | vacuum leak (expected MAP against throttle and rpm) |
+| ''MapKeyOnCheck, MapCircuitCheck'' | P0106, P0107, P0108 | MAP rationality, low, high |
+| ''O2ShortHighCheck'' | P0132, P0152 | upstream O2 high, banks 1 and 2 |
+| ''PurgeSolenoidCheck'' | P0443 | purge solenoid circuit |
+| ''EgrPositionMonitor, EgrSolenoidCheck'' | P0405, P0406, P0403 | EGR position sensor low and high, EGR solenoid circuit |
+| ''WotLeanMonitor'' | P1298 | lean at WOT |
+| ''FlexFaultReport'' | P1496 | 5 V supply low |
+| ''TransMilRequest'' | P0700 | transmission control |
+| ''TccMonitor'' | P0740 | torque converter clutch (rpm/speed ratio does not drop at lock-up) |
+| ''O2DownCircuitCheck'' | P0137, P0138, P0157, P0158 | downstream O2 low/high, banks 1 and 2 |
+| ''FuelSenderMonitor'' | P0460, P0462, P0463 | fuel level sender stuck, low, high (analog $0A92) |
+| ''BrakeSwitchMonitor'' | P0703 | brake switch performance |
+| ''PnSwitchMonitor'' | P1899 | P/N switch stuck |
+| ''O2NoActivityCold, O2ActivityWarm'' | P0134, P0154, P0140, P0160 | O2 sensors inactive (cold-start soak check and heater-switched check when warm) |
+| ''PspSwitchMonitor'' | P0551 | power steering pressure switch |
+| ''MapIdleChangeCheck'' | P1297 | no MAP change between start and idle |
+| ''TpsMapRationality, ProcessThrottle'' | P0121, P0122, P0123 | throttle sensor rationality, low, high |
+| ''VssMonitor'' | P0500 | vehicle speed sensor (load without speed) |
+| ''CamSensorMonitor, CamCrankSyncMonitor'' | P0340, P1391 | cam sensor, intermittent cam/crank |
+| ''CamCrankRelation, CamCrankMeasure'' | P1390 | cam/crank relation (timing belt skipped) |
+| ''LdpSolenoidCheck'' | P1495 | leak detection pump solenoid |
+| ''ProcessCoolantTemp, ProcessAirTemp'' | P0117, P0118, P0112, P0113 | coolant and air temperature sensors low/high |
+| ''BatteryTempSensorCheck'' | P1492, P1493 | battery temperature sensor high/low |
+| ''FlexSensorCheck'' | P0176, P0178, P0179 | fuel composition sensor |
+| ''SriMileageStore, EepromWriteService'' | P1697, P1696 | SRI mileage not stored, EEPROM write denied |
+| ''CatTempMonitor'' | P1482, P1483, P1484 | catalyst temperature sensor low/high, catalyst overheat (input $0A8E, shared with the flex sensor) |
+| ''MtvCheck'' | P1289 | manifold tune valve |
+| ''CcdReceive, PciReceive'' | P1685 | SKIM invalid key |
+
+Misfire, catalyst, O2-sensor, EVAP-leak and purge-flow monitors report through their own state
+machines; their constants are named after the monitor (''Misfire...'', ''CatMon...'', ''O2Mon...'',
+''Ldp...'', ''PurgeMon...'').
+
+The P0176 test of ''FlexSensorCheck'' changes one earlier reading: ''FlexSensorRaw'' ($0A8E,Z), read as the fuel level,
+is the fuel composition sensor input (now ''FlexSensorRaw''), and the P1697 test shows that the
+word at ''SriMileage'' ($000D,Z) is the SRI (service reminder) mileage (''SriMileage'').
+
+===== Fault table =====
+
+''FaultTable'' ($4052) has 256 rows of 10 bytes:
+
+^ Byte ^ Content ^
+| 0 | row number |
+| 1 | trigger count |
+| 2 | blink code (BCD, as flashed by the check-engine lamp) |
+| 3 | attribute bits |
+| 4, 5 | mask and byte offset of the fault bit in the fault bit array |
+| 6, 7 | P-code (BCD): $03 $40 = P0340 |
+| 8, 9 | unused (zero) |
+
+83 rows carry a P-code; the list is in the catalogue. Codes for cylinders 5 and 6 (P0205, P0206,
+P0355) are present, so the program also covers six-cylinder engines.
+
+===== OBD monitor table and condition lists =====
+
+''ObdMonitorTable'' ($20000, in the code area) has 16 rows of 20 bytes, one per OBD monitor, read by
+''ObdMonitorMain'': the record offset, the monitor status byte (''MonStatus*''), the run period (low
+six bits of byte 5, tested against ''MainLoopCounter''), the fault table row of the monitor's P-code,
+the addresses of three condition lists, and the result byte and bit. The rows show which status
+byte belongs to which code: ''MonStatusCatBank1/2'' are the catalyst monitors (P0420, P0432),
+''MonStatusO2Resp1/2'' the O2 response monitors (P0133, P0153), ''MonStatusO2Sensor1-4'' the heater
+monitors (P0135, P0155, P0141, P0161), and the fuel system monitors give P0171/P0174 for "too lean"
+(adaptive at its upper limit) and P0172/P0175 for "too rich". The fuel system routines and
+constants were renamed after this (''FuelSysTooLean//'', ''FuelSysTooRich//'').
+
+''ConditionTable'' ($20B1C) checks such a list: a count, then 4-byte entries of RAM offset, test and
+mask. Test 0 needs the masked bits clear, test 2 needs them all set, test 4 needs the value above
+the mask byte; the check fails at the first entry that does not hold. The 48 lists lie in bank 0
+between $33CA and $4015 and are laid out in the source with each entry decoded, for example
+''CatBank1Conds1'': the catalyst monitor runs only while none of 19 bytes of stored faults (''FaultMem*'',
+about 70 P-codes) are set. These lists are calibration: changing them changes which faults suspend
+which monitor.
+
+Two more data blocks of bank 0 are laid out with their entries decoded. ''FaultStatusMap'' ($758C,
+44 rows of 10 bytes) ties a fault table row to a monitor status byte and bit, and for the 22
+two-trip tests (rows 11-32, searched by ''ObdFaultReport'') to a second pair: ''MonFlags09D-09F'' hold
+the pending bits (failed once, fault not reported yet) and ''SwitchMonFlags'', ''O2MonFlags'',
+''MonFlags65A'' the result each monitor hands over (set = failed), so their bits now have P-codes (P0740,
+P1899, P0703, P0500, P1294, P0125, P1281, P0551, the O2 and fuel level codes). ''BitCollectMaps''
+($713B, 29 maps of 32 bytes) are the input of ''CollectBits'': eight entries of RAM offset, mask and
+output bit build one byte, for the switch inputs and for the status bytes the SCI and bus messages
+send.
+
+Lists of RAM addresses in the code banks are laid out with each word named: the EEPROM map
+(''EepromShadowMap'', $38448: EEPROM word and the RAM copy), the descriptors of the O2, O2 heater,
+downstream O2 and catalyst monitors, the OBD record pointers, the CCD transmit rotation and eight
+lists the SCI diagnostic service probably sends from (''DiagDataList1-8'').

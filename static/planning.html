@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>planning [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="planning" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body"><li class="level3"><a href="#logging_and_monitoring">Logging and monitoring</a></li>
+<li class="level3"><a href="#getting_custom_cals_into_the_ecu">Getting custom cals into the ECU</a></li>
+<li class="level3"><a href="#tuning_and_editing_cals">Tuning and editing cals</a></li>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Easy" src="_static/lib/plugins/howhard/images/style1/2.png"/></div><div class="howhard_txt">Easy</div></div><hr/>
+<h3 class="sectionedit1" id="logging_and_monitoring">Logging and monitoring</h3>
+<div class="level3">
+<hr/>
+</div>
+<h4 id="logging_data_from_the_chrysler_ecu">Logging data from the Chrysler ECU</h4>
+<div class="level4">
+<p>
+The Chrysler ECU has many sensors connected to it, some of which could be very useful to monitor and log during vehicle tuning or for troubleshooting.
+</p>
+<p>
+The ECU also has many internal “variables” that are used internally for calculation, or indicate an operating state that doesn't have a sensor connected directly to it, but is still something that is “known” by the ECU, such as injector pulse width.
+</p>
+<p>
+In order to monitor and/or log these things, you will need some kind of interface that connects the ECU diagnostic connector (SCI bus) to whatever you will read/log with. 
+</p>
+<p>
+Scan tools such as the Chrysler DRBII and OTC have the interface and the reading/logging device combined into one unit. 
+</p>
+<p>
+A laptop needs a separate device, typically a USB to SCI cable.
+</p>
+<p>
+BoostButton offers a USB to SCI device which has many important features and is preconfigured out of the box, requiring minimal additional setup - <a class="urlextern" href="http://www.boostbutton.com/store/en/data-cables/13-sci-usb-cable.html" rel="ugc nofollow noopener" target="_blank" title="http://www.boostbutton.com/store/en/data-cables/13-sci-usb-cable.html">BoostButton SCI Cable</a>
+</p>
+</div>
+<h4 id="logging_data_from_a_wideband_o2_sensor">Logging data from a wideband O2 sensor</h4>
+<div class="level4">
+<p>
+There are 2 options for logging wideband data.
+</p>
+<p>
+1. A wideband O2 sensor may be logged simply by using the software came with it. For instance, with Innovate wideband O2 sensors, a program called LogWorks allows logging the wideband O2 sensor. So to log the Chrysler ECU data and the wideband, you would need to have MPSCAN and LogWorks running simultaneously. And then when logging is complete, you would need to manually combine and synchronize the two datasets, which can be a tedious and complex process.
+</p>
+<p>
+2. It is also possible to connect your wideband O2 sensor directly to the Chrysler ECU, in place of the stock O2 sensor, using a Turbonator cal that has been setup to take a WB input in place of the NB input. The cal internally converts the WB signal into a NB signal for fuel control feedback purposes and allows the user to log both the WB and NB values, if desired. In this case, the WB data is perfectly aligned with the rest of the engine operating data such as MAP and RPM.
+</p>
+<p>
+More info here: <a class="wikilink1" data-wiki-id="wb2nb_setup" href="wb2nb_setup.html" title="wb2nb_setup">WB2NB Setup</a>
+</p>
+<hr/>
+</div>
+<h3 class="sectionedit2" id="getting_custom_cals_into_the_ecu">Getting custom cals into the ECU</h3>
+<div class="level3">
+<hr/>
+<p>
+There are a couple of options for getting your cal into the ECU.
+</p>
+<p>
+<strong>Swapping Chips</strong>
+</p>
+<p>
+For all generations of Chrysler ECU, you can simply socket the computer and swap chips to change the calibration data. This usually requires removing the ECU from the car and physically changing the chip. But, it is also possible to use a remote socket as offered by Moates.com.
+</p>
+<p>
+For more info, see the <a class="wikilink1" data-wiki-id="chip_burning_basics" href="chip_burning_basics.html" title="chip_burning_basics">article on socketing and burning chips</a>.
+</p>
+<p>
+<strong>Real-time tuning</strong>
+</p>
+<p>
+With a socketed ECU, you can also use the Ostrich (also offered by Moates.com). The Ostrich allows for real-time tuning while the engine is running. But, it is not recommended for long-term use. Basically, it is used for tuning, and then a chip is burned when the tuning is complete.
+</p>
+<p>
+The SBEC will require a special adapter - <a class="urlextern" href="http://www.boostbutton.com/store/en/ecu-chips/18-latch-board.html" rel="ugc nofollow noopener" target="_blank" title="http://www.boostbutton.com/store/en/ecu-chips/18-latch-board.html">a latch board</a> - to use the Ostrich. 
+</p>
+<p>
+<strong>Flash ECU Conversion</strong>
+</p>
+<p>
+Finally, if your car uses a SMEC (88-89) or and SBEC/SBECII (90-93), it can be made 'flashable'. That is, the ECU is modified with a memory module that can be re-flashed in-car with a data cable attached to the SCI port. While the engine does have to be turned off to change the cal, the ECU itself does not have to be removed, and the flash process itself takes less than 1 minute in most cases.
+</p>
+<p>
+For the SMEC, a pin must be added to the 60-way and a switch wired to constant 12v. For the SBEC, the wire is added to the SCI connector, which is also then switched to 12v constant.
+</p>
+<p>
+See the <a class="wikilink1" data-wiki-id="how_to_flash_a_cal" href="how_to_flash_a_cal.html" title="how_to_flash_a_cal">flashing instructions</a> for more details on the flash process. 
+</p>
+<p>
+See the <a class="wikilink1" data-wiki-id="add_a_pin" href="add_a_pin.html" title="add_a_pin">adding a pin to the 60-way</a> instructions for more details on that process.
+</p>
+<hr/>
+</div>
+<h3 class="sectionedit3" id="tuning_and_editing_cals">Tuning and editing cals</h3>
+<div class="level3">
+<hr/>
+<p>
+For more information about the Turbonator cals and some history of the various tuning packages that have been used, see the <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">Turbonator/MP Tune/MP Scan</a> page.
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>planning.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

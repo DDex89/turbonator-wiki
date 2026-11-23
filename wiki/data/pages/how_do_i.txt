@@ -1,0 +1,25 @@
+====== How To ======
+
+This page will be used for navigation to the various How-To articles contained in this wiki.
+
+=== How To... ===
+  * [[planning|...figure out what you'll need to log/flash/burn/tune]] 
+  * [[cable_setup|...get your laptop talking to the Chrysler ECU]] 
+  * [[ecu_socketing|...socket your ECU]]
+  * [[chip_burning_basics|...burn chips]] 
+  * [[use-the-ostrich|...use the Ostrich with an LM, SMEC, or SBEC]]
+  * [[add_a_pin|...add a pin to the SMEC or SBEC 60-way connector]] 
+  * [[install_flash_module|...install a BB flash module into your SMEC or SBEC]]
+  * [[how_to_flash_a_cal|...flash a suitably modified SMEC or SBEC]] 
+  * [[flash_an_FCC|...flash a '95 Neon FCC]]
+  * [[fcc_overview|...read the '95 Neon FCC firmware source code]]
+  * [[sbec3_overview|...read the SBEC3 firmware source code (1996+ Neon / 2G Eclipse-Talon)]]
+  * [[sbec3_reflash|...read or reflash an SBEC3 over the diagnostic line]]
+  * [[base_cal_setup|...setup a base Turbonator cal using MP Tune]]
+  * [[mask_err_codes|...mask error codes]]
+  * [[setup datalogging|...setup MP Scan for datalogging]]  
+  * [[setup turbonator features|...setup the Turbonator features]] 
+  * [[MAP_Sensor_Xfer_Func|...make a precise MAP transfer function]]
+  * [[afr-peftbl tuning|...use logged AFR data to re-tune the PefTbl in MP Tune]] 
+  * [[boost control tuning|...fine tune the computer controlled boost]] 
+  * [[det can setup|...setup a detonation listening device]] 

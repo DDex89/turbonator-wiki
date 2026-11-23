@@ -1,0 +1,5 @@
+**Modified Dwell Calculation**
+
+Added Dwell compensation for battery volts. This will maintain better dwell control than the stock code. Should improve ignition performance at WOT (when the alternator shuts off and battery voltage can drop).
+
+The modified dwell calculation is built into every cal and is not configurable. However, the Dwell Time vs. battery volts table is available for adjustments if needed. It's not recommended to adjust this table unless you are sure about what you are doing.

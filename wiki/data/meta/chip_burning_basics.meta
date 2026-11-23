@@ -1,0 +1,13 @@
+a:2:{s:7:"current";a:9:{s:4:"date";a:2:{s:7:"created";i:1422327808;s:8:"modified";i:1426001942;}s:11:"last_change";a:7:{s:4:"date";i:1426001942;s:2:"ip";s:15:"205.144.100.200";s:4:"type";s:1:"E";s:2:"id";s:19:"chip_burning_basics";s:4:"user";s:8:"shelgame";s:3:"sum";s:0:"";s:5:"extra";s:0:"";}s:4:"user";s:0:"";s:7:"creator";s:0:"";s:11:"contributor";a:1:{s:8:"shelgame";s:9:"Rob Lloyd";}s:5:"title";s:15:"Burning a chip:";s:11:"description";a:2:{s:15:"tableofcontents";a:3:{i:0;a:4:{s:3:"hid";s:14:"burning_a_chip";s:5:"title";s:15:"Burning a chip:";s:4:"type";s:2:"ul";s:5:"level";i:3;}i:1;a:4:{s:3:"hid";s:12:"chip_choices";s:5:"title";s:13:"Chip choices:";s:4:"type";s:2:"ul";s:5:"level";i:3;}i:2;a:4:{s:3:"hid";s:7:"offsets";s:5:"title";s:8:"Offsets:";s:4:"type";s:2:"ul";s:5:"level";i:3;}}s:8:"abstract";s:503:"----------
+
+Burning a chip:
+
+----------
+
+Required tools/materials:
+
+	*  Chip burner
+	*  Chip
+	*  .bin file to burn to the chip
+
+First, you will need a burner. There are many types/brand available, but your best bet is to buy a Willem style burner or a Burn2. The Willem cost is ~$40 (or less), and it will burn/erase every type of chip that could be used in our ECU's (and then some). Also, the Willem software is free and open-source. The Burn2 is basically fool-proof in setup; but it can't burn th…";}s:8:"internal";a:2:{s:5:"cache";b:1;s:3:"toc";b:1;}s:8:"relation";a:1:{s:10:"firstimage";s:0:"";}}s:10:"persistent";a:5:{s:4:"date";a:2:{s:7:"created";i:1422327808;s:8:"modified";i:1426001942;}s:11:"last_change";a:7:{s:4:"date";i:1426001942;s:2:"ip";s:15:"205.144.100.200";s:4:"type";s:1:"E";s:2:"id";s:19:"chip_burning_basics";s:4:"user";s:8:"shelgame";s:3:"sum";s:0:"";s:5:"extra";s:0:"";}s:4:"user";s:0:"";s:7:"creator";s:0:"";s:11:"contributor";a:1:{s:8:"shelgame";s:9:"Rob Lloyd";}}}

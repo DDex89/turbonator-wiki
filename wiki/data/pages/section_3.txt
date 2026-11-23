@@ -1,0 +1,17 @@
+====== Section 3 - Fine Tuning ======
+
+===== Chapter 1 - Setting Up MP Scan =====
+
+Make sure the your interface or cable to the ECU is setup and working correctly.
+
+[[cable_setup|Cable Setup Instructions]]
+===== Chapter 2 - Fine Tuning Fuel =====
+
+First, read the article about how the fuel tables work.
+
+[[fuel_setup|Fuel Calculations Explained]]
+===== Chapter 3 - Tuning Spark =====
+
+===== Chapter 4 - Tuning Boost Control =====
+
+

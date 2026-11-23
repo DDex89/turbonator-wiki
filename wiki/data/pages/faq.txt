@@ -1,0 +1,180 @@
+===== Frequently Asked Questions =====
+
+
+This page will be for questions not answered in the tuning guide. When a question is answered, it will be incorporated into the main how-to, if possible, and linked from this page.
+
+Please use this example formatting for questions and answers:
+
+
+
+===== Pumping Efficiency Questions =====
+
+==== Q - Which way do you go w/ Pump Efficiency to make it richer? ====
+
+== Answered ==
+Up on the PumpEff. More air = More fuel.
+
+==== Q - Isn't the idea basically that pumping efficiency is base fuel and then you have idle/mid/WOT tables to fine tune? ====
+
+== Answered ==
+Actually, no. There are 3 main 'ideal' PW tables. Which table is used is decided by throttle position - there is a table each for idle, part throttle, and wide-open throttle. The Pumping Efficiency table is a fraction of the 'ideal' fuel vs. RPM. Since the engine never flows it's full potential, you need to reduce the 'ideal' PW by this amount.
+
+==== Q - When tuning cals 1st became something everyone could do they found that Mopar just scaled the PE table for the S60 cal. At that time everyone was told that is the wrong way to do it and not to touch that. Now you guys have reversed your tune to say 'Oh yes mess with the PE table to make fueling adjustments'. So which is it? And WHY? ====
+
+== Answered ==
+The problem with the S60 cal is that Mopar ONLY scaled the PeffTbl. They did not adjust the 3 main fuel tables for injectors, or fuel, or base charge temperature. They're just stock T2 fuel tables. The PefTbl is set to like 40% volumetric efficiency to compensate. Obviously, that's not right. The DC ported head that came with the S60 package would have flowed much better than that. I don't think it was said to NOT touch the PEfTbl, just to not do ALL of the fuel scaling with it.
+
+
+===== 3 Main Fuel Table Questions =====
+
+==== Q - I was wondering why the fuel full throttle has so few data points to adjust and the part throttle has so many. It makes sense that you could tune it more precisely with more points, or am I just wrong? ====
+
+== Answered ==
+The 3 main fuel tables are really just used to set a target A/F based on your injector size, engine displacement, fuel specific gravity, and an assumed intake air temp. There aren’t many points because the A/F doesn’t need too many changes. You’re probably used to seeing a fuel table where the RPM is included. We have the PumpEff table for that. It (usually) has many data points for accuracy.
+
+==== Q - How does the target AF work in MP Tuner? ====
+
+== Answered ==
+The target A/F is just a tool for plotting a phantom line on the 3 main fuel tables to help you set those to your target A/F. It’s not used by the ECU at all. To adjust fueling you need to open up a template, select ‘miscellaneous’, then ‘fueling setup’. You will see 3 columns of AFRs for the 3 fueling tables. Enter your desired A/F based on the corresponding MAP. The A/F data is saved with the template so the next time you open up the template the data should be the same. In the 3 main fuel tables, the yellow phantom line represents the theoretical pulsewidth calculated based on the A/F and other info you entered in that screen above. So, if the yellow line is higher than the fuel graph line you will be running leaner than desired (pulsewidth is shorter than desired). You will see the data represented in A/F form on the bottom right of the fuel table window.
+
+==== Q - Is there an easy way to switch on and off O2 Feedback? ====
+
+== Answered ==
+For the SMEC and SBEC, set 'NoCellUpdateAboveFromMAP’ to a high value. This will essentially force the O2 control to work the same as if you were at full throttle. The other ‘NoCellUpdate***’ constants will have a similar effect. For the LM, only setting 'PWMIN_NoCellUpdateBelow_PWMIN_Pulsewidth' to a high value can disable the O2 feedback. The others will only affect the adaptive cell updates.
+
+This is useful when tuning the part throttle fuel table.
+
+
+==== Q – It’s hard to adjust fuel, spark, and the wastegate with the computer constantly changing them. How do I disable the adaptives for tuning? ====
+
+== Answered ==
+There are constants that can be used to dis-able the adaptives:
+
+'NoCellUpdateAboveThisMAP' for fuel,
+'AdaptiveRetard_MinMAPForAdjustment' for the adaptive retard, and
+'StopAdaptiveWGWhenMapIsThisCloseToBoostTar get' for the wastegate adaptives
+
+Basically, set them all to 0xff to disable (remember the stock settings, though, so you can change it back when you're done getting your base tune).
+
+===== Accelerator Pump Questions =====
+
+==== Q - I added a bigger throttle body and I now get a lean tip-in. How do I adjust the Accel Pump/Pump Shot? ====
+
+== Answered ==
+Here's the best description of the PumpShot calculation I can give. This is valid for T-LM/SMEC/SBEC; it's a little more complicated for the T3 stuff.
+
+There are 2 Pumpshot calculations: MAP-based and TPS-based.
+
+MAP-Based PumpShotPW:
+
+AvgMAP --> AETIME is the time constant for the AvgMAP calculation. A higher time constant gives a longer-term average (and usually a higher DeltaMAP - see the next definition).
+DeltaMAP --> DeltaMAP is the difference between the current MAP value and the calculated average MAP (AvgMAP). [DeltaMAP = MAP - AvgMAP]
+
+PumpShotPW Calculation:
+
+If DeltaMAP is less than MAPTRG then there is no MAP PumpShot;
+If DeltaMAP is greater than MAPTRG and lower than MAPMAX, then use DeltaMAP in the PW calculation;
+If DeltaMAP is greater than MAPMAX, then substitute MAPMAX for DeltaMAP in the PW calculation (DeltaMAP = MAPMAX);
+Lookup the value from the AESLOP table (from coolant temp);
+
+[PumpShotPW(MAP) = AESLOP_valule X DeltaMAP]
+
+TPS-Based PumpShotPW:
+
+AvgTPS --> THRTCN is the time constant for the AvgTPS calculation. A higher time constant gives a longer-term average (and usually a higher DeltaTPS - see the next definition).
+DeltaTPS --> DeltaTPS is the difference between the current TPS value and the calculated average TPS (AvgTPS). [DeltaTPS = TPS - AvgTPS]
+
+PumpShotPW Calculation:
+
+If DeltaTPS is less than POSTRG then there is no TPS PumpShot;
+If DeltaTPS is greater than POSTRG and lower than THRMAX, then use DeltaTPS in the PW calculation;
+If DeltaTPS is greater than THRMAX, then substitute THRMAX for DeltaTPS in the PW calculation (DeltaTPS = THRMAX);
+Lookup the value from the POSSLP table (from coolant temp);
+
+[PumpShotPW(TPS) = POSSLP_valule X DeltaTPS]
+
+I know it's still pretty complicated.
+
+For a bigger TB, I would actually start with the POSSLP table. Add PW in the operating temp range.
+
+Reducing THRTCN would actually have the effect of reducing the pumpshot, I think, because it would reduce the DeltaTPS value. Increasing THRTCN should also increase the PumpShot, as would increasing THRMAX.
+
+If increasing POSSLP doesn't seem to help, try increasing THRMAX, too.
+
+Similarly, for a heavily ported head, I would adjust the AESLOP table. Add PW in the operating temp range.
+
+Reducing AETIME would actually have the effect of reducing the pumpshot, because it would reduce the DeltaMAP value. Increasing AETIME should also increase the PumpShot, as would increasing MAPMAX.
+
+===== Other Fuelling Questions =====
+
+==== Q - how can i adjust fuel at idle/ coasting down? ====
+
+== Answered ==
+If you want to adjust the idle fuel, there are a few ways to do it. 
+
+1) Reduce the PumpEff at low RPM. For some reason, Chrysler left the PumpEff at like 60+% even at idle. When, in reality, this is probably not very realistic. So, reduce the PumpEff in maybe 5% increments below 1200rpm and see if that helps.
+
+2) Reduce the baseline/no throttle fuel table near idle vacuum. If you have a different cam or cam timing than stock, it's likely that you're operating in a different part of this table than stock and are calculating a richer mixture.
+
+3) Spark scatter fuel - Chrysler actually uses spark scatter and subtle fuel changes to control the idle speed primarily. The AIS motor is actually a last resort. This is because fuel and spark changes are much more responsive than the AIS motor. But, the constant changing spark and fuel make it hard to tune. Turn it off (temporarily) by setting the threshold temperature (TempAboveWhichSparkScatterIsActive) really high.
+
+4) Then, there is the adaptive fuel which also works at idle. You can also dis-able the adaptives for tuning purposes by…
+
+==== Q - What parameter to adjust the open/closed loop switch point? ====
+
+== Answered ==
+Adjust the ‘NoCellUpdate*’ constants under the 'Adaptive Memory' group. These are the limits to force open-loop operation. ‘NoCellUpdateAboveThisMAP’ for example will force open-loop above the MAP setpoint.
+
+===== Ignition Timing =====
+
+==== Q - How is the total timing calculated? Base timing + AdvancefromRPM + AdvancefromMap? ====
+
+== Answered ==
+There is no such thing as base timing. Total timing is pretty simple  Advance from RPM + Advance from MAP is the basic timing. The advance from MAP can be either the WOT or P/T table depending on TPS position. And, there is a WOT multiplier for the advance from MAP table for when the lookup value from that table is negative. There is also a maximum timing value.
+
+
+==== Q - So I am clear on this.... The timing shown in the cal, and on a Scan Tool, will be the total timing. This number assumes the base timing of 12* (or whatever is called for on the emissions label) is there. So the number shown in a cal is not necessarily the number used in a calculation, correct? ====
+
+== Answered ==
+There is no such thing as base timing. The 12* is just the fixed timing used to set the sync between the distributor and the crank. The reason they chose 12* is simply because an engine generally will not run well @ 0* advance. The 12* is not a 'base' timing at all. It's simply a reference point. It never gets 'added' to anything. All the timing figures in the cal are relative to TDC (0*).
+
+If the sync is in fact wrong (ie, you set the sync at 14* instead of 12*), then the actual timing will be off by the same amount (2* in this example). But, the ECU will not know about that difference and will not be able to report it to a scan tool.
+
+==== Q  What is the AdvanceFromRPMMax table for? ====
+
+== Answered ==
+It's the max cutoff point for advance. Any calculated advance over that lookup value will use the lookup value instead. For example, if your combined advance is 60* and the Max is 53*, you will get 53*.
+
+==== Q  What is the MultiplierOnMAPAdvanceWhenRetarding table used for? ====
+
+== Answered ==
+MultiplierOnMAPAdvanceWhenRetarding basically multiplies the WOT advance from MAP value based on RPM when the WOT advance from MAP is negative. The table is scaled from 0 to 4. This table was used by Chrysler to remove more timing when in boost at higher RPM. Its the primary reason the WOT MAP advance table appears to have more timing than the P/T table in the T1 cals. In most of the T2 cals, this table is set to a multiplier of 1 (no effect).
+
+===== Boost Control =====
+
+==== Q - How do you raise the overboost cutout point in T-SBEC, T-SMEC and T-LM? ====
+
+== Answered ==
+Look for the 4 overboost constants (OverboostFuelShutoff*) in the OB, Speed, and Rev Limiter section. Set them all to FF to completely disable overboost by either typing in the value or moving the slider all the way to the right.
+
+==== Q - I only have full boost if I go past 3/4 throttle, till that only have about 5 psi. Why? ====
+
+== Answered ==
+There is a boost target table for throttle position (AllowedBoostPartThrottle). Most likely, it is set for 5psi below 3.8V.
+
+===== General =====
+
+==== Q - What 'offset' do I use to burn my chip? ====
+
+== Answered ==
+The CPU in the SMEC or SBEC can access up to 64k of memory - total. The bottom 32k is mostly reserved for system memory - RAM, and input/ouput ports. The top 32k is used for the program and data storage (the EPROM). But, the entry point for the code is at the END of the memory space (the interrupt vectors). The #1 rule is that the very last byte of your file must match up with the very last byte of the memory space. The hardware ensures that the last byte of the chip itself is always at the end of the CPU's address space.
+
+ 16k .bin + 16k chip = No offset
+ 32k .bin + 32k chip = No Offset
+ 16k .bin + 32k chip = Offset of 4000h
+ 32k .bin + 64k chip = Offset of 8000h
+ 16k .bin + 64k chip = Offset of C000h
+
+ 27C128 = 16k
+ 27C256 (or 87C257, or any other chip ending in '256) = 32k
+ 27C512 (or 27SF512 or any other chip ending in '512) = 64k

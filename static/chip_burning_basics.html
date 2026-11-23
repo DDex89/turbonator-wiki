@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>chip_burning_basics [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="chip_burning_basics" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body"><li class="level3"><a href="#burning_a_chip">Burning a chip:</a></li>
+<li class="level3"><a href="#chip_choices">Chip choices:</a></li>
+<li class="level3"><a href="#offsets">Offsets:</a></li>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Easy" src="_static/lib/plugins/howhard/images/style1/2.png"/></div><div class="howhard_txt">Easy</div></div><hr/>
+<h3 class="sectionedit1" id="burning_a_chip">Burning a chip:</h3>
+<div class="level3">
+<hr/>
+<p>
+<strong>Required tools/materials:</strong>
+</p>
+<ul>
+<li class="level1"><div class="li"> Chip burner</div>
+</li>
+<li class="level1"><div class="li"> Chip</div>
+</li>
+<li class="level1"><div class="li"> .bin file to burn to the chip</div>
+</li>
+</ul>
+<p>
+First, you will need a burner. There are many types/brand available, but your best bet is to buy a Willem style burner or a Burn2. The Willem cost is ~$40 (or less), and it will burn/erase every type of chip that could be used in our ECU's (and then some). Also, the Willem software is free and open-source. The Burn2 is basically fool-proof in setup; but it can't burn the factory chips used in the SBEC. The Burn2 algorithm is now integrated into MP Tune. SO, you can burn the 27SF512 chips directly from MP Tune, without needed a 2nd burner program.
+</p>
+<p>
+Also, before I go into burning the chip, I want to talk about the various chips that can be used. The original chip used was a 28-pin DIP, 16k or 32k EPROM (Erasable-Programmable-Read-Only-Memory). An EPROM is a ceramic chip with a quartz window. The window is used to erase the chip by exposure to UV light. A specific type (wavelength) of UV light is required. Commercial UV erasers are about $100 minimum. They are fully enclosed and usually incorporate a timer to keep from over-exposing the chips. But, you can use a handheld “germicidal” UV light. They cost about $20. But, there is no protection for the user, and no timer. Also, they are much lower power. So the danger of skin exposure is less, but they also take longer to erase the chip (~10min). A regular fluorescent bulb or even a “plant” light won't do the job. Exposure to sunlight, in theory, can erase the EPROM. But, the required exposure time is ~10 hours ? not very practical. The price of flash memory chips is decreasing rapidly. As such, they are a very viable alternative to the original EPROM chips originally used by Chrysler. Also, they do not require the use of a UV eraser. But, they will require a burner capable of erasing them.
+</p>
+<hr/>
+</div>
+<h3 class="sectionedit2" id="chip_choices">Chip choices:</h3>
+<div class="level3">
+<hr/>
+<p>
+<strong>LM:</strong>
+</p>
+<ul>
+<li class="level1"><div class="li"> 27C128 : 16k 28-pin Ceramic DIP</div>
+</li>
+<li class="level1"><div class="li"> 27C256 : 32k 28-pin Ceramic DIP</div>
+</li>
+<li class="level1"><div class="li"> 29C256 : 32k EEPROM (Electrically-Erasable-PROM) 28-pin Plastic DIP; These are out-of-production in the 28-pin DIP and as such are expensive when you can find them.</div>
+</li>
+<li class="level1"><div class="li"> 27SF512 : 64k Flash Memory 28-pin Plastic DIP; These are actually cheaper than the 27C256 at this point in time.</div>
+</li>
+</ul>
+<p>
+<strong>SMEC:</strong>
+</p>
+<ul>
+<li class="level1"><div class="li"> 27C128 : 16k 28-pin Ceramic DIP; only for the 16k bins (T2/S60 based)</div>
+</li>
+<li class="level1"><div class="li"> 27C256 : 32k 28-pin Ceramic DIP</div>
+</li>
+<li class="level1"><div class="li"> 29C256 : 32k EEPROM (Electrically-Erasable-PROM) 28-pin Plastic DIP; this chip is out-of-production in the 28-pin DIP and as such are expensive when you can find them.</div>
+</li>
+<li class="level1"><div class="li"> 27SF512 : 64k Flash Memory 28-pin Plastic DIP; this chip is actually cheaper than the 27C256 at this point in time.</div>
+</li>
+</ul>
+<p>
+<strong>SBEC:</strong>
+</p>
+<ul>
+<li class="level1"><div class="li"> 87C257 : 32k 28-pin Ceramic DIP; this is currently the only chip available for use in the SBEC. This chip is the same as the 27C256, except that it has a built-in address latch. There are no EEPROM or Flash memory chips with similar configuration available.</div>
+</li>
+</ul>
+<p>
+I won't get into the support of the burner. The Willem has a good form with a ton of information. And, there are TM guys that can guide you if you get stuck.
+</p>
+<p>
+There is also good support for the Moates Burn2. MP Tune supports flashing the chip via the Burn2 from within MP Tune; making this combination a good choice.
+</p>
+<hr/>
+</div>
+<h3 class="sectionedit3" id="offsets">Offsets:</h3>
+<div class="level3">
+<hr/>
+<p>
+Here's where things can get confusing. I'll try to explain as simply as possible, without confusing you with too much HEX or hacker jargon. 
+</p>
+<p>
+The chip memory offset is required to in order to place the interrupt vectors in the correct location. Interrupt vectors are special subroutines called when certain outside events happen (for example, when the ECU is powered up, or the HEP input is triggered). The microprocessor expects these interrupts to be in a specific memory address at end of the memory space. If these are NOT at the correct address, the code will not be able to run at all. So, the offset places the .bin file in the correct location on the chip so that these memory addresses are where they need to be. The offset is dependent on both the size of the .bin and the size of the chip itself.
+</p>
+<p>
+For example, if the .bin is 16k (LM or T2/S60 SMEC), and you're burning it to a 32k chip, you need to offset the .bin by 16k to put it at the end. If you are burning a 16k .bin to a 64k chip (27SF512), you need to offset the .bin by 48k. 
+</p>
+<p>
+Here's a breakdown:
+</p>
+<div class="table sectionedit4"><table class="inline">
+<tr class="row0">
+<th class="col0">.bin size</th><td class="col1">Chip size</td><td class="col2">offset</td><td class="col3"> (hex)</td>
+</tr>
+<tr class="row1">
+<td class="col0" rowspan="3">16k</td><td class="col1"> 16k</td><td class="col2 leftalign"> 0  </td><td class="col3"> (0x0000)</td>
+</tr>
+<tr class="row2">
+<td class="col0"> 32k</td><td class="col1"> 16k</td><td class="col2"> (0x4000)</td>
+</tr>
+<tr class="row3">
+<td class="col0"> 64k</td><td class="col1"> 48k</td><td class="col2"> (0xC000)</td>
+</tr>
+<tr class="row4">
+<td class="col0" rowspan="2">32k</td><td class="col1"> 32k</td><td class="col2 leftalign"> 0  </td><td class="col3"> (0x0000)</td>
+</tr>
+<tr class="row5">
+<td class="col0"> 64k</td><td class="col1"> 32k</td><td class="col2"> (0x8000)</td>
+</tr>
+</table></div>
+<p>
+Once you get the offset configured correctly, simply load up the chip and burn it according to your burners' instructions.
+</p>
+<p>
+Now, just load the chip into your newly socketed ECU, plug it back into the car, and give it a try.
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>chip_burning_basics.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

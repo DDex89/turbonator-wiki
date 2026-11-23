@@ -1,0 +1,19 @@
+-----
+==== What is a 'template' file? =====
+-----
+
+A template file is the file that contains the calibration data to build a cal using MP Tune. It's called a template because it's intended to be a starting point for a custom cal. You could, however, build a completely stock calibration from these files; with or without any of the the Turbonator features enabled. The file actually contains both the calibration data and the information used to display the data correctly in MP Tune - such as data type, axis scaling factors, whether or not it is affected by MAP or Injector scaling, etc. Each template file is based a stock calibration. When the template file is put together with the assembly file, they can be compiled into a fresh binary.
+
+Picking a template to use is pretty simple. There are many included, this is only because I'm trying to be complete. When I find a new binary file, I make a template from it - if possible. There are usually some minor differences from cal to cal. If possible, pick them template that matches your cars original calibration. If in doubt, juts pick a template that matches your car setup (ECU + displacement + trans type). If you want to run AC, you should also pick a template that has AC enabled already. Turning on the AC function is not as easy as simply enabling the option flag. There are also many other calibration values that change when AC is enabled.
+
+The template file naming convention is:
+
+**[Turbonator Version]_[Engine Size]_[Transmission]_[Factory CalID]_[Usage]**
+
+So, for example, 
+
+**T-SMEC_22_MTX_9528_S60.tpl**
+
+Is a T-SMEC template containing the 2.2L calibration data with the ID code 9528, used on the Super 60 package.
+
+The last 3 digits of the CalID will always match the last 3 digits of the original ECU part number. These 3 digits (at least) will always appear on the chip itself. Sometimes, the chip has the full computer PN on it.

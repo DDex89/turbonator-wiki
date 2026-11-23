@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>SBEC3: calibration [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="sbec3_calibration" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body">
+<ul class="">
+<li class="level1"><a href="#sbec3calibration">SBEC3: calibration</a>
+<ul class="">
+<li class="level2"><a href="#where_the_calibration_lies">Where the calibration lies</a></li>
+<li class="level2"><a href="#table_formats">Table formats</a></li>
+<li class="level2"><a href="#units">Units</a></li>
+<li class="level2"><a href="#known_tables_and_constants">Known tables and constants</a></li>
+<li class="level2"><a href="#table_names_410_tables">Table names (410 tables)</a></li>
+<li class="level2"><a href="#idle_and_spark_control">Idle and spark control</a></li>
+<li class="level2"><a href="#constants_and_option_bits">Constants and option bits</a></li>
+<li class="level2"><a href="#fuel_pulse_width">Fuel pulse width</a></li>
+<li class="level2"><a href="#fuel_corrections">Fuel corrections</a></li>
+<li class="level2"><a href="#fault_monitors">Fault monitors</a></li>
+<li class="level2"><a href="#fault_table">Fault table</a></li>
+<li class="level2"><a href="#obd_monitor_table_and_condition_lists">OBD monitor table and condition lists</a></li>
+</ul></li>
+</ul>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Very Hard" src="_static/lib/plugins/howhard/images/style1/5.png"/></div><div class="howhard_txt">Very Hard</div></div><hr/>
+<h1 class="sectionedit1" id="sbec3calibration">SBEC3: calibration</h1>
+<div class="level1">
+<hr/>
+<p>
+See also <a class="wikilink1" data-wiki-id="sbec3_overview" href="sbec3_overview.html" title="sbec3_overview">SBEC3 overview</a> and <a class="wikilink1" data-wiki-id="sbec3_tuning" href="sbec3_tuning.html" title="sbec3_tuning">tuning notes (TunerPro, porting, open questions)</a>. The full per-image table catalogue is generated into <a class="urlextern" href="https://github.com/DDex89/neon-sbec3-firmware/tree/main/docs/catalogue" rel="ugc nofollow noopener" target="_blank" title="https://github.com/DDex89/neon-sbec3-firmware/tree/main/docs/catalogue">docs/catalogue/</a> in the repository.
+</p>
+</div>
+<h2 class="sectionedit2" id="where_the_calibration_lies">Where the calibration lies</h2>
+<div class="level2">
+<p>
+The calibration is in bank 0, between the header at $00202 and the start of the code at $08000. The
+reset code sets EK = 0, so the code reads it with plain extended addresses (<code>CMPA $19DC</code>). Nothing
+in the code writes there: the area is read-only.
+</p>
+<p>
+The code refers to it in two ways:
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Tables</strong>, passed in X to one of four lookup routines (<code>LDX #table</code>, <code>JSR Lookup2D</code>). The lookup</div>
+</li>
+</ul>
+<p>
+routines force XK = 0, so every table is in bank 0. 410 tables are found this way, between $0398
+and $ABD7 (two small ones lie among the bank 0 code).
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Constants</strong>, read directly: 1,449 different addresses, mostly with <code>CMPA</code>/<code>CMPB</code> (thresholds),</div>
+</li>
+</ul>
+<p>
+<code>LDAA</code>/<code>LDAB</code> and <code>LDD</code>/<code>CPD</code> (16-bit values). Configuration bits at $0328-$0340 are tested
+with <code>BRSET</code>/<code>BRCLR</code>. See constants and option bits.
+</p>
+</div>
+<h2 class="sectionedit3" id="table_formats">Table formats</h2>
+<div class="level2">
+<p>
+All values are bytes. The formats follow from the lookup routines:
+</p>
+<div class="table sectionedit4"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Format </th><th class="col1"> Routine </th><th class="col2"> Layout </th><th class="col3"> 2GNT type </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> 2D </td><td class="col1"> <code>Lookup2D</code> ($0C08E) </td><td class="col2"> n, flags, then n pairs (x, y), x ascending </td><td class="col3"> C </td>
+</tr>
+<tr class="row2">
+<td class="col0"> 2D (y, x) </td><td class="col1"> <code>Lookup2DRev</code> ($0C36A) </td><td class="col2"> n, unused, then n pairs (y, x) </td><td class="col3 leftalign"> </td>
+</tr>
+<tr class="row3">
+<td class="col0"> 3D </td><td class="col1"> <code>Lookup3D</code> ($0C214) </td><td class="col2"> rows, columns, signed flag, column axis (one byte per column), values row by row </td><td class="col3"> A </td>
+</tr>
+<tr class="row4">
+<td class="col0"> 3D, no axis </td><td class="col1"> <code>Lookup3DNorm</code> ($0C28C) </td><td class="col2"> rows, columns, signed flag, values row by row </td><td class="col3"> B </td>
+</tr>
+</table></div>
+<p>
+Fault table: see below (2GNT type D).
+</p>
+<p>
+<strong>2D.</strong> The input is compared with the x values; between two points the result is interpolated
+linearly, outside the range it is the first or last y. The flags byte selects the arithmetic: $80
+unsigned (320 of the 353 tables), $20 signed y, $10 steps without interpolation, $40 a zero y counts
+as 256. Many 2D tables are followed by unused bytes up to a 12-byte slot (five points); whether a
+table may be lengthened into that space has to be checked per table.
+</p>
+<p>
+<strong>3D.</strong> The row input is a <em>position</em> 0-255 spread evenly over the rows (row = position x (rows-1)
+/ 256). It usually comes from a 2D scale table that converts MAP into that position: the part-throttle
+tables use <code>PartThrottleMapScale</code>, the WOT tables <code>WotMapScale</code>. The column input is searched on the
+stored column axis (<code>Lookup3D</code>) or is also a position 0-255 (<code>Lookup3DNorm</code>). The result is
+interpolated in both directions. Sizes in this image: 17 x 17, 9 x 17, 9 x 9, 5 x 9 and 5 x 5.
+</p>
+<p>
+The signed flag ($FF) makes the values two's complement; the source shows them as negative decimals.
+</p>
+</div>
+<h2 class="sectionedit5" id="units">Units</h2>
+<div class="level2">
+<p>
+The unit names in <code>annotations/tables.json</code> and in the source comments:
+</p>
+<div class="table sectionedit6"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Unit </th><th class="col1"> Conversion </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> rpm32 </td><td class="col1"> rpm = x * 32 </td>
+</tr>
+<tr class="row2">
+<td class="col0"> rpm8 </td><td class="col1"> rpm = x * 8 </td>
+</tr>
+<tr class="row3">
+<td class="col0"> kpa </td><td class="col1"> kPa = x / 2.428 (2GNT: torr = x / 0.3237) </td>
+</tr>
+<tr class="row4">
+<td class="col0"> spark </td><td class="col1"> degrees BTDC = x / 2 </td>
+</tr>
+<tr class="row5">
+<td class="col0"> tempc </td><td class="col1"> deg C = x - 128 (deg F = (x - 128) * 1.8 + 32) </td>
+</tr>
+<tr class="row6">
+<td class="col0"> tempdiff </td><td class="col1"> deg C = x, a difference of two temperatures </td>
+</tr>
+<tr class="row7">
+<td class="col0"> sparks </td><td class="col1"> degrees BTDC = x / 2, x signed (compared with signed branches) </td>
+</tr>
+<tr class="row8">
+<td class="col0"> volt16 </td><td class="col1"> volts = x / 16.19 </td>
+</tr>
+<tr class="row9">
+<td class="col0"> volt51 </td><td class="col1"> volts = x / 51 </td>
+</tr>
+<tr class="row10">
+<td class="col0"> pwus32 </td><td class="col1"> microseconds = x * 32 </td>
+</tr>
+<tr class="row11">
+<td class="col0"> mult256 </td><td class="col1"> factor = x / 256 </td>
+</tr>
+<tr class="row12">
+<td class="col0"> pos256 </td><td class="col1"> position 0-255 over the rows of a 3D table </td>
+</tr>
+<tr class="row13">
+<td class="col0"> fuelcorr </td><td class="col1"> fuel factor = 1 + x / 256, x signed: -128 gives 0.5, +127 gives 1.496 </td>
+</tr>
+</table></div>
+<p>
+These are the same as in the 1995 FCC controller and as on the 2GNT pages.
+</p>
+</div>
+<h2 class="sectionedit7" id="known_tables_and_constants">Known tables and constants</h2>
+<div class="level2">
+<div class="table sectionedit8"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Address </th><th class="col1"> Name </th><th class="col2"> Content </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> $08F8 </td><td class="col1"> PartThrottleMapScale </td><td class="col2"> MAP to row position, part throttle (spark and fuel) </td>
+</tr>
+<tr class="row2">
+<td class="col0"> $0904 </td><td class="col1"> WotMapScale </td><td class="col2"> MAP to row position, WOT (spark and fuel) </td>
+</tr>
+<tr class="row3">
+<td class="col0"> $1BFA </td><td class="col1"> PartThrottleSpark </td><td class="col2"> 17 x 17, rpm x MAP, spark </td>
+</tr>
+<tr class="row4">
+<td class="col0"> $1FAF </td><td class="col1"> WotSpark </td><td class="col2"> 9 x 17, signed </td>
+</tr>
+<tr class="row5">
+<td class="col0"> $0BF6 </td><td class="col1"> PartThrottleFuel </td><td class="col2"> 17 x 17, signed, fuel correction </td>
+</tr>
+<tr class="row6">
+<td class="col0"> $0F6C </td><td class="col1"> WotFuel </td><td class="col2"> 9 x 17, signed, fuel correction </td>
+</tr>
+<tr class="row7">
+<td class="col0"> $0B92, $0B93 </td><td class="col1"> PartThrottleFuelK, PartThrottleFuelMapOffset </td><td class="col2"> base pulse width constants, part throttle </td>
+</tr>
+<tr class="row8">
+<td class="col0"> $0B94, $0B95 </td><td class="col1"> WotFuelK, WotFuelMapOffset </td><td class="col2"> the same for WOT </td>
+</tr>
+<tr class="row9">
+<td class="col0"> $0B76 </td><td class="col1"> InjectorDeadTime </td><td class="col2"> battery voltage to dead time </td>
+</tr>
+<tr class="row10">
+<td class="col0"> $0B9E </td><td class="col1"> ReturnlessFuelScale </td><td class="col2"> fuel multiplier of the returnless fuel system </td>
+</tr>
+<tr class="row11">
+<td class="col0"> $24AB </td><td class="col1"> KnockThreshold </td><td class="col2"> knock sensor threshold against rpm </td>
+</tr>
+<tr class="row12">
+<td class="col0"> $2684 </td><td class="col1"> IdleTargetRpm </td><td class="col2"> target idle speed against coolant temperature </td>
+</tr>
+<tr class="row13">
+<td class="col0"> $19DC, $19DE </td><td class="col1"> RevLimit, RevLimitAlt </td><td class="col2"> two rev limits (6,048 and 7,008 rpm), chosen by <code>DriveFlags</code> ($0C31,Z) bit 5 </td>
+</tr>
+<tr class="row14">
+<td class="col0"> $19E1, $19E3 </td><td class="col1"> SpeedLimit, SpeedLimitMinRpm </td><td class="col2"> speed limiter, enabled by calibration bit $0337.5 </td>
+</tr>
+<tr class="row15">
+<td class="col0"> $4052 </td><td class="col1"> FaultTable </td><td class="col2"> 256 fault rows </td>
+</tr>
+</table></div>
+<p>
+All of these were checked against the code: each is read where 2GNT says, with the format above. One
+correction: 2GNT shows the rev limit as two cells starting at $19DB (resume and limit), but $19DB
+holds $FF and is never read; the code compares rpm with $19DC or with $19DE.
+The 2GNT page calls the fuel tables “msec”; the code shows that they are corrections applied to a
+pulse width computed from MAP (next section).
+</p>
+</div>
+<h2 class="sectionedit9" id="table_names_410_tables">Table names (410 tables)</h2>
+<div class="level2">
+<p>
+All 410 tables of the reference image are named by hand from the code (and checked against 2GNT
+where it has them). The name says what the table does; the description in
+<code>annotations/tables.json</code> (and in the catalogue and the XDF) says which routine reads it, its inputs
+and where the result goes. Where the meaning of a RAM variable is still open, the name keeps its
+address (<code>FlexLearnLimitPurgeTrim</code>), and readings that rest only on how the code uses a value say
+“probably”.
+</p>
+<div class="table sectionedit10"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Category </th><th class="col1"> Tables </th><th class="col2"> Main prefixes </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> Fuel </td><td class="col1"> 115 </td><td class="col2"> <code>Fuel</code>, <code>PartThrottleFuel</code>, <code>AccelFuel</code>, <code>AfterStartFuel</code>, <code>CrankFuel</code>, <code>FuelCut</code>, <code>Flex</code>, <code>FlexLearn</code> </td>
+</tr>
+<tr class="row2">
+<td class="col0"> Idle </td><td class="col1"> 92 </td><td class="col2"> <code>IdleTarget</code>, <code>Idle</code>, <code>Iac</code>, <code>IdleMap</code>, <code>ShiftIdle</code>, <code>ThrottleClose</code> </td>
+</tr>
+<tr class="row3">
+<td class="col0"> Spark </td><td class="col1"> 78 </td><td class="col2"> <code>Spark</code>, <code>Surge</code>, <code>TipInRetard</code>, <code>SpeedDamp</code>, <code>AcSpark</code>, <code>EgrSpark</code>, <code>Dwell</code> </td>
+</tr>
+<tr class="row4">
+<td class="col0"> Diagnostics </td><td class="col1"> 36 </td><td class="col2"> <code>Misfire</code>, <code>ExpectedMap</code>, <code>LimpRpm</code>, <code>FuelSys</code>, <code>Diag</code> </td>
+</tr>
+<tr class="row5">
+<td class="col0"> Sensors </td><td class="col1"> 20 </td><td class="col2"> sensor curves, <code>BattTemp</code>, <code>ChargeVolts</code>, <code>MapHigh</code>, <code>BaroUpdate</code> </td>
+</tr>
+<tr class="row6">
+<td class="col0"> EVAP purge </td><td class="col1"> 15 </td><td class="col2"> <code>Purge</code> (probable) </td>
+</tr>
+<tr class="row7">
+<td class="col0"> Knock </td><td class="col1"> 11 </td><td class="col2"> <code>Knock</code> </td>
+</tr>
+<tr class="row8">
+<td class="col0"> Speed control </td><td class="col1"> 11 </td><td class="col2"> <code>SpeedCtl</code> (probable) </td>
+</tr>
+<tr class="row9">
+<td class="col0"> EGR </td><td class="col1"> 8 </td><td class="col2"> <code>Egr</code> </td>
+</tr>
+<tr class="row10">
+<td class="col0"> Closed loop </td><td class="col1"> 7 </td><td class="col2"> <code>O2</code> </td>
+</tr>
+<tr class="row11">
+<td class="col0"> Cooling fan </td><td class="col1"> 6 </td><td class="col2"> <code>Fan</code> </td>
+</tr>
+<tr class="row12">
+<td class="col0"> A/C </td><td class="col1"> 4 </td><td class="col2"> <code>AcThrottle</code> </td>
+</tr>
+<tr class="row13">
+<td class="col0"> Other </td><td class="col1"> 4 </td><td class="col2"> <code>FieldRampFactor</code>, <code>RpmFilterAboveIdle</code>, <code>EventTimingLimit</code>, … </td>
+</tr>
+<tr class="row14">
+<td class="col0"> Startup </td><td class="col1"> 3 </td><td class="col2"> <code>ResetCoolant</code> </td>
+</tr>
+</table></div>
+<p>
+<code>tools/autoname.py</code> merges the hand names (<code>python3 tools/autoname.py hand.json</code>) and still gives a
+<strong>structural name</strong> to any table found later without a hand name: the subsystem prefix (taken from
+the routine that reads the table and the scheduled routine above it), then the inputs (<code>Coolant</code>,
+<code>Rpm</code>, <code>Map</code>, <code>V0A91</code> for an unnamed RAM variable, …) and a number when the name repeats. Such
+entries are marked <code>“auto”: true</code> and get a * in the catalogue.
+</p>
+</div>
+<h2 class="sectionedit11" id="idle_and_spark_control">Idle and spark control</h2>
+<div class="level2">
+<p>
+The idle air valve is driven by several routines that all end in the step routine <code>IacSetTarget</code>:
+</p>
+<div class="table sectionedit12"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Routine </th><th class="col1"> What it does </th><th class="col2"> Tables </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>IdleRpmTarget</code> </td><td class="col1"> idle target (<code>IdleTarget</code> ($0300,Z)): coolant table (P/N variant), additions for an rpm dip in gear, hot intake air, and a ramped target against battery temperature and run time </td><td class="col2"> <code>IdleTargetRpm//</code>, <code>IdleTargetDip//</code>, <code>IdleTargetHotAirAdder</code>, <code>IdleBattTemp*</code> </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>IdleRpmLoop</code> </td><td class="col1"> closed loop on rpm: error term (coarse/fine, P/N), rate filter, deadband from MAP and coolant, integrator that takes opening or closing IAC steps </td><td class="col2"> <code>IdleErrorTerm//</code>, <code>IdleRateFilterCoolant</code>, <code>IdleDeadband//</code>, <code>IdleStep*</code> </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>IdleMapTargetCalc</code> </td><td class="col1"> closed loop on MAP: idle MAP target ($031E,Z) from base, time, coolant, rpm and baro, then IAC steps against the MAP error </td><td class="col2"> <code>IdleMap//</code>, <code>IacMap//Step*</code> </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>IacBaseCalc</code> </td><td class="col1"> base IAC position against baro and idle target, coasting target, generator field duty, A/C engagement </td><td class="col2"> <code>IacBase//</code>, <code>IacCoast//</code>, <code>IacFieldDuty*</code>, <code>IacAcEngageAdder</code> </td>
+</tr>
+<tr class="row5">
+<td class="col0"> <code>IdleTargetControl</code>, <code>GearStateUpdate</code> </td><td class="col1"> events: gear change (delay, duration, step; A/C and P/N variants), rpm droop and dip kicks, A/C clutch kick, rolling target </td><td class="col2"> <code>IacGear//</code>, <code>IacDroop//</code>, <code>IacDipKick//</code>, <code>IacAcKick//</code>, <code>IacRoll//</code>, <code>ShiftIdle//</code> </td>
+</tr>
+<tr class="row6">
+<td class="col0"> <code>IacChargeStepCalc</code> </td><td class="col1"> extra air when the battery voltage stays below the charging target </td><td class="col2"> <code>IacChargeStep</code> </td>
+</tr>
+<tr class="row7">
+<td class="col0"> <code>IacCrankControl</code> </td><td class="col1"> IAC position while cranking and in start mode </td><td class="col2"> <code>IacCrankCoolant</code>, <code>IacRunUpCoolant</code> </td>
+</tr>
+</table></div>
+<p>
+Spark corrections besides the base tables:
+</p>
+<div class="table sectionedit13"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Routine </th><th class="col1"> What it does </th><th class="col2"> Tables </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>SurgeControl</code>, <code>SurgeFilters</code> </td><td class="col1"> driveline surge: a staged retard from rpm acceleration and jerk (band-passed segment rpm), weighted by gear (rpm/speed ratio), MAP rise and coolant </td><td class="col2"> <code>Surge*</code> </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>TipInSparkControl</code> </td><td class="col1"> tip-in retard near idle against throttle rise and air temperature </td><td class="col2"> <code>TipInRetard*</code> </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>SpeedDampControl</code> </td><td class="col1"> low-speed surge damping: P, D and I terms on the deviation of rpm from an expected rpm for the vehicle speed </td><td class="col2"> <code>SpeedRpmRef//</code>, <code>SpeedDamp//</code> </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>IdleSparkCalc</code> </td><td class="col1"> idle spark against the idle rpm error </td><td class="col2"> <code>IdleSpark*</code> </td>
+</tr>
+<tr class="row5">
+<td class="col0"> <code>AcSparkRate</code>, <code>AcClutchSpark</code> </td><td class="col1"> spark compensation around A/C clutch engagement </td><td class="col2"> <code>AcEngageSpark//</code>, <code>AcClutchSpark//</code>, <code>AcSpark*</code> </td>
+</tr>
+<tr class="row6">
+<td class="col0"> <code>O2SparkTrimCalc</code> </td><td class="col1"> spark change against the short-term fuel trim deviation </td><td class="col2"> <code>O2SparkTrim*</code> </td>
+</tr>
+<tr class="row7">
+<td class="col0"> <code>EgrSparkCalc</code> </td><td class="col1"> addition with EGR active (17×17) </td><td class="col2"> <code>EgrSpark</code> </td>
+</tr>
+<tr class="row8">
+<td class="col0"> <code>DwellLookup</code> </td><td class="col1"> coil dwell against battery voltage </td><td class="col2"> <code>DwellBattery*</code> </td>
+</tr>
+</table></div>
+<p>
+Knock control learns a noise level per rpm band (<code>KnockNoise*</code>), runs above a MAP threshold
+(<code>KnockMapThreshold//</code>) and limits the retard by rpm and MAP (<code>KnockRetardMax//</code>, <code>KnockRetardLimit</code>).
+</p>
+<p>
+Several of these readings rest on how the code uses a variable rather than on a document: the
+battery temperature (<code>BatteryTemp</code> ($0A5A,Z), used for the charging target), the generator field duty (<code>FieldDuty</code> ($032E,Z),
+a duty count of CS2 input $106E bit 5) and the A/C sensor (<code>AcSensor</code> ($0A88,Z), probably A/C
+pressure) are inferred this way.
+</p>
+</div>
+<h2 class="sectionedit14" id="constants_and_option_bits">Constants and option bits</h2>
+<div class="level2">
+<p>
+<code>tools/constants.py</code> finds every byte or word the code reads directly with extended addressing and
+that is not part of a table: 1,449 of them in 05293190AC (1,264 bytes, 181 words, 4 longs; two more,
+the row counts after <code>FaultStatusMap</code>, are named by hand because the code reaches them through X), among
+them 21 option bytes tested with <code>BRSET</code>/<code>BRCLR</code> (120 bits used). They are kept with the tables in
+the <code>scalars</code> of <code>annotations/tables.json</code>, so the sources show <code>CMPA &gt;IdleCoolantMin</code> instead of
+<code>CMPA $2853</code>, the catalogue lists them with value and physical value, the XDF has them as constants
+(and every option bit as a flag), and the port carries them to the other images (from 239 in family
+A to 1,404 in family E).
+</p>
+<p>
+All 120 used option bits are described in <code>annotations/bits.json</code>. The polarity was read from the
+code: most bits switch a function on (<code>BRCLR</code> skips it when the bit is clear), a few switch it off
+(for example $033A.7 skips the idle flare check, $0328.0 the SKIM handling). Bits that only pick one
+of two code paths without a clear purpose are described as “selects a branch in …”. Settled ones
+include $032C.7 closed loop off, $032C.6 flex fuel, $032E.6 manual transmission, $032E.2 PCI bus
+instead of CCD, $032F.7-4 the O2 sensors fitted (upstream 1 and 2, downstream 1 and 2) and
+$033F.7-4 the matching heater monitors. The XDF puts the text in the description of each flag.
+</p>
+<p>
+For each constant the script looks at how it is used: what the register held before the compare,
+add or subtract (<code>LDAA &gt;CoolantTemp,Z</code> then <code>CMPA $2853</code>), or what a loaded value is compared with
+or stored into. That gives the unit (temperature, rpm, kPa, volts) and a structural name: the
+prefix of the tables of the same routine or the subsystem, the variable, and the role (<code>Thresh</code> for
+a compare, <code>Adder</code>, <code>Offset</code>, <code>Factor</code>, <code>Init</code> for a value stored into RAM, <code>Value</code> otherwise),
+numbered when repeated. All 1,451 constants now have hand names from the code that reads them;
+where the purpose is not certain the description says “probably”. The structural name and the *
+in the catalogue remain only for constants found in a new image and not yet named. Word rpm values use the unit <code>rpmw</code> (rpm = x / 8).
+</p>
+<p>
+The option bytes at $0328-$0340 are global configuration. The bits identified so far, with their
+state in 05293190AC:
+</p>
+<div class="table sectionedit15"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Byte </th><th class="col1"> Bit </th><th class="col2"> Name </th><th class="col3"> Set </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> $032B </td><td class="col1"> $20 </td><td class="col2"> <code>SparkCalcHookOn</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row2">
+<td class="col0"> $032B </td><td class="col1"> $40 </td><td class="col2"> <code>DwellBatteryOn</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row3">
+<td class="col0"> $032C </td><td class="col1"> $40 </td><td class="col2"> <code>FlexFuelOn</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row4">
+<td class="col0"> $032D </td><td class="col1"> $20 </td><td class="col2"> <code>AcClutchLogicOn</code> </td><td class="col3"> 1 </td>
+</tr>
+<tr class="row5">
+<td class="col0"> $032E </td><td class="col1"> $40 </td><td class="col2"> <code>ManualTransmission</code> </td><td class="col3"> 1 </td>
+</tr>
+<tr class="row6">
+<td class="col0"> $0330 </td><td class="col1"> $01 </td><td class="col2"> <code>BattTempModelOn</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row7">
+<td class="col0"> $0330 </td><td class="col1"> $04 </td><td class="col2"> <code>BattTempCurveAlt</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row8">
+<td class="col0"> $0330 </td><td class="col1"> $20 </td><td class="col2"> <code>TipInAirTempCheck</code> </td><td class="col3"> 1 </td>
+</tr>
+<tr class="row9">
+<td class="col0"> $0331 </td><td class="col1"> $80 </td><td class="col2"> <code>AcPressureSensor</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row10">
+<td class="col0"> $0335 </td><td class="col1"> $04 </td><td class="col2"> <code>EgrSparkScaled</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row11">
+<td class="col0"> $0337 </td><td class="col1"> $01 </td><td class="col2"> <code>IdleDipKickMode</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row12">
+<td class="col0"> $0337 </td><td class="col1"> $10 </td><td class="col2"> <code>SurgeSparkOn</code> </td><td class="col3"> 1 </td>
+</tr>
+<tr class="row13">
+<td class="col0"> $0337 </td><td class="col1"> $20 </td><td class="col2"> <code>SpeedLimitOn</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row14">
+<td class="col0"> $0337 </td><td class="col1"> $40 </td><td class="col2"> <code>SpeedDampOn</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row15">
+<td class="col0"> $0337 </td><td class="col1"> $80 </td><td class="col2"> <code>EventSparkOn</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row16">
+<td class="col0"> $0338 </td><td class="col1"> $02 </td><td class="col2"> <code>FieldControlAlt</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row17">
+<td class="col0"> $0338 </td><td class="col1"> $04 </td><td class="col2"> <code>FuelEventOffsetAlt</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row18">
+<td class="col0"> $0339 </td><td class="col1"> $01 </td><td class="col2"> <code>TipInRetardHold</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row19">
+<td class="col0"> $0339 </td><td class="col1"> $04 </td><td class="col2"> <code>PurgeDutyAltClosed</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row20">
+<td class="col0"> $0339 </td><td class="col1"> $08 </td><td class="col2"> <code>PurgeDutyAltOther</code> </td><td class="col3"> 1 </td>
+</tr>
+<tr class="row21">
+<td class="col0"> $033A </td><td class="col1"> $10 </td><td class="col2"> <code>AcSparkOn</code> </td><td class="col3"> 0 </td>
+</tr>
+<tr class="row22">
+<td class="col0"> $033D </td><td class="col1"> $08 </td><td class="col2"> <code>IacCoastOff</code> </td><td class="col3"> 0 </td>
+</tr>
+</table></div>
+<p>
+<code>ManualTransmission</code> set means the P/N switch is ignored (the idle and spark P/N variants are never
+used), which fits the manual 05293190AC.
+</p>
+</div>
+<h2 class="sectionedit16" id="fuel_pulse_width">Fuel pulse width</h2>
+<div class="level2">
+<p>
+<code>CalcFuelPulse</code> ($11F40) runs from the input-capture 1 interrupt, that is on every reference
+event:
+</p>
+<ol>
+<li class="level1"><div class="li"> Part throttle or WOT is chosen by <code>FuelModeFlags</code> ($0771,Z) bit 5; this selects the constants, the scale table</div>
+</li>
+</ol>
+<p>
+and the fuel table.
+</p>
+<ol>
+<li class="level1"><div class="li"> Base pulse width = (Map - MapOffset) x (256 + K) / 16, or zero if MAP is below the offset. With</div>
+</li>
+</ol>
+<p>
+calibration bit $0337.2 set, MAP is first raised to the lowest point of the part-throttle scale.
+</p>
+<ol>
+<li class="level1"><div class="li"> The fuel table gives a signed value v (rows by MAP through the scale table, columns by</div>
+</li>
+</ol>
+<p>
+<code>EngineRpm</code>, whose high byte is rpm / 32); the base is multiplied by 1 + v / 256.
+</p>
+<ol>
+<li class="level1"><div class="li"> <code>BaroFuelAdder</code> ($080E,Z) is added and the result is stored in <code>FuelPulse</code> ($07E2,Z) and <code>Temp4F6</code> ($04F6,Z).</div>
+</li>
+</ol>
+<p>
+So the fuel tables work like a volumetric-efficiency correction on a linear MAP model, with the
+two constants setting the slope and the zero point. Dead time, temperature and other corrections
+are applied elsewhere (stage 5).
+</p>
+<p>
+<code>InjectorDeadTime</code> is looked up with <code>BatteryVolts2</code> ($0A51,Z) as input. 2GNT lists a fix that changes this to
+<code>BatteryVolts</code> ($0A50,Z) (<code>BatteryVolts</code>); who writes $0A51 has not been checked yet.
+</p>
+</div>
+<h2 class="sectionedit17" id="fuel_corrections">Fuel corrections</h2>
+<div class="level2">
+<p>
+Besides the base pulse, the code builds these corrections (names as in the source):
+</p>
+<div class="table sectionedit18"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Part </th><th class="col1"> Routine </th><th class="col2"> Tables </th><th class="col3"> Result </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> Warm-up enrichment </td><td class="col1"> <code>WarmupFuel</code> </td><td class="col2"> <code>WarmupMapCoolant</code> (MAP x coolant), <code>WarmupMapCoolantLowSpeed</code> (below a vehicle speed), <code>WarmupRpmCoolantIdle</code> (throttle closed), <code>WarmupCoolantAdder</code> (WOT), factors for baro, run time and rpm </td><td class="col3"> <code>WarmupFuelFactor</code> ($07E4,Z) </td>
+</tr>
+<tr class="row2">
+<td class="col0"> After-start decay </td><td class="col1"> <code>WarmupFuel</code> </td><td class="col2"> <code>AfterStartTimeScale</code>, <code>AfterStartDecay</code> (time since start x cranking coolant) </td><td class="col3"> part of the warm-up factor </td>
+</tr>
+<tr class="row3">
+<td class="col0"> Cold-soak </td><td class="col1"> <code>WarmupFuel</code> </td><td class="col2"> <code>ColdSoakMapCoolant</code>, used when the coolant at start is close to <code>BatteryTempStart</code> ($0A5E,Z) </td><td class="col3"> <code>ColdSoakMap</code> ($07E7,Z) </td>
+</tr>
+<tr class="row4">
+<td class="col0"> Cranking </td><td class="col1"> <code>CrankFuel</code> </td><td class="col2"> <code>CrankBasePulse</code> (ethanol x cranking coolant), reductions against rpm, <code>CrankDecayIndex</code> ($0769,Z) and baro, each weighted by coolant; <code>CrankVacuumFactor</code> </td><td class="col3"> <code>CrankPulse</code> ($0766,Z) </td>
+</tr>
+<tr class="row5">
+<td class="col0"> Throttle tip-in </td><td class="col1"> <code>TipInFuelControl</code> </td><td class="col2"> <code>TipInMatrix</code> (9 x 9, rows by throttle opening, columns by throttle step), coolant, air temperature and baro factors </td><td class="col3"> <code>TipInFuel</code> ($07C6,Z) </td>
+</tr>
+<tr class="row6">
+<td class="col0"> MAP-rate and throttle-rate enrichment </td><td class="col1"> <code>AccelEnrichFactors</code> </td><td class="col2"> <code>AccelMapGainCoolant</code>, <code>AccelTpsRateLimit</code>, <code>AccelTpsCoolantFactor</code>, baro terms, <code>AccelRpmFactor</code> </td><td class="col3"> <code>AccelMapGain</code>, <code>AccelTpsFuel</code>, <code>AccelFactor</code> </td>
+</tr>
+<tr class="row7">
+<td class="col0"> Deceleration enleanment </td><td class="col1"> <code>DecelLeanControl</code> </td><td class="col2"> <code>DecelLeanAirflow</code> (rpm x throttle), coolant, time, rpm, MAP and baro factors </td><td class="col3"> <code>DecelLeanFuel</code> ($07C2,Z) </td>
+</tr>
+<tr class="row8">
+<td class="col0"> Deceleration fuel cut-off </td><td class="col1"> <code>FuelCutControl</code> </td><td class="col2"> <code>DecelCutMapThreshold</code>, <code>DecelCutDelay</code>, minimum rpm against coolant; rev and speed limits </td><td class="col3"> <code>FuelModeFlags2</code> ($0770,Z) flags, <code>DecelCutRpmFactor</code> </td>
+</tr>
+<tr class="row9">
+<td class="col0"> Deceleration fuel reduction </td><td class="col1"> <code>DecelFuelRampControl</code> </td><td class="col2"> <code>DecelMapRpmLimit</code> (MAP x rpm) </td><td class="col3"> <code>DecelFuelFactor</code> ($077A,Z) </td>
+</tr>
+<tr class="row10">
+<td class="col0"> WOT enrichment over time </td><td class="col1"> <code>WotEnrichControl</code> </td><td class="col2"> <code>WotTimeEnrichMax</code> </td><td class="col3"> <code>WotTimeEnrich</code> ($07AA,Z) </td>
+</tr>
+<tr class="row11">
+<td class="col0"> Idle enrichment </td><td class="col1"> <code>IdleEnrichment</code> </td><td class="col2"> run time, ethanol x start air temperature, engine-off time </td><td class="col3"> <code>IdleEnrichFactor</code> ($07DA,Z) </td>
+</tr>
+<tr class="row12">
+<td class="col0"> Hot-engine enrichment </td><td class="col1"> <code>HotEngineEnrichCalc</code> </td><td class="col2"> <code>HotEngineEnrich</code> </td><td class="col3"> <code>HotEnrich</code> ($0811,Z) </td>
+</tr>
+<tr class="row13">
+<td class="col0"> Air temperature </td><td class="col1"> <code>FuelCorrections</code> </td><td class="col2"> <code>FuelAirTempCorr</code> with rpm and MAP weights </td><td class="col3"> multiplies the fuel </td>
+</tr>
+<tr class="row14">
+<td class="col0"> MAP and throttle filters </td><td class="col1"> <code>MapTpsFilters</code> </td><td class="col2"> filter coefficients for rising and falling MAP and throttle against start coolant </td><td class="col3"> <code>MapFilterCoef</code>, <code>TpsFilterCoef</code> </td>
+</tr>
+</table></div>
+<p>
+<strong>Flex fuel.</strong> The program supports flexible-fuel vehicles: <code>FlexSensorCheck</code> checks the fuel composition
+sensor (<code>FlexSensorRaw</code>, $0A8E,Z) and the flex-fuel learning code (<code>FlexLearn…</code>, around
+<code>FlexLearnMain</code>) learns the ethanol content from the oxygen-sensor trims (<code>FlexEthanolLearned</code> $0197,Z,
+0-170, and <code>FlexEthanol</code> $0198,Z). The ethanol content then selects rows in the <code>Flex…</code> fuel and
+spark tables and in the cranking table. Calibration bit $032C.6 enables it; in 05293190AC (a
+gasoline car) the flex tables are neutral.
+</p>
+</div>
+<h2 class="sectionedit19" id="fault_monitors">Fault monitors</h2>
+<div class="level2">
+<p>
+Monitors report through two routines: <code>ReportFault</code> ($245CC) counts a failed test and sets the
+fault bit, <code>ReportPass</code> ($24160) counts a passed one and clears it; both take in Y the row of
+<code>FaultTable</code>. Following <code>LDY #row</code> before these calls gives the code each routine reports
+(<code>tools/constants.py</code> adds it to the descriptions of the constants the routine reads):
+</p>
+<div class="table sectionedit20"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Routine </th><th class="col1"> Codes </th><th class="col2"> Test </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> <code>Reset</code> </td><td class="col1"> P1602 </td><td class="col2"> PCM not programmed </td>
+</tr>
+<tr class="row2">
+<td class="col0"> <code>BusTimeoutCheck</code> </td><td class="col1"> P1687, P1695 </td><td class="col2"> no cluster / body bus messages </td>
+</tr>
+<tr class="row3">
+<td class="col0"> <code>ChecksumCheck</code> </td><td class="col1"> P0601 </td><td class="col2"> checksum </td>
+</tr>
+<tr class="row4">
+<td class="col0"> <code>VacuumLeakMonitor</code> </td><td class="col1"> P1299 </td><td class="col2"> vacuum leak (expected MAP against throttle and rpm) </td>
+</tr>
+<tr class="row5">
+<td class="col0"> <code>MapKeyOnCheck, MapCircuitCheck</code> </td><td class="col1"> P0106, P0107, P0108 </td><td class="col2"> MAP rationality, low, high </td>
+</tr>
+<tr class="row6">
+<td class="col0"> <code>O2ShortHighCheck</code> </td><td class="col1"> P0132, P0152 </td><td class="col2"> upstream O2 high, banks 1 and 2 </td>
+</tr>
+<tr class="row7">
+<td class="col0"> <code>PurgeSolenoidCheck</code> </td><td class="col1"> P0443 </td><td class="col2"> purge solenoid circuit </td>
+</tr>
+<tr class="row8">
+<td class="col0"> <code>EgrPositionMonitor, EgrSolenoidCheck</code> </td><td class="col1"> P0405, P0406, P0403 </td><td class="col2"> EGR position sensor low and high, EGR solenoid circuit </td>
+</tr>
+<tr class="row9">
+<td class="col0"> <code>WotLeanMonitor</code> </td><td class="col1"> P1298 </td><td class="col2"> lean at WOT </td>
+</tr>
+<tr class="row10">
+<td class="col0"> <code>FlexFaultReport</code> </td><td class="col1"> P1496 </td><td class="col2"> 5 V supply low </td>
+</tr>
+<tr class="row11">
+<td class="col0"> <code>TransMilRequest</code> </td><td class="col1"> P0700 </td><td class="col2"> transmission control </td>
+</tr>
+<tr class="row12">
+<td class="col0"> <code>TccMonitor</code> </td><td class="col1"> P0740 </td><td class="col2"> torque converter clutch (rpm/speed ratio does not drop at lock-up) </td>
+</tr>
+<tr class="row13">
+<td class="col0"> <code>O2DownCircuitCheck</code> </td><td class="col1"> P0137, P0138, P0157, P0158 </td><td class="col2"> downstream O2 low/high, banks 1 and 2 </td>
+</tr>
+<tr class="row14">
+<td class="col0"> <code>FuelSenderMonitor</code> </td><td class="col1"> P0460, P0462, P0463 </td><td class="col2"> fuel level sender stuck, low, high (analog $0A92) </td>
+</tr>
+<tr class="row15">
+<td class="col0"> <code>BrakeSwitchMonitor</code> </td><td class="col1"> P0703 </td><td class="col2"> brake switch performance </td>
+</tr>
+<tr class="row16">
+<td class="col0"> <code>PnSwitchMonitor</code> </td><td class="col1"> P1899 </td><td class="col2"> P/N switch stuck </td>
+</tr>
+<tr class="row17">
+<td class="col0"> <code>O2NoActivityCold, O2ActivityWarm</code> </td><td class="col1"> P0134, P0154, P0140, P0160 </td><td class="col2"> O2 sensors inactive (cold-start soak check and heater-switched check when warm) </td>
+</tr>
+<tr class="row18">
+<td class="col0"> <code>PspSwitchMonitor</code> </td><td class="col1"> P0551 </td><td class="col2"> power steering pressure switch </td>
+</tr>
+<tr class="row19">
+<td class="col0"> <code>MapIdleChangeCheck</code> </td><td class="col1"> P1297 </td><td class="col2"> no MAP change between start and idle </td>
+</tr>
+<tr class="row20">
+<td class="col0"> <code>TpsMapRationality, ProcessThrottle</code> </td><td class="col1"> P0121, P0122, P0123 </td><td class="col2"> throttle sensor rationality, low, high </td>
+</tr>
+<tr class="row21">
+<td class="col0"> <code>VssMonitor</code> </td><td class="col1"> P0500 </td><td class="col2"> vehicle speed sensor (load without speed) </td>
+</tr>
+<tr class="row22">
+<td class="col0"> <code>CamSensorMonitor, CamCrankSyncMonitor</code> </td><td class="col1"> P0340, P1391 </td><td class="col2"> cam sensor, intermittent cam/crank </td>
+</tr>
+<tr class="row23">
+<td class="col0"> <code>CamCrankRelation, CamCrankMeasure</code> </td><td class="col1"> P1390 </td><td class="col2"> cam/crank relation (timing belt skipped) </td>
+</tr>
+<tr class="row24">
+<td class="col0"> <code>LdpSolenoidCheck</code> </td><td class="col1"> P1495 </td><td class="col2"> leak detection pump solenoid </td>
+</tr>
+<tr class="row25">
+<td class="col0"> <code>ProcessCoolantTemp, ProcessAirTemp</code> </td><td class="col1"> P0117, P0118, P0112, P0113 </td><td class="col2"> coolant and air temperature sensors low/high </td>
+</tr>
+<tr class="row26">
+<td class="col0"> <code>BatteryTempSensorCheck</code> </td><td class="col1"> P1492, P1493 </td><td class="col2"> battery temperature sensor high/low </td>
+</tr>
+<tr class="row27">
+<td class="col0"> <code>FlexSensorCheck</code> </td><td class="col1"> P0176, P0178, P0179 </td><td class="col2"> fuel composition sensor </td>
+</tr>
+<tr class="row28">
+<td class="col0"> <code>SriMileageStore, EepromWriteService</code> </td><td class="col1"> P1697, P1696 </td><td class="col2"> SRI mileage not stored, EEPROM write denied </td>
+</tr>
+<tr class="row29">
+<td class="col0"> <code>CatTempMonitor</code> </td><td class="col1"> P1482, P1483, P1484 </td><td class="col2"> catalyst temperature sensor low/high, catalyst overheat (input $0A8E, shared with the flex sensor) </td>
+</tr>
+<tr class="row30">
+<td class="col0"> <code>MtvCheck</code> </td><td class="col1"> P1289 </td><td class="col2"> manifold tune valve </td>
+</tr>
+<tr class="row31">
+<td class="col0"> <code>CcdReceive, PciReceive</code> </td><td class="col1"> P1685 </td><td class="col2"> SKIM invalid key </td>
+</tr>
+</table></div>
+<p>
+Misfire, catalyst, O2-sensor, EVAP-leak and purge-flow monitors report through their own state
+machines; their constants are named after the monitor (<code>Misfire…</code>, <code>CatMon…</code>, <code>O2Mon…</code>,
+<code>Ldp…</code>, <code>PurgeMon…</code>).
+</p>
+<p>
+The P0176 test of <code>FlexSensorCheck</code> changes one earlier reading: <code>FlexSensorRaw</code> ($0A8E,Z), read as the fuel level,
+is the fuel composition sensor input (now <code>FlexSensorRaw</code>), and the P1697 test shows that the
+word at <code>SriMileage</code> ($000D,Z) is the SRI (service reminder) mileage (<code>SriMileage</code>).
+</p>
+</div>
+<h2 class="sectionedit21" id="fault_table">Fault table</h2>
+<div class="level2">
+<p>
+<code>FaultTable</code> ($4052) has 256 rows of 10 bytes:
+</p>
+<div class="table sectionedit22"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0"> Byte </th><th class="col1"> Content </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"> 0 </td><td class="col1"> row number </td>
+</tr>
+<tr class="row2">
+<td class="col0"> 1 </td><td class="col1"> trigger count </td>
+</tr>
+<tr class="row3">
+<td class="col0"> 2 </td><td class="col1"> blink code (BCD, as flashed by the check-engine lamp) </td>
+</tr>
+<tr class="row4">
+<td class="col0"> 3 </td><td class="col1"> attribute bits </td>
+</tr>
+<tr class="row5">
+<td class="col0"> 4, 5 </td><td class="col1"> mask and byte offset of the fault bit in the fault bit array </td>
+</tr>
+<tr class="row6">
+<td class="col0"> 6, 7 </td><td class="col1"> P-code (BCD): $03 $40 = P0340 </td>
+</tr>
+<tr class="row7">
+<td class="col0"> 8, 9 </td><td class="col1"> unused (zero) </td>
+</tr>
+</table></div>
+<p>
+83 rows carry a P-code; the list is in the catalogue. Codes for cylinders 5 and 6 (P0205, P0206,
+P0355) are present, so the program also covers six-cylinder engines.
+</p>
+</div>
+<h2 class="sectionedit23" id="obd_monitor_table_and_condition_lists">OBD monitor table and condition lists</h2>
+<div class="level2">
+<p>
+<code>ObdMonitorTable</code> ($20000, in the code area) has 16 rows of 20 bytes, one per OBD monitor, read by
+<code>ObdMonitorMain</code>: the record offset, the monitor status byte (<code>MonStatus*</code>), the run period (low
+six bits of byte 5, tested against <code>MainLoopCounter</code>), the fault table row of the monitor's P-code,
+the addresses of three condition lists, and the result byte and bit. The rows show which status
+byte belongs to which code: <code>MonStatusCatBank1/2</code> are the catalyst monitors (P0420, P0432),
+<code>MonStatusO2Resp1/2</code> the O2 response monitors (P0133, P0153), <code>MonStatusO2Sensor1-4</code> the heater
+monitors (P0135, P0155, P0141, P0161), and the fuel system monitors give P0171/P0174 for “too lean”
+(adaptive at its upper limit) and P0172/P0175 for “too rich”. The fuel system routines and
+constants were renamed after this (<code>FuelSysTooLean//</code>, <code>FuelSysTooRich//</code>).
+</p>
+<p>
+<code>ConditionTable</code> ($20B1C) checks such a list: a count, then 4-byte entries of RAM offset, test and
+mask. Test 0 needs the masked bits clear, test 2 needs them all set, test 4 needs the value above
+the mask byte; the check fails at the first entry that does not hold. The 48 lists lie in bank 0
+between $33CA and $4015 and are laid out in the source with each entry decoded, for example
+<code>CatBank1Conds1</code>: the catalyst monitor runs only while none of 19 bytes of stored faults (<code>FaultMem*</code>,
+about 70 P-codes) are set. These lists are calibration: changing them changes which faults suspend
+which monitor.
+</p>
+<p>
+Two more data blocks of bank 0 are laid out with their entries decoded. <code>FaultStatusMap</code> ($758C,
+44 rows of 10 bytes) ties a fault table row to a monitor status byte and bit, and for the 22
+two-trip tests (rows 11-32, searched by <code>ObdFaultReport</code>) to a second pair: <code>MonFlags09D-09F</code> hold
+the pending bits (failed once, fault not reported yet) and <code>SwitchMonFlags</code>, <code>O2MonFlags</code>,
+<code>MonFlags65A</code> the result each monitor hands over (set = failed), so their bits now have P-codes (P0740,
+P1899, P0703, P0500, P1294, P0125, P1281, P0551, the O2 and fuel level codes). <code>BitCollectMaps</code>
+($713B, 29 maps of 32 bytes) are the input of <code>CollectBits</code>: eight entries of RAM offset, mask and
+output bit build one byte, for the switch inputs and for the status bytes the SCI and bus messages
+send.
+</p>
+<p>
+Lists of RAM addresses in the code banks are laid out with each word named: the EEPROM map
+(<code>EepromShadowMap</code>, $38448: EEPROM word and the RAM copy), the descriptors of the O2, O2 heater,
+downstream O2 and catalyst monitors, the OBD record pointers, the CCD transmit rotation and eight
+lists the SCI diagnostic service probably sends from (<code>DiagDataList1-8</code>).
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>sbec3_calibration.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+**Decel Fuel Cut**
+
+This will cut fuel (completely) on decel for fuel economy improvement. Currently only works on MT trans cals. (included on the factory cals for the SBEC)

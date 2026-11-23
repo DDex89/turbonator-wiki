@@ -1,0 +1,3 @@
+**Customized Boost Control**
+
+Added some custom code and an additional table to modify the WG duty Cycle as an anti-lag measure. Basically, the WGDC is set to 100% during transients to keep the WG from seeing the manifold pressure and releasing the exhaust gases early.

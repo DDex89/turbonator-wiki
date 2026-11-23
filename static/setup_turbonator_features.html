@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>Setup the Turbonator Features [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="setup_turbonator_features" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Medium" src="_static/lib/plugins/howhard/images/style1/3.png"/></div><div class="howhard_txt">Medium</div></div><hr/>
+<h2 class="sectionedit1" id="setup_the_turbonator_features">Setup the Turbonator Features</h2>
+<div class="level2">
+<hr/>
+<p>
+** This page is not finished **
+</p>
+<p>
+<a class="urlextern" href="https://drive.google.com/open?id=0BwcPBhg2fwrIUndXcm9SNlJSUXM&amp;authuser=0" rel="ugc nofollow noopener" target="_blank" title="https://drive.google.com/open?id=0BwcPBhg2fwrIUndXcm9SNlJSUXM&amp;authuser=0">Download the latest release of the Turbonator codebase.</a> <br/>
+
+For information on the different file types included in the Turbonator download, see <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">here</a>.
+</p>
+<div class="table sectionedit2"><table class="inline">
+<thead>
+<tr class="row0">
+<th class="col0" colspan="2"> <strong>Turbonator Features:</strong> </th>
+</tr>
+</thead>
+<tr class="row1">
+<td class="col0"><strong>1) Knock Indicator</strong> – [ALL] This feature flashes the ‘Check Engine’ lamp whenever the timing is being retarded due to knock. It’s a useful feature to feedback to the driver when you should back off to save your engine.</td><td class="col1"><a class="wikilink1" data-wiki-id="ceflash_setup" href="ceflash_setup.html" title="ceflash_setup">Setup Link</a></td>
+</tr>
+<tr class="row2">
+<td class="col0"><strong>2) Switchable boost</strong> – [ALL] This allows a ‘LOW’ boost setting to be used when a switch is applied. Unfortunately, it must be one of the existing inputs to the SMEC (Cruise, A/C, P/N switch, etc.). But, these can be ‘doubled up’ – <abbr title="Internet Explorer">IE</abbr>, you can have the cruise on/off switch work for both hi/lo boost as well as cruise. This is similar in operation to the S60 boost switch feature, though without the timing adjustment for low octane fuel.</td><td class="col1"><a class="wikilink1" data-wiki-id="switchableboost_setup" href="switchableboost_setup.html" title="switchableboost_setup">Setup Link</a></td>
+</tr>
+<tr class="row3">
+<td class="col0"><strong>3) Staging Limiter (2-Step)</strong> – [ALL] This feature allows a lower than normal rev limit to be set. This lower limit can be enabled by a low speed cutoff (usually 2-10mph), and/or a switch (usually the brake switch for auto cars). The lower rev limit is useful for launching the car in a drag race.</td><td class="col1"><a class="wikilink1" data-wiki-id="launchcontrol_setup" href="launchcontrol_setup.html" title="launchcontrol_setup">Setup Link</a></td>
+</tr>
+<tr class="row4">
+<td class="col0"><strong>4) Spark-Cut Rev Limiter</strong> – [SMEC/SBEC Only] Added the ability to specify a spark-cut to be used for the rev limit instead of a fuel-cut (which is the stock operation). When used in conjunction with the staging limiter, this gives much more precise control of the RPM while staging. The fuel-cut typically has a ~500rpm swing. The spark-cut staging limiter can get down to ~200rpm. If desired, it is also possible to configure the spark-cut limiter for 'bang-bang' operation.</td><td class="col1"><a class="wikilink1" data-wiki-id="launchcontrol_setup" href="launchcontrol_setup.html" title="launchcontrol_setup">Setup Link</a></td>
+</tr>
+<tr class="row5">
+<td class="col0"><strong>5) Anti-lag Retard</strong> – [ALL] Anti-Lag is a feature that helps spool the turbo. For the latest release of T/SMEC and T/SBEC, anti-lag has been completely re-written. Previously, anti-lag retarded the timing proportionally to the difference from boost target. Now, the Anti-lag timing is a pre-set value and it only works during staging (though, it will work with either the spark-cut or fuel-cut limiters). The anti-lag/staging advance can be set anywhere from -16 to +16 degrees.</td><td class="col1"><a class="wikilink1" data-wiki-id="launchcontrol_setup" href="launchcontrol_setup.html" title="launchcontrol_setup">Setup Link</a></td>
+</tr>
+<tr class="row6">
+<td class="col0"><strong>6) Alky Injection</strong> – This feature is available, but not included in the standard build. Please PM me if you are interested in using it. Due to space and time limitations, I commented it out. But, it can easily be re-enabled for those that are interested.</td><td class="col1"><a class="wikilink1" data-wiki-id="alky_setup" href="alky_setup.html" title="alky_setup">Setup Link</a></td>
+</tr>
+<tr class="row7">
+<td class="col0"><strong>7) Customized Boost Control</strong> – [SMEC Only] Added some custom code and an additional table to modify the WG duty Cycle as an anti-lag measure. Basically, the WGDC is set to 100% during transients to keep the WG from seeing the manifold pressure and releasing the exhaust gases early.</td><td class="col1"><a class="wikilink1" data-wiki-id="boostcontrol_setup" href="boostcontrol_setup.html" title="boostcontrol_setup">Setup Link</a></td>
+</tr>
+<tr class="row8">
+<td class="col0"><strong>8) Modified Dwell Calculation</strong> - [SMEC/SBEC] Added Dwell compensation for battery volts. This will maintain better dwell control than the stock code. Should improve ignition performance at WOT (when the alternator shuts off and battery voltage can drop). This feature is enabled in all cals. </td><td class="col1"><a class="wikilink1" data-wiki-id="dwell_setup" href="dwell_setup.html" title="dwell_setup">Setup Link</a></td>
+</tr>
+<tr class="row9">
+<td class="col0"><strong>9) Lock-up solenoid operation</strong> – [SMEC/SBEC] Added PTU capability to the SMEC codebase. This is the exact same functionality as the stock 3.0 and later 4-cylinder turbo and TBI ECU’s. (included on the factory cals for the SBEC)</td><td class="col1"><a class="wikilink1" data-wiki-id="lockup_setup" href="lockup_setup.html" title="lockup_setup">Setup Link</a></td>
+</tr>
+<tr class="row10">
+<td class="col0"><strong>10) Decel Fuel Cut</strong> - [SMEC/SBEC] This will cut fuel (completely) on decel for fuel economy improvement. Currently only works on MT trans cals.(included on the factory cals for the SBEC)</td><td class="col1"><a class="wikilink1" data-wiki-id="decelfuelcut_setup" href="decelfuelcut_setup.html" title="decelfuelcut_setup">Setup Link</a></td>
+</tr>
+<tr class="row11">
+<td class="col0"><strong>11) WB2NB</strong> - [SMEC/SBEC] This is a feature that will allow you to feed a 0-5v WB signal directly into the SMEC thru the existing O2 sensor input. The code will automatically convert the signal to a NB range for use in the stock feedback mechansim. The WB AFR is stored in RAM so that it can be read and logged using MP Tune. There is also a constant value that can be used to offset the entire NB signal to force the engine to run richer or leaner in feedback mode.</td><td class="col1"><a class="wikilink1" data-wiki-id="wb2nb_setup" href="wb2nb_setup.html" title="wb2nb_setup">Setup Link</a></td>
+</tr>
+</table></div>
+<p>
+<strong>More stuff here when I'm not so tired.</strong>
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>setup_turbonator_features.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:54+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

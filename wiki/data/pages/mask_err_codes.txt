@@ -1,0 +1,55 @@
+----
+======= Error Code masking =======
+----
+
+====== T/GLHS and T/LM ======
+
+Not done yet.
+
+====== T/SMEC and T/SBEC (and later) ======
+
+Error code "masking" is implemented differently in the SMEC/SBEC than in the earlier code. Instead of masking bits for the individual codes, an internal code is used to mask up to 7 different code bytes. This is because there are in some cases 2 or more different diagnostic methods to set a given code. The mask bytes are used to prevent the code being set by a specific diagnostic routine.
+
+
+The code bytes are as follows:
+
+^Code #|Code|Offset (masking code)|
+^61|Baro sensor open or shorted|31|
+^62|EMR mileage cannot be stored in EEPROM|30|
+^63|Controller cannot write to EEPROM|2f|
+^44|Loss of FJ2|08,2c|
+^45|Nothing (overboost)|07|
+^46|Battery Volts High|06|
+^47|Battery Volts Low|05|
+^51|Lean condition|04|
+^52|Rich Condition|03,2d|
+^53|Prom Checksum|02|
+^54|Distributor Sync|01|
+^33|AC Cutout Relay|10|
+^34|Speed Ctl Solenoid|0f|
+^35|Radiator Fan Relay|0e|
+^36|Wastegate Solenoid|0d|
+^37|Barometric Read Solenoid|0c|
+^41|Charging System|0b|
+^42|Auto Shutdown Relay|0a|
+^43|Ignition Coil Control|09,28,29,2b|
+^22|Coolant Temp Sensor|1e,1f|
+^23|Charge Temp Sensor|1c,1d|
+^24|Throttle Position|1a,1b|
+^25|AIS Motor|19|
+^26|Injector Current Limit Not Achieved|16,17,18|
+^27|Injector Driver interface|13,14,15|
+^31|Purge Solenoid|12|
+^32|Exh Gas Recirc Solenoid|11,2e|
+^11|Engine Not Cranked Since Battery Disconnected|28|
+^12|Memory Standby Power Lost|00|
+^13|MAP Pneumatic|26,27|
+^14|MAP Electrical|24,25|
+^15|Vehicle Distance Sensor|23|
+^16|Battery Voltage Sense|22|
+^17|Engine Running Too Cool (thermostat)|21|
+^21|Oxygen Sensor|20|
+
+The last byte MUST be 0x00, otherwise the code will result in an error. I think the original intent was to allow the factory calibrators to mask specific internal codes to try and debug errors. Previously, only the final error code could be masked - making the cause unclear in the case where multiple internal codes set the same error code.
+
+It should be possible to increase the size of the list by adding additional code bytes after "FLTMSK7_ErrorBitsMask7". Just make sure that the byte after the last one in the list remains 0x00. The mask checking routine looks for this to mark the end of the list. Also, if the list is too long, it may cause lack of space for other items. So, be careful if adding to this list.

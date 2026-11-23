@@ -1,0 +1,7 @@
+**Knock Indicator**
+
+This feature flashes the ‘Check Engine’ lamp whenever the timing is being retarded due to knock. It’s a useful feature to feedback to the driver when you should back off to save your engine.
+
+To enable this feature, go to 'Setup', 'Cal Configuration', 'CalCustomOptionsConfig1' in the MP Tune editor window. Check the box for 'Flash CE on Knock'. It's now turned on.
+
+The only config option for this feature is the coolant temp cutoff. You can specify the minimum coolant temp to allow this feature to operate. Generally, you can get false knock at low coolant temps.

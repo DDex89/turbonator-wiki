@@ -1,0 +1,42 @@
+----
+==== SCI bus technical info ====
+----
+
+The communications specs are typical 8-N-1 at 0-5v (TTL) logic levels. However, it is setup with inverted logic. That means that a 0v registers as a binary '1'; and a 5v registers as a binary '0'. So, the interface you choose needs to be able to deal with this inverted logic. The ECU uses 'odd' baud rates - at least compared to a traditional PC serial port. Most ECU's start communications at 7812 baud, and then switch to 62500 for logging. Older LM's use lower baud rates, but still atypical. So, you also need to consider an interface that can communicate at these 'odd' baud rates, as well as switch baud rates after the port has been opened.
+
+(put list of all Chrysler ECUs and what baud rates they require here)
+
+With these requirements in mind, it should be clear that a simple RS232-TLL converter (typically sold on robotics web sites) will not work. They can't use the correct baud rates or the required inverted logic levels.
+
+^Caution|There are 2 versions of the FTDI cable. One uses 3.3v logic for use with newer processors (like an Arduino); the other uses 5v logic. Make sure you are using the 5v logic version. The 3.3v version will not reliably work with the older TTL voltage levels used in the Chrysler ECU's.|
+
+There are certainly other USB-to-TTL interfaces available. If you choose one of these, make sure it can meet the baud and logic requirements above.
+
+----
+====Chrysler SCI data format====
+----
+
+Data on the SCI bus is structured as follows, in chronological order:
+
+  * START bit (binary 0, 5V)
+  * bit4
+  * bit5
+  * bit6
+  * bit7
+  * bit0
+  * bit1
+  * bit2
+  * bit3
+  * STOP bit (binary 1, 0V)
+
+Observing on an oscilloscope, a 0x12 byte on the SCI bus would appear as follows:
+
+{{ :chrysler_sci_bus_example.jpg |}}
+
+
+====TO DO LIST===
+
+  * Is the SCI bus truly TTL? Perhaps its CMOS or has some other threshold setup? 
+    * Probably CMOS, but it's still basically 0-5v. Newer LV stuff doesn't work.
+  * How exactly does the SCI bus become "locked up" requiring key on/off to re-initiate comm?
+    * It doesn't get locked up. It's just that Chrysler provided no way to exit the 0x12 logging routine in the LM or SMEC. In the SBEC, you can get out of this mode and back to the DRB command mode. 

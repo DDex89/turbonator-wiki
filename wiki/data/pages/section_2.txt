@@ -1,0 +1,3 @@
+====== Section 2 ======
+
+Is now empty. Content moved to '[[base_cal_setup|base cal setup]]'

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html class="no-js" dir="ltr" lang="en" xml:lang="en">
+<head>
+<meta charset="utf-8"/>
+
+<title>How to flash the Neon FCC using the FCCFlash Tool. [Turbonator Tuning Wiki]</title>
+<script>(function(H){H.className=H.className.replace(/\bno-js\b/,'js')})(document.documentElement)</script>
+
+<meta content="noindex,nofollow" name="robots"/>
+<meta content="flash_an_fcc" name="keywords"/>
+
+
+
+
+
+<link href="_static/style_screen.css" rel="stylesheet"/>
+
+
+
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="_static/lib/tpl/starterbootstrap/images/favicon.ico" rel="shortcut icon"/>
+<link href="_static/lib/tpl/starterbootstrap/images/apple-touch-icon.png" rel="apple-touch-icon"/>
+
+<link href="_static/lib/tpl/starterbootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="_static/lib/tpl/starterbootstrap/css/print.css" media="print" rel="stylesheet"/>
+<script src="_static/lib/tpl/starterbootstrap/js/respond.min.js" type="text/javascript"></script>
+</head>
+<body data-spy="scroll" data-target="#dw_toc">
+
+<div id="dokuwiki__site"><div class="dokuwiki site mode_show hasSidebar" id="dokuwiki__top">
+<div class="navbar navbar-default navbar-fixed-top">
+<div class="navbar-header">
+<button class="navbar-toggle" data-target="#topnav" data-toggle="collapse" type="button">
+<span class="sr-only">Toggle Navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a accesskey="h" class="navbar-brand" href="index.html" title="[H]">Turbonator Tuning Wiki</a> </div>
+<div class="navbar-collapse collapse" id="topnav">
+<ul class="nav navbar-nav navbar-right">
+
+</ul>
+<form action="search.html" class="navbar-form navbar-right" id="dw__search" method="get" role="search"><div class="form-group"><input class="form-control" name="q" placeholder="Search" type="text"/></div></form> </div>
+</div>
+<div class="container-fluid not-header">
+<div class="notifications hidden-print">
+</div>
+<a class="sr-only hidden-print" href="#dokuwiki__content">skip to content</a>
+<a class="skip-to-sidebar hidden-print visible-xs btn-block btn btn-info" href="#dokuwiki__aside">Skip to Navigation</a>
+<section class="wrapper row">
+
+<div class="col-sm-9 col-sm-push-3" id="dokuwiki__content"><div class="static-archive-banner" style="background:#fcf8e3;border:1px solid #faebcc;color:#8a6d3b;padding:6px 12px;margin:0 0 12px 0;border-radius:4px;font-size:90%">Static archive of the <b>Turbonator Tuning Wiki</b> (BoostButton, 2014–2017). Read-only copy.</div>
+
+<div class="hidden-print panel panel-default pull-right col-sm-4 col-md-3 col-xs-12" id="dw_toc">
+<div class="panel-heading hidden-print"><h3 class="panel-title" data-target="#toc_contents" data-toggle="collapse">Table of Contents <b class="caret"></b></h3></div>
+<div class="hidden-print panel-collapse collapse in" id="toc_contents"><div class="panel-body"><li class="level2"><a href="#how_to_flash_the_neon_fcc_using_the_fccflash_tool">How to flash the Neon FCC using the FCCFlash Tool.</a>
+<ul class="">
+<li class="level3"><a href="#overview">Overview</a></li>
+<li class="level3"><a href="#set_up_the_usb-to-sci_cable_windows">Set up the USB-to-SCI cable (Windows)</a></li>
+<li class="level3"><a href="#flash_the_calibration_with_fccflash">Flash the calibration with FCCFlash</a></li>
+<li class="level3"><a href="#troubleshooting_and_limitations">Troubleshooting and limitations</a></li>
+<li class="level3"><a href="#backgroundwhat_the_fcc_expects_from_a_flash">Background: what the FCC expects from a flash</a></li>
+</ul></li>
+</div></div></div>
+
+<div class="page" role="main">
+
+<div class="howhard"><div class="howhard_title">Difficulty</div><div class="howhard_img"><img alt="Easy" src="_static/lib/plugins/howhard/images/style1/2.png"/></div><div class="howhard_txt">Easy</div></div><hr/>
+<h2 class="sectionedit1" id="how_to_flash_the_neon_fcc_using_the_fccflash_tool">How to flash the Neon FCC using the FCCFlash Tool.</h2>
+<div class="level2">
+<hr/>
+</div>
+<h3 class="sectionedit2" id="overview">Overview</h3>
+<div class="level3">
+<p>
+Flashing the '95 Neon FCC with the FCCFlash Tool.
+</p>
+<p>
+The original FCCFlash instructions are reproduced and reorganized below. They describe the
+FCCFlash Windows utility and its matching USB flashing adapter with the red boot button.
+</p>
+</div>
+<h3 class="sectionedit3" id="set_up_the_usb-to-sci_cable_windows">Set up the USB-to-SCI cable (Windows)</h3>
+<div class="level3">
+<p>
+Follow <a class="wikilink1" data-wiki-id="cable_setup" href="cable_setup.html#setup_the_usb_to_sci_cable" title="cable_setup">Setup the USB to SCI cable</a> in the
+original Turbonator Wiki. In brief:
+</p>
+<ol>
+<li class="level1"><div class="li"> Connect the USB-to-SCI cable to the Windows PC and allow the driver to install.</div>
+</li>
+<li class="level1"><div class="li"> Open <strong>Device Manager</strong>, find the FTDI USB device and open its properties.</div>
+</li>
+<li class="level1"><div class="li"> Enable <strong>Load VCP Driver</strong> on the <strong>Advanced</strong> tab (see the original wiki screenshots).</div>
+</li>
+<li class="level1"><div class="li"> Disconnect and reconnect the cable. Windows should enumerate it as a COM port.</div>
+</li>
+<li class="level1"><div class="li"> Start FCCFlash and confirm its status bar shows the assigned COM port.</div>
+</li>
+</ol>
+<p>
+If the COM port does not appear, the original <a class="wikilink1" data-wiki-id="cable_setup" href="cable_setup.html" title="cable_setup">cable setup guide</a> discusses
+reinstalling an FTDI driver; the archived download <abbr title="Uniform Resource Locator">URL</abbr> may no longer work. A non-BoostButton
+cable may also require <a class="wikilink1" data-wiki-id="manual_ftdi_setup" href="manual_ftdi_setup.html" title="manual_ftdi_setup">FTDI EEPROM configuration</a> and protection against
+the 12 V present on SCI during flashing. Those advanced modifications are <strong>not</strong> the same as
+simply enabling VCP in Windows. Do not assume that an ordinary USB-TTL cable is safe to use.
+</p>
+</div>
+<h3 class="sectionedit4" id="flash_the_calibration_with_fccflash">Flash the calibration with FCCFlash</h3>
+<div class="level3">
+<ol>
+<li class="level1"><div class="li"> Connect the FCCFlash adapter to the vehicle diagnostic port and to a USB port on the PC.</div>
+</li>
+<li class="level1"><div class="li"> Start <strong>FCCFlash</strong>, and verify that the status bar shows the adapter's COM port.</div>
+</li>
+<li class="level1"><div class="li"> Click <strong>Button #1 (Boot the FCC)</strong>. The popup describes a short key-on window (reported as around five seconds, but not confirmed in the original instructions).</div>
+</li>
+<li class="level1"><div class="li"> <strong>Press and hold the red button</strong> on the flashing adapter.</div>
+</li>
+<li class="level1"><div class="li"> Turn the ignition <strong>ON</strong> and immediately release the red button (approximately 0.5 seconds after key-on).</div>
+</li>
+<li class="level1"><div class="li"> A successful boot disables Button #1 and enables Buttons #2, #3 and #4.</div>
+</li>
+<li class="level1"><div class="li"> <strong>Optional:</strong> Click <strong>Button #2</strong> to read and save the existing calibration.</div>
+</li>
+<li class="level1"><div class="li"> Click <strong>Flash</strong>. FCCFlash identifies the ECU, then erases the calibration; a file selection dialog opens afterward.</div>
+</li>
+<li class="level1"><div class="li"> Select the compatible <code>.bin</code> file when prompted.</div>
+</li>
+<li class="level1"><div class="li"> Allow roughly <strong>three minutes</strong> for programming. The version described by the original author does <strong>not</strong> show a progress indicator. Do not disconnect the adapter or turn off the ignition while programming is in progress.</div>
+</li>
+</ol>
+</div>
+<h3 class="sectionedit5" id="troubleshooting_and_limitations">Troubleshooting and limitations</h3>
+<div class="level3">
+<ul>
+<li class="level1"><div class="li"> ECU identification or erase may occasionally fail. The original author reported that restarting the flashing procedure often worked on a second attempt.</div>
+</li>
+<li class="level1"><div class="li"> Recommended RTS and programming timeout settings were <strong>not provided</strong> in the original instructions.</div>
+</li>
+<li class="level1"><div class="li"> Preserve a verified copy of the original calibration where possible; verify ECU, code-base and binary compatibility before erasing.</div>
+</li>
+<li class="level1"><div class="li"> The source describes a <strong>calibration flash</strong>. It does not establish that FCCFlash can program arbitrary complete ROM images.</div>
+</li>
+<li class="level1"><div class="li"> The procedure above is for the <strong>FCC</strong>, not the SBEC3/SCI bootloader procedure described in <a class="wikilink1" data-wiki-id="sbec3_reflash" href="sbec3_reflash.html" title="sbec3_reflash">SBEC3 reflash</a>.</div>
+</li>
+</ul>
+<p>
+<strong>Historical source:</strong> FCCFlash flashing instructions posted by the tool's original author for users of the red-button adapter. These steps are historical documentation; confirm hardware compatibility before use.
+</p>
+</div>
+<h3 class="sectionedit6" id="backgroundwhat_the_fcc_expects_from_a_flash">Background: what the FCC expects from a flash</h3>
+<div class="level3">
+<p>
+This section is reverse-engineered from the firmware itself (see <a class="wikilink1" data-wiki-id="fcc_overview" href="fcc_overview.html" title="fcc_overview">FCC overview</a> and
+<a class="wikilink1" data-wiki-id="fcc_calibration" href="fcc_calibration.html" title="fcc_calibration">calibration</a>), not from the FCCFlash tool's own documentation, so treat it as
+“how to tell whether a download is sane” rather than tool instructions.
+</p>
+<ul>
+<li class="level1"><div class="li"> <strong>Checksum.</strong> The controller sums every byte of the EPROM image, 8-bit, wrapping; the result</div>
+</li>
+</ul>
+<p>
+must equal the byte at <code>$B805</code> (the last byte of the BCD part number). If it doesn't, the FCC
+</p>
+<pre class="code">  won't run on it. Any chip burner or MP Tune-compatible tool fixes this automatically when it
+  writes a calibration change, but if you build or edit a ''.bin'' by hand, re-check or re-sum it
+  before burning.
+* **Code base must match.** The calibration (roughly ''$B800''-''$E228'') can be swapped freely
+  between two images **only if they share the same code base** — the program code outside the
+  calibration area has to be byte-identical, because the fixed addresses the code reads
+  (''LDX #table'', ''CMPA $xxxx'') assume the calibration layout of that one code base. See
+  [[fcc_calibration#all_images|the code base table]] for which part numbers go together (B559,
+  B4F3, B4C2, B4CC, ...). Flashing a calibration from one code base onto a chip built for another
+  will boot into garbage at best.
+* **Byte-mode download over the diagnostic line.** The FCC's own DRB-protocol serial link (pins 9
+  RX / 30 TX, see [[fcc_sci|diagnostics and communication]]) has a command, ''$1B''
+  (''InitByteModeDownload''), that puts the controller into a byte-mode code download over that
+  same line. This is the path a DRB-class tool (and, most likely, FCCFlash) uses to get bytes
+  into the chip without pulling it from the socket; it's a different mechanism from EPROM
+  chip burning (see [[chip_burning_basics|chip burning basics]]) and from [[ecu_socketing|ECU
+  socketing]] for in-circuit reprogramming.
+* **EPROM size.** The program fills the full ''$1200-$FFFF'' window (60,928 bytes) of a 27C512 or
+  equivalent; make sure whatever you flash is exactly that size and not truncated or padded
+  wrong.</pre>
+<p>
+For cable driver screenshots and non-BoostButton adapter notes, see <a class="wikilink1" data-wiki-id="cable_setup" href="cable_setup.html" title="cable_setup">USB-to-SCI setup</a> and <a class="wikilink1" data-wiki-id="manual_ftdi_setup" href="manual_ftdi_setup.html" title="manual_ftdi_setup">manual FTDI setup</a>.
+</p>
+</div>
+
+</div>
+<div class="archive-note" style="margin-top:2em;padding:.6em 1em;border-top:1px solid #ddd;color:#777;font-size:90%">
+Archived copy of the <b>Turbonator Tuning Wiki</b> by BoostButton (2014–2017). Original content by Rob Lloyd and the wiki contributors; preserved after BoostButton closed.
+</div>
+</div>
+
+<aside class="col-sm-3 col-sm-pull-9" id="dokuwiki__aside">
+<div class="sidebar-page">
+<p>
+<a class="media" href="_media/wiki/slide3small.png" rel="noopener" target="_blank" title="wiki:slide3small.png"><img alt="" class="media" loading="lazy" src="_media/wiki/slide3small_300x.png" width="300"/></a>
+</p>
+<ul>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="turbonator_and_mptune" href="turbonator_and_mptune.html" title="turbonator_and_mptune">What are Turbonator and MP Tune</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="how_do_i" href="how_do_i.html" title="how_do_i">Tuning How-To</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="advanced" href="advanced.html" title="advanced">Advanced Tuning Topics</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="faq" href="faq.html" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="other_info" href="other_info.html" title="other_info">Other Tech Info</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="glossary" href="glossary.html" title="glossary">Glossary</a></div>
+</li>
+<li class="level1"><div class="li"> <a class="wikilink1" data-wiki-id="tuning_links" href="tuning_links.html" title="tuning_links">Tuning Links</a></div>
+</li>
+
+</ul>
+<p>
+<br/>
+<sub><a class="wikilink1" data-wiki-id="wiki:syntax" href="wiki.syntax.html" title="wiki:syntax">wiki syntax</a></sub> <br/>
+
+</p>
+</div>
+</aside>
+</section>
+
+<footer class="hidden-print" id="dokuwiki__footer">
+<ul class="doc breadcrumb pull-right">
+<li><a accesskey="t" class="action top" href="#dokuwiki__top" rel="nofollow" title="Back to top [T]">Back to top</a></li>
+<li><bdi>flash_an_fcc.txt</bdi> · Last modified: <time datetime="2026-11-23T18:27:55+0000">2026/11/23 18:27</time> (external edit)</li>
+</ul>
+</footer>
+</div>
+</div></div>
+<div class="no"></div>
+
+<script src="_static/lib/tpl/starterbootstrap/js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var jQNew = $.noConflict(true);
+</script>
+<script src="_static/lib/tpl/starterbootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/sorttable.js" type="text/javascript"></script>
+<script src="_static/lib/tpl/starterbootstrap/js/script.js" type="text/javascript"></script>
+</body>
+</html>

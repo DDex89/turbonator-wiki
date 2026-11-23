@@ -1,0 +1,61 @@
+{{howhard>4}}
+-----
+====SMEC Flash Module Install====
+-----
+
+pic - The SMEC logic board after module installation\\
+pic - Details of flash module and RW connection\\
+pic - Details of PROG and A15 connections\\
+pic - Connection points for A15 and PROG wires\\
+pic - Back of SMEC logic board\\
+pic - Details of the zener diode bypass on the rear of the SMEC board\\
+
+How to install the BoostButton SMEC flash module.
+
+== Preparation ==
+The logic board must be prepared the same as if a [[ecu_socketing|socket were installed]]. Additionally, a few other areas on the front of the board and one on the back need to be depotted. The zener diode on the rear that needs to be bypassed is located right next to the first number "4" in the part number printed at the edge of the board.
+== Installation ==
+Once the board is depotted and the eprom removed, the module is installed in the orientation shown in the picture. Connections for the A15, RW, and PROG wires of the module are detailed in the pictures as well.
+In order for the SMEC to be able to be put into programming mode with only 12v, a zener diode on the rear of the board must be bypassed. This is detailed in the pictures to the right. Once you are sure things are correct, it is a good idea to seal everything up with some silicone caulking that you can get at a home improvement store.
+== Finishing up ==
+A wire must be installed at pin 11 in the 60 way SMEC connector; follow the instructions [[add_a_pin|here]]. This wire needs to be connected through a toggle switch to an //unswitched// 12 volt source.
+If you have a T1 harness and plan on using a charge temp sensor, now would be a good time to add a wire to pin 21 as well.
+== Usage ==
+For flashing instructions, see [[how_to_flash_a_cal|here]].
+-----
+====SBEC Flash Module Install====
+-----
+
+How to install the BoostButton SBEC flash module.
+
+== Preparation ==
+The SBEC board must be prepared the same as if a [[ecu_socketing|socket were installed]]. With the exception that you need to expose the 4 'extra' pads as they will be used by the flash module. 
+
+== Installation == 
+The SBEC Flash Module can be installed either directly to the board, or into a 32-pin socket. For the flash module, we use the ‘extra’ 4 pins that Chrysler was so generous to provide on the SBEC boards. The ‘extra’ 4 pins are just above the 28pins used for the regular SBEC chip (the 87C257) and contain the control signals used for flashing. So, unlike the SMEC, there is no need to point-to-point wiring to get the control signals to the board.
+ 
+3 of the 4 ‘extra’ pads were not drilled by Chrysler. One of them usually is. The pin just to the right of pin # 1 is usually drilled and filled with solder. So, a solder sucker can usually clear it out. However, I have found a couple of SBEC’s where this hole was not drilled.
+
+You will need to drill these holes very carefully with a 0.037” Drill bit (#63). Be sure to keep the bit on center with the pad. 
+
+The upper 2 pads conduct on the bottom of the board, but the lower 2 pads conduct on the top. So, you would be better off to drill the top hole from the bottom of the board, and the lower 2 holes from the top of the board. The drill bit will tend to push the pad off on the opposite side of the board.
+
+PIC
+ 
+After drilling, top side:
+
+PIC
+
+After drilling, bottom side:
+
+PIC
+
+Since we have drilled these after manufacturing, the holes are not thru plated. So, solder will not flow thru the board from the back side to the top. So, you will have to flow the solder on the top of the board for the lower 2 pins, and from the back for the upper 2 pins.
+
+When you get the 32-pin socket installed, you’ll want to check continuity between the socket and the traces on the board to make sure the module will get all the required signals.
+
+Once tested, you can plug the module into the socket and try it out. I usually recommend sealing the socket at least to reduce the exposed connections to the atmosphere.
+
+After the socket installation, you can still use a regular 87C257 chip with the SBEC, but you’ll need to be sure to install the chip biased toward the left (4 ‘extra’ pins are open) for it to work correctly.
+== Usage ==
+For flashing instructions, see [[how_to_flash_a_cal|here]].

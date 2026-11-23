@@ -1,0 +1,9 @@
+===== Advanced Tuning Topics =====
+
+=== Topics ===
+  * [[point-slope|Chrysler's Point-Slope 2D table format explained]]
+  * [[fuel_setup|(2D) WOT and P/T Fuel Tables explained]]
+  * [[TIII_fuel_setup|(TIII) WOT and P/T Fuel Tables explained]]
+  * [[pumpshot_details|PumpShot (Accelerator Pump) explained]]
+  * [[O2Feedback_details|O2 Feedback and Adaptive fuel explained]]
+  * [[3-Bar_resolution|3-Bar MAP resolution 'errors']]

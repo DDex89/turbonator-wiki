@@ -1,0 +1,38 @@
+{{howhard>3}}
+-----
+===== PefTbl Fine Tuning =====
+-----
+
+MP Tune has a feature to assist you in the fine tuning of the PefTbl.
+
+Basically, this feature takes in detailed AFR log data with corresponding MAP and RPM data (required); compares that data to the AFR that you should have based on the WOT fuel table; calculates the error; and shows you a guideline for correction on the PefTbl table display. You can then decide how to adjust the PefTbl to best fit the 'corrected' PefTbl guideline.
+
+Requirements:
+
+  - Turbonator calibration setup in MP Tune with the AFR guidelines
+  - Good AFR data in .csv (comma-separated-values) format. If you have the data in a text or Excel file, this is easy to convert.
+    * 'Good' AFR data in this case means the data is all WOT (preferably), not mixed WOT + P/T; and with consistent boost and throttle position. Transient fuel from changing throttle or boost; or O2 feedback, will introduce error to this process. The AFR data can come from MP Tune or from an outside logger, the data source is not important.
+  - The most important point is that the data MUST be applied to the cal that was used when the data was being recorded. Applying the data to a cal that has had either the fuel tables or the PefTbl edited, will result in an incorrect guideline. 
+
+Example AFR data in .csv format:
+
+<code>RPM, MAP, AFR
+4400,16.96,11.64
+4450,17.20,11.79
+4500,17.34,11.65
+4550,17.50,11.63
+4600,17.47,11.61</code>
+
+  - Open the cal that was used to log the AFR data.
+    * {{:peftbl_tuning_1.jpg|}}
+  - Open the Wideband Tuning Tool.
+    * {{:peftbl_tuning_2.jpg|}}
+  - Import the WB data, save, and close the editor.
+    * {{:peftbl_tuning_3.jpg|}}
+    * {{:peftbl_tuning_4.jpg|}}
+  - Now you have a guideline on the PefTbl showing you the 'error'.
+    * {{:peftbl_tuning_5.jpg|}}
+  - Retune the PefTbl as desired and save.
+    * {{:peftbl_tuning_6.jpg|}}
+
+

@@ -1,0 +1,3 @@
+**Lock-up solenoid operation**
+
+Added PTU capability to the SMEC codebase. This is the exact same functionality as the stock 3.0 and later 4-cylinder turbo and TBI ECU’s. (included on the factory cals for the SBEC)
