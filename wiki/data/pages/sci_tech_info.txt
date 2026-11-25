@@ -40,3 +40,8 @@ Observing on an oscilloscope, a 0x12 byte on the SCI bus would appear as follows
     * Probably CMOS, but it's still basically 0-5v. Newer LV stuff doesn't work.
   * How exactly does the SCI bus become "locked up" requiring key on/off to re-initiate comm?
     * It doesn't get locked up. It's just that Chrysler provided no way to exit the 0x12 logging routine in the LM or SMEC. In the SBEC, you can get out of this mode and back to the DRB command mode. 
+==== SBEC3 128 KiB SCI/PIT research (Black Death Dev., 2026-11-26) ====
+
+New reverse-engineering supplement, separate from the archived community material. In stock 04887050 (1996) and 05293013AC (1997), SCI receives bytes and PIT can dispatch the buffered request on the 13th allowed service call after the last byte, subject to the other gates. Both have nominal IPL 3. A conditional shared Scratch0 conflict exists between foreground OBD fault processing and PIT diagnostic clear in the reviewed code; isolated exact-ROM simulation passed, but physical handshake, actual interrupt overlap and hardware behavior remain unproven. This does not establish the same issue in FCC or other SBEC3 ROMs. No firmware fix is claimed.
+
+See [[https://github.com/DDex89/neon-sbec3-firmware/blob/e7c7329f2c03d9ffae708ece49685af59bead037/docs/en/sci-obd-128k.md|stock SCI/OBD technical note]] and [[https://github.com/DDex89/recore-sbec3/actions/runs/45710722294|ReCore machine-test CI]].
