@@ -6,6 +6,10 @@
 
 See also [[sbec3_overview|SBEC3 overview]] and [[sbec3_tuning|tuning notes (TunerPro, porting, open questions)]]. The full per-image table catalogue is generated into [[https://github.com/DDex89/neon-sbec3-firmware/tree/main/docs/catalogue|docs/catalogue/]] in the repository.
 
+===== Scope of addresses and option masks =====
+
+The detailed tables below use the 256 KB reference 05293190AC unless stated otherwise. For stock A/B 128 KB images 04887050/51 and 05293013AC/14AC, the reviewed FlexFuel option is $0324 mask $01, and manual transmission is $0325 mask $20. For family C (05007038/05293148AA), manual transmission is $0324 mask $08. These are family-specific metadata corrections, not instructions to change the stock settings. Use the matching XDF; runtime RAM/MMIO symbols are not editable ROM calibration addresses. See [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/tunerpro.md|stock XDF metadata review]] and [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/stock-128k-symbol-review.md|symbol and dependency review]].
+
 ===== Where the calibration lies =====
 
 The calibration is in bank 0, between the header at $00202 and the start of the code at $08000. The

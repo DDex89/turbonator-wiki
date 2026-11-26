@@ -6,6 +6,14 @@
 
 Since 1996 the Neon (and the second-generation Eagle Talon / Mitsubishi Eclipse 420A engine) use a different controller, the **SBEC III**, with a Motorola 68HC16 CPU in place of the FCC's 68HC11. It is a separate reverse-engineering project, a companion to [[fcc_overview|neon-fcc-firmware]]: [[https://github.com/DDex89/neon-sbec3-firmware|github.com/DDex89/neon-sbec3-firmware]]. The annotations are made on one reference image and carried over to the other ten by matching routines between programs (see [[sbec3_tuning#porting to the other images|porting]]); where a routine or table has not been matched yet it keeps a numeric placeholder name. This page, [[sbec3_calibration|calibration]], [[sbec3_tuning|tuning notes]] and [[sbec3_reflash|reflashing]] cover it the same way the FCC pages cover the 1995 controller.
 
+===== Stock 128 KB engineering update (2026-11-26) =====
+
+The detailed architecture below primarily describes the 256 KB reference image 05293190AC. Do not transplant its addresses, RAM sizes, bus configuration or timing to 04887050 or 05293013AC.
+
+For these two 128 KB images, the updated stock audit distinguishes the VSS event counter from CCD distance deltas and SRI mileage, the EEPROM request from a verified write, and the running reset marker from the retained-RAM additive checksum. EEPROM aliases EepromWrite947 and EepromWrite949 refer to the low bytes of the address and payload; EepromWrite94B is the readback-table byte offset, not a retry count. The SRI value changes at request time; physical distance scaling and interrupted writes are not established.
+
+See [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/stock-128k-symbol-review.md|per-ROM symbols and dependencies]], [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/eeprom-128k-audit.md|EEPROM audit]], [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/architecture.md|architecture]], [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/sci-obd-128k.md|SCI/PIT/OBD]] and [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/fuel-pulse.md|fuel and CCD]]. Source-level findings and pending machine tests are distinguished in those documents. No stock firmware or calibration changes.
+
 ===== Images collected so far =====
 
 First look at the images collected so far: what each file is, how the flash is laid out, the
