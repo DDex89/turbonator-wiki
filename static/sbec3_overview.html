@@ -59,6 +59,7 @@
 <ul class="">
 <li class="level1"><a href="#sbec3_1996_neon_2g_eclipse-talonhardware_and_firmware_overview">SBEC3 (1996+ Neon / 2G Eclipse-Talon): hardware and firmware overview</a>
 <ul class="">
+<li class="level2"><a href="#stock_128_kb_engineering_update_2026-11-27">Stock 128 KB engineering update (2026-11-27)</a></li>
 <li class="level2"><a href="#images_collected_so_far">Images collected so far</a>
 <ul class="">
 <li class="level3"><a href="#images">Images</a></li>
@@ -92,6 +93,26 @@
 Since 1996 the Neon (and the second-generation Eagle Talon / Mitsubishi Eclipse 420A engine) use a different controller, the <strong>SBEC III</strong>, with a Motorola 68HC16 CPU in place of the FCC's 68HC11. It is a separate reverse-engineering project, a companion to <a class="wikilink1" data-wiki-id="fcc_overview" href="fcc_overview.html" title="fcc_overview">neon-fcc-firmware</a>: <a class="urlextern" href="https://github.com/DDex89/neon-sbec3-firmware" rel="ugc nofollow noopener" target="_blank" title="https://github.com/DDex89/neon-sbec3-firmware">github.com/DDex89/neon-sbec3-firmware</a>. The annotations are made on one reference image and carried over to the other ten by matching routines between programs (see <a class="wikilink1" data-wiki-id="sbec3_tuning" href="sbec3_tuning.html#porting_to_the_other_images" title="sbec3_tuning">porting</a>); where a routine or table has not been matched yet it keeps a numeric placeholder name. This page, <a class="wikilink1" data-wiki-id="sbec3_calibration" href="sbec3_calibration.html" title="sbec3_calibration">calibration</a>, <a class="wikilink1" data-wiki-id="sbec3_tuning" href="sbec3_tuning.html" title="sbec3_tuning">tuning notes</a> and <a class="wikilink1" data-wiki-id="sbec3_reflash" href="sbec3_reflash.html" title="sbec3_reflash">reflashing</a> cover it the same way the FCC pages cover the 1995 controller.
 </p>
 </div>
+<h2 id="stock_128_kb_engineering_update_2026-11-27">Stock 128 KB engineering update (2026-11-27)</h2>
+<div class="level2">
+<p>The architecture below primarily describes the SBEC3 256 KB reference 05293190AC. The addresses in this update apply to the two listed stock 128 KB SBEC3 images. FCC has its own 68HC11 address map.</p>
+<table class="inline">
+<thead><tr><th>Symbol</th><th>04887050 (A)</th><th>05293013AC (B)</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td><code>EepromAddrLow</code></td><td><code>$F8487</code></td><td><code>$F84A3</code></td><td>Low byte of the EEPROM address word</td></tr>
+<tr><td><code>EepromDataLow</code></td><td><code>$F8489</code></td><td><code>$F84A5</code></td><td>Low byte of the payload word</td></tr>
+<tr><td><code>EepromReadbackTableOffset</code></td><td><code>$F848B</code></td><td><code>$F84A7</code></td><td>Byte offset into the readback table</td></tr>
+<tr><td><code>StoredFlexEthanol</code></td><td><code>$F8344</code></td><td><code>$F835E</code></td><td>Retained byte mapped to EEPROM $00C</td></tr>
+<tr><td><code>VssQualifiedEventCounter</code></td><td><code>$F8032</code></td><td><code>$F8034</code></td><td>16-bit qualified event counter</td></tr>
+<tr><td><code>VssQualifiedEventCounterLow</code></td><td><code>$F8033</code></td><td><code>$F8035</code></td><td>Low byte of the counter, read by the main loop</td></tr>
+<tr><td><code>ClearFaultHistoryAndCurrentState</code></td><td><code>$1BB34</code></td><td><code>$1E450</code></td><td>Bank 1 routine that also clears MIL-related state inline</td></tr>
+</tbody>
+</table>
+<p>The historical names EepromWrite947, EepromWrite949 and EepromWrite94B correspond to the first three symbols above, in that order. The VSS event counter, CCD distance delta and SRI mileage request are separate values. SRI changes at request time. Physical distance scaling and interrupted writes remain open.</p>
+<p>The 1997 image retains six additional history bytes at $F8092–$F8097 on warm reset and includes them in the retained-RAM checksum. Cold reset and ClearFaultHistoryAndCurrentState clear them. The isolated readiness and pass-side OBD checks preserved them in the tested cases. Other computed writers, normal nonzero use and hardware timing remain open. In the isolated misfire-aging checks, the threshold path also cleared the six bytes by calling ClearFaultHistoryAndCurrentState.</p>
+<p>An isolated full freeze-frame capture writes 14 bytes at $F80CF–$F80DC on 04887050 and $F80D7–$F80E4 on 05293013AC. The full capture also writes a LookupResult byte at $F83B0 and $F82FE respectively. A higher-priority capture of the same ID updates only the priority byte.</p>
+<p>See <a href="https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/stock-128k-symbol-review.md">per-ROM symbols and dependencies</a>, <a href="https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/eeprom-128k-audit.md">EEPROM audit</a>, <a href="https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/architecture.md">architecture</a>, <a href="https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/sci-obd-128k.md">SCI/PIT/OBD</a>, <a href="https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/fuel-pulse.md">fuel and CCD</a>, <a href="https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/diagnostic-symbol-canonicalization.md">DTC symbols</a>.</p>
+</div>
 <h2 class="sectionedit2" id="images_collected_so_far">Images collected so far</h2>
 <div class="level2">
 <p>
@@ -116,7 +137,7 @@ named outside source, <strong>[inferred]</strong> a conclusion that still needs 
 </tr>
 </thead>
 <tr class="row1">
-<td class="col0"> <code>04887050</code> </td><td class="col1"> 128 KB </td><td class="col2"> 2 KB ($F87FE) </td><td class="col3"> $03DDD </td><td class="col4"> $0C760 </td><td class="col5"> A </td><td class="col6 leftalign"> </td><td class="col7"> unknown; copyright 1995, so 1996 model year [inferred] </td>
+<td class="col0"> <code>04887050</code> </td><td class="col1"> 128 KB </td><td class="col2"> 2 KB ($F87FE) </td><td class="col3"> $03DDD </td><td class="col4"> $0C760 </td><td class="col5"> A </td><td class="col6 leftalign"> </td><td class="col7"> 1996 FJ 2.0 DOHC automatic, FED/Taiwan/CAL service group <a href="https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/emissions-calibrations.md">[FCA service listing]</a> </td>
 </tr>
 <tr class="row2">
 <td class="col0"> <code>04887051</code> </td><td class="col1"> 128 KB </td><td class="col2"> 2 KB </td><td class="col3"> $03DDD </td><td class="col4"> $0C760 </td><td class="col5"> A </td><td class="col6 leftalign"> </td><td class="col7"> unknown, as above </td>

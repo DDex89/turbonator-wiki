@@ -6,13 +6,26 @@
 
 Since 1996 the Neon (and the second-generation Eagle Talon / Mitsubishi Eclipse 420A engine) use a different controller, the **SBEC III**, with a Motorola 68HC16 CPU in place of the FCC's 68HC11. It is a separate reverse-engineering project, a companion to [[fcc_overview|neon-fcc-firmware]]: [[https://github.com/DDex89/neon-sbec3-firmware|github.com/DDex89/neon-sbec3-firmware]]. The annotations are made on one reference image and carried over to the other ten by matching routines between programs (see [[sbec3_tuning#porting to the other images|porting]]); where a routine or table has not been matched yet it keeps a numeric placeholder name. This page, [[sbec3_calibration|calibration]], [[sbec3_tuning|tuning notes]] and [[sbec3_reflash|reflashing]] cover it the same way the FCC pages cover the 1995 controller.
 
-===== Stock 128 KB engineering update (2026-11-26) =====
+===== Stock 128 KB engineering update (2026-11-27) =====
 
-The detailed architecture below primarily describes the 256 KB reference image 05293190AC. Do not transplant its addresses, RAM sizes, bus configuration or timing to 04887050 or 05293013AC.
+The architecture below primarily describes the SBEC3 256 KB reference 05293190AC. The addresses in this update apply to the two listed stock 128 KB SBEC3 images. FCC has its own 68HC11 address map.
 
-For these two 128 KB images, the updated stock audit distinguishes the VSS event counter from CCD distance deltas and SRI mileage, the EEPROM request from a verified write, and the running reset marker from the retained-RAM additive checksum. EEPROM aliases EepromWrite947 and EepromWrite949 refer to the low bytes of the address and payload; EepromWrite94B is the readback-table byte offset, not a retry count. The SRI value changes at request time; physical distance scaling and interrupted writes are not established.
+^ Symbol ^ 04887050 (A) ^ 05293013AC (B) ^ Use ^
+| ''EepromAddrLow'' | ''$F8487'' | ''$F84A3'' | Low byte of the EEPROM address word |
+| ''EepromDataLow'' | ''$F8489'' | ''$F84A5'' | Low byte of the payload word |
+| ''EepromReadbackTableOffset'' | ''$F848B'' | ''$F84A7'' | Byte offset into the readback table |
+| ''StoredFlexEthanol'' | ''$F8344'' | ''$F835E'' | Retained byte mapped to EEPROM $00C |
+| ''VssQualifiedEventCounter'' | ''$F8032'' | ''$F8034'' | 16-bit qualified event counter |
+| ''VssQualifiedEventCounterLow'' | ''$F8033'' | ''$F8035'' | Low byte of the counter, read by the main loop |
+| ''ClearFaultHistoryAndCurrentState'' | ''$1BB34'' | ''$1E450'' | Bank 1 routine that also clears MIL-related state inline |
 
-See [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/stock-128k-symbol-review.md|per-ROM symbols and dependencies]], [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/eeprom-128k-audit.md|EEPROM audit]], [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/architecture.md|architecture]], [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/sci-obd-128k.md|SCI/PIT/OBD]] and [[https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/fuel-pulse.md|fuel and CCD]]. Source-level findings and pending machine tests are distinguished in those documents. No stock firmware or calibration changes.
+The historical names EepromWrite947, EepromWrite949 and EepromWrite94B correspond to the first three symbols above, in that order. The VSS event counter, CCD distance delta and SRI mileage request are separate values. SRI changes at request time. Physical distance scaling and interrupted writes remain open.
+
+The 1997 image retains six additional history bytes at $F8092–$F8097 on warm reset and includes them in the retained-RAM checksum. Cold reset and ClearFaultHistoryAndCurrentState clear them. The isolated readiness and pass-side OBD checks preserved them in the tested cases. Other computed writers, normal nonzero use and hardware timing remain open. In the isolated misfire-aging checks, the threshold path also cleared the six bytes by calling ClearFaultHistoryAndCurrentState.
+
+An isolated full freeze-frame capture writes 14 bytes at $F80CF–$F80DC on 04887050 and $F80D7–$F80E4 on 05293013AC. The full capture also writes a LookupResult byte at $F83B0 and $F82FE respectively. A higher-priority capture of the same ID updates only the priority byte.
+
+See [[https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/stock-128k-symbol-review.md|per-ROM symbols and dependencies]], [[https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/eeprom-128k-audit.md|EEPROM audit]], [[https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/architecture.md|architecture]], [[https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/sci-obd-128k.md|SCI/PIT/OBD]], [[https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/fuel-pulse.md|fuel and CCD]], [[https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/diagnostic-symbol-canonicalization.md|DTC symbols]].
 
 ===== Images collected so far =====
 
@@ -29,7 +42,7 @@ named outside source, **[inferred]** a conclusion that still needs confirming.
 ==== Images ====
 
 ^ File ^ Flash ^ RAM (stack top) ^ Header ^ Reset entry ^ Family ^ Build stamp ^ Vehicle ^
-| ''04887050'' | 128 KB | 2 KB ($F87FE) | $03DDD | $0C760 | A |  | unknown; copyright 1995, so 1996 model year [inferred] |
+| ''04887050'' | 128 KB | 2 KB ($F87FE) | $03DDD | $0C760 | A |  | 1996 FJ 2.0 DOHC automatic, FED/Taiwan/CAL service group [[https://github.com/DDex89/recore-sbec3/blob/f5b079e7d69e276f871de293921728a9027a39b0/docs/en/emissions-calibrations.md|[FCA service listing]]] |
 | ''04887051'' | 128 KB | 2 KB | $03DDD | $0C760 | A |  | unknown, as above |
 | ''05293013AC'' | 128 KB | 2 KB | $03E08 | $0C860 | B | 960716 | 1997 Eagle Talon, manual [source: 2GNT forum] |
 | ''05293014AC'' | 128 KB | 2 KB | $03E08 | $0C860 | B | 961211 | 1997 Mitsubishi Eclipse (VIN 4A3AK44Y0VE097567 in the SBECBootLoader README) [source] |

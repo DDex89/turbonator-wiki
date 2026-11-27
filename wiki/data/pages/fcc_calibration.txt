@@ -380,7 +380,7 @@ Both use exactly the same program code; only the calibration area differs. Table
 | ''$CB52'' | ''EGR17A'' | 1 | ExhGasRecircConstHiLimit17a |
 | ''$CB53'' | ''EGR19'' | 1 | ExhGasRecircConstLoLimit19 |
 | ''$CB55'' | ''EGR6'' | 1 | ExhGasRecircConst6 |
-| ''$CB57'' | ''SCRMP1'' | 110 | SecondaryRampSubtractor1 |
+| ''$CB58'' | ''SCRMP1'' | 110 | SecondaryRampSubtractor1. The B4CC code subtracts the byte at $CB58 from the O2 toggle time. The historical MP Tune table lists $CB57. [[https://github.com/DDex89/neon-fcc-firmware/commit/8cbd82d462ebe87cbca3aa8f4954d30349365a66|FCC source review]] |
 | ''$CDA8'' | ''COILHI'' | 49 | HiLimitBatteryVoltsForCoilVerify |
 | ''$CF5D'' | ''RPMSCL'' | 15 | Output is used as the input to the 3D tables |
 | ''$CFDF'' | ''RPMTHS'' | 47 | AISPos from RPM |

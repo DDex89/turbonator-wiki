@@ -59,6 +59,7 @@
 <ul class="">
 <li class="level1"><a href="#sbec3calibration">SBEC3: calibration</a>
 <ul class="">
+<li class="level2"><a href="#scope_of_addresses_and_option_masks">Scope of addresses and option masks</a></li>
 <li class="level2"><a href="#where_the_calibration_lies">Where the calibration lies</a></li>
 <li class="level2"><a href="#table_formats">Table formats</a></li>
 <li class="level2"><a href="#units">Units</a></li>
@@ -84,6 +85,10 @@
 <p>
 See also <a class="wikilink1" data-wiki-id="sbec3_overview" href="sbec3_overview.html" title="sbec3_overview">SBEC3 overview</a> and <a class="wikilink1" data-wiki-id="sbec3_tuning" href="sbec3_tuning.html" title="sbec3_tuning">tuning notes (TunerPro, porting, open questions)</a>. The full per-image table catalogue is generated into <a class="urlextern" href="https://github.com/DDex89/neon-sbec3-firmware/tree/main/docs/catalogue" rel="ugc nofollow noopener" target="_blank" title="https://github.com/DDex89/neon-sbec3-firmware/tree/main/docs/catalogue">docs/catalogue/</a> in the repository.
 </p>
+</div>
+<h2 id="scope_of_addresses_and_option_masks">Scope of addresses and option masks</h2>
+<div class="level2">
+<p>The detailed tables below use the 256 KB reference 05293190AC unless stated otherwise. For stock A/B 128 KB images 04887050/51 and 05293013AC/14AC, the reviewed FlexFuel option is $0324 mask $01, and manual transmission is $0325 mask $20. For family C (05007038/05293148AA), manual transmission is $0324 mask $08. These are family-specific metadata corrections, not instructions to change the stock settings. Use the matching XDF; runtime RAM/MMIO symbols are not editable ROM calibration addresses. See <a href="https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/tunerpro.md">stock XDF metadata review</a> and <a href="https://github.com/DDex89/neon-sbec3-firmware/blob/b5e57bf010dd0e6ce2c34a09841095efb53e09e9/docs/en/stock-128k-symbol-review.md">symbol and dependency review</a>.</p>
 </div>
 <h2 class="sectionedit2" id="where_the_calibration_lies">Where the calibration lies</h2>
 <div class="level2">
