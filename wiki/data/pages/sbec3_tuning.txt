@@ -54,10 +54,9 @@ the constants the port carries over (239 in family A to 1,404 in family E).
 table or constant of the same name, table sizes must match the table headers, flag masks must be
 bits the code tests, no two elements may share bytes, and the unit formulas must give plausible
 values (rpm, deg C, kPa, volts, degrees) for the values stored in the image. It needs the image
-files, which are not in the repository, so it runs locally; on all eleven XDFs it reports no
-errors. The only remaining warnings are three unnamed 2D tables in the ported images whose x
-values are not in order (''Tab2D_04FB'' in family A, ''Tab2D_050D'', ''Tab2D_2C31''), which may not be
-real tables.
+files, which are not in the repository, so it runs locally.
+
+The exact-ROM audit found zero XDF errors across all eleven definitions and five non-monotonic-axis warnings in stock data. ''ExpectedMapThrottleScale'' has x values [10, 61, 77, 0, 0] in ''04887050'', ''04887051'', ''05293013AC'' and ''05293014AC''. The stock ''Lookup2D'' returned zero for every unsigned-byte input on those four images. ''05293148AA'' accounts for the fifth warning with ''LimpRpmThrottle'' [0, 10, 26, 13]. TunerPro GUI behavior and the purpose of the original calibration were outside the test. See [[https://github.com/DDex89/recore-sbec3/blob/4b5e6527dbdee8ca729f9009fa4eb16021d9ef56/docs/en/tunerpro.md#exact-rom-validation-follow-up|exact-ROM XDF validation]].
 
 ''tools/edittest.py'' (run in CI, no image needed) edits a copy of the source: a cell of
 ''PartThrottleFuelMain'', the constant ''RevLimit'' and bit 5 of ''Options0337''. It rebuilds, checks that
@@ -143,13 +142,15 @@ found and laid out in every image, named or not.
 One image per family has its source in ''src/'' and is checked by the build:
 
 ^ Family ^ Image ^ Note ^
-| A | 04887050 | copyright 1995, probably 1996 model year |
+| A | 04887050 | 1996 FJ 2.0 DOHC automatic (FCA service listing) |
 | B | 05293013AC | 1997 Eagle Talon, manual |
-| C | 05007038 | probably a Mopar Performance calibration |
+| C | 05007038 | Part-number match to Mopar Performance P5007038 for the 1997–99 Neon DOHC manual |
 | D | 05269833AH | probably Neon |
 | E | 05269833AI | probably Neon |
 | F | 05293190AC | reference, 1999 Mitsubishi Eclipse, manual |
 | G | 05032017AA | copyright 1998 |
+
+Application references and limits are listed in the [[https://github.com/DDex89/recore-sbec3/blob/4b5e6527dbdee8ca729f9009fa4eb16021d9ef56/docs/en/emissions-calibrations.md|stock emissions calibration audit]].
 
 Each has its catalogue in docs/catalogue/. The second image of a family differs
 from the first only in calibration bytes (no code byte differs); ''tools/caldiff.py'' lists those
@@ -167,4 +168,4 @@ program.
 
 ===== Open questions =====
 
-The uncertain readings ($032x$-$033x$ option bits still marked "probably", data blocks not decoded yet, bit positions with no text) are tracked in the repository and updated as they are settled; see [[https://github.com/DDex89/neon-sbec3-firmware/blob/main/docs/en/open-questions.md|open-questions.md]] for the current list. Two settled this round, as examples: `MonFlags09D`-`09F` are the two-trip pending bits (not "test not passed yet"), and the curve formerly called `FlexSensorCurve` is the catalyst temperature sensor curve, shared with the flex-fuel input.
+The firmware repository tracks unresolved option bits, data blocks and other labels in [[https://github.com/DDex89/neon-sbec3-firmware/blob/main/docs/en/open-questions.md|open questions]]. On the 256 KB reference ''05293190AC'', ''ObdPriorFailSwitch'', ''ObdPriorFailO2'' and ''ObdPriorFailMisc'' name the prior-failure bytes used by ''ObdFaultReport''. The curve historically called ''FlexSensorCurve'' is the catalyst temperature sensor curve, shared with the flex-fuel input.

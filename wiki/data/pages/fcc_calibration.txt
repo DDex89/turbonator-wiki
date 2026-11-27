@@ -14,7 +14,7 @@ Applications and revision letters come from the "Neon Code Families" spreadsheet
 
 ^ Code base ^ Images ^ Copyright ^ Notes ^
 | B588 | 1 | 1993 | 94½ generation |
-| B559 | 12 | 1994 | The original 1995 part numbers, SOHC and DOHC, all markets; buildable from this repository (''src_b559/'') |
+| B559 | 12 | 1994 | Original 1995 SOHC and DOHC part numbers. Eleven of the twelve archived images are rebuildable (''src_b559/'') |
 | B4F3 | 3 | 1994 | Later revisions (rev D of 4874154 and 4874156, export automatic); buildable (''src_b4f3/'') |
 | B4C2 | 1 | 1994 | Rev C of 4874154; not listed in the spreadsheet; buildable (''src_b4c2/'') |
 | B4CC | 3 (+2 "enh") | 1994 | Mopar Performance SOHC/DOHC and 5269718 (rev B of 4874164); the code base of this repository |
@@ -233,9 +233,9 @@ Every table with its address, name, type and description is in the generated [[h
 5269718: Chrysler factory 1995 Neon 2.0 DOHC manual 'Racing' calibration (rev B of 4874164)
 5007033: Mopar Performance 1995 Neon SOHC manual-transmission calibration
 
-Both use exactly the same program code; only the calibration area differs. Tables listed below contain at least one different byte.
+Both images use the same program code. In this comparison, each differing calibration byte is grouped under the closest preceding listed item. The counts show grouped differences. See the [[https://github.com/DDex89/neon-fcc-firmware/blob/05cde9ad7fdc0e8b6c10276a91e4eedd8e08ceec/docs/en/calibration_variants.md|source comparison]].
 
-^ Address ^ Table ^ Bytes changed ^ Description ^
+^ Address ^ Table ^ Attributed changed bytes ^ Description ^
 | ''$B803'' | ''PARTNO2'' | 1 | Part Number prefix. The 1st 4 digits of the Mopar PN for this ECU. |
 | ''$B804'' | ''PARTNO1'' | 1 | Part Number prefix. The 1st 4 digits of the Mopar PN for this ECU. |
 | ''$B805'' | ''PARTNO0'' | 1 | Part Number prefix. The 1st 4 digits of the Mopar PN for this ECU. |
@@ -287,12 +287,12 @@ Both use exactly the same program code; only the calibration area differs. Table
 | ''$BC35'' | ''MSPDRE'' | 1 | MinimumMPHForDeltaRPMEvaluation |
 | ''$BC3B'' | ''ICCNT2'' | 101 | IdleControlCounterInit2 |
 | ''$BD6A'' | ''RETSPD'' | 1 | Retard from Speed. |
-| ''$BDBC'' | ''STRTFL'' | 10 | Start fuel uSec = [ STRTFL // STRTFL // (1 - STFBAR - STFTMP) // EPPMUL + (BATOFF // 4) ] * 4 |
+| ''$BDBC'' | ''STRTFL'' | 10 | Start pulse (µs) = [STRTFL² × (1 − STFBAR − STFTMP) × EPPMUL + BATOFF × 4] × 4 |
 | ''$BDE3'' | ''STRLMT'' | 1 | Coldest temperature accepted as input to STRTFL table - anything below this value will be replaced with this value |
 | ''$BDE4'' | ''STFLOI'' | 6 | StartFuelOffIdleFactor fromRPM |
 | ''$BE0B'' | ''STFLID'' | 6 | StartFuelIdleFactor fromRPM |
-| ''$BE41'' | ''EPPMUL'' | 5 | Start fuel uSec = [ STRTFL // STRTFL // (1 - STFBAR - STFTMP) // EPPMUL + (BATOFF // 4) ] * 4. This table decreases fuel for each engine rotation while starting |
-| ''$BE96'' | ''SFDCAY'' | 3 | Start fuel uSec = [ STRTFL // STRTFL // (1 - STFBAR - STFTMP) // EPPMUL + (BATOFF // 4) ] * 4. This allows fuel to decay gradually after the start-run transition. |
+| ''$BE41'' | ''EPPMUL'' | 5 | Start pulse (µs) = [STRTFL² × (1 − STFBAR − STFTMP) × EPPMUL + BATOFF × 4] × 4. This table decreases fuel for each engine rotation while starting |
+| ''$BE96'' | ''SFDCAY'' | 3 | Start pulse (µs) = [STRTFL² × (1 − STFBAR − STFTMP) × EPPMUL + BATOFF × 4] × 4. This allows fuel to decay gradually after the start-run transition. |
 | ''$BEA5'' | ''BATOFF'' | 12 | Compensates for slower opening times of injectors with lower voltage. |
 | ''$BEC9'' | ''PRTTBL'' | 279 | FuelFromRPMAndMAP |
 | ''$BFED'' | ''PTEADJ'' | 107 | EnrichAdjust FromMap |
@@ -372,15 +372,16 @@ Both use exactly the same program code; only the calibration area differs. Table
 | ''$CB31'' | ''EGR23'' | 1 | ExhGasRecircConstFromMAP1 |
 | ''$CB32'' | ''EGR24'' | 1 | ExhGasRecircConstFromMAP2 |
 | ''$CB35'' | ''EGR27'' | 7 | ExhGasRecircConstFromCoolantTemp |
-| ''$CB46'' | ''EGR18'' | 2 | ExhGasRecircConstLoLimit18 |
-| ''$CB48'' | ''EGR15'' | 2 | ExhGasRecircConstFromRPMLoLimit15 |
-| ''$CB4A'' | ''EGR9'' | 3 | ExhGasRecircConstFromTimeEngRunning9 |
-| ''$CB50'' | ''EGR16'' | 1 | ExhGasRecircConstLoLimit16 |
-| ''$CB51'' | ''EGR16A'' | 1 | ExhGasRecircConstHiLimit16a |
-| ''$CB52'' | ''EGR17A'' | 1 | ExhGasRecircConstHiLimit17a |
-| ''$CB53'' | ''EGR19'' | 1 | ExhGasRecircConstLoLimit19 |
-| ''$CB55'' | ''EGR6'' | 1 | ExhGasRecircConst6 |
-| ''$CB58'' | ''SCRMP1'' | 110 | SecondaryRampSubtractor1. The B4CC code subtracts the byte at $CB58 from the O2 toggle time. The historical MP Tune table lists $CB57. [[https://github.com/DDex89/neon-fcc-firmware/commit/8cbd82d462ebe87cbca3aa8f4954d30349365a66|FCC source review]] |
+| ''$CB46'' | ''EGR18'' | 2 | EGR flow monitor, first-phase MAP window lower limit ($CB47 is the upper limit). |
+| ''$CB48'' | ''EGR15'' | 2 | EGR flow monitor, first-phase RPM window lower limit ($CB49 is the upper limit). |
+| ''$CB4A'' | ''EGR9'' | 3 | EGR flow monitor, first-phase throttle-above-MINTHR window lower limit ($CB4B is the upper limit). |
+| ''$CB50'' | ''EGR16'' | 1 | EGR flow monitor, second-phase MAP window lower limit. |
+| ''$CB51'' | ''EGR16A'' | 1 | EGR flow monitor, second-phase MAP window upper limit. |
+| ''$CB52'' | ''EGR17A'' | 1 | EGR flow monitor, second-phase RPM window lower limit. |
+| ''$CB53'' | ''EGR19'' | 1 | EGR flow monitor, second-phase RPM window upper limit. |
+| ''$CB55'' | ''EGR6'' | 1 | EGR flow monitor, second-phase throttle-above-MINTHR window upper limit. |
+| ''$CB56'' | ''EGR15A'' | 1 | EGR flow monitor, word-sized sample count before judging the second phase. |
+| ''$CB58'' | ''SCRMP1'' | 109 | SecondaryRampSubtractor1. The B4CC code subtracts the byte at $CB58 from the O2 toggle time. The historical MP Tune table lists $CB57. [[https://github.com/DDex89/neon-fcc-firmware/commit/8cbd82d462ebe87cbca3aa8f4954d30349365a66|FCC source review]] |
 | ''$CDA8'' | ''COILHI'' | 49 | HiLimitBatteryVoltsForCoilVerify |
 | ''$CF5D'' | ''RPMSCL'' | 15 | Output is used as the input to the 3D tables |
 | ''$CFDF'' | ''RPMTHS'' | 47 | AISPos from RPM |

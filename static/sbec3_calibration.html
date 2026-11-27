@@ -417,6 +417,18 @@ Spark corrections besides the base tables:
 Knock control learns a noise level per rpm band (<code>KnockNoise*</code>), runs above a MAP threshold
 (<code>KnockMapThreshold//</code>) and limits the retard by rpm and MAP (<code>KnockRetardMax//</code>, <code>KnockRetardLimit</code>).
 </p>
+<p>On the two stock 128 KB images, <code>KnockNoiseCalc</code> reads the following five curves using engine RPM.</p>
+<table class="inline">
+<thead><tr><th>Stock table</th><th>04887050 ROM</th><th>05293013AC ROM</th><th>Lookup result</th></tr></thead>
+<tbody>
+<tr><td><code>KnockMapThresholdRpm</code></td><td>$1C63</td><td>$1C7B</td><td>MAP gate threshold</td></tr>
+<tr><td><code>KnockNoiseFilterWeightRpm</code></td><td>$1C7F</td><td>$1C97</td><td>Weight of the previous learned-noise sample</td></tr>
+<tr><td><code>KnockNoiseMin</code></td><td>$1C8B</td><td>$1CA3</td><td>Lower bound for learned noise</td></tr>
+<tr><td><code>KnockNoiseMax</code></td><td>$1C97</td><td>$1CAF</td><td>Upper bound for learned noise</td></tr>
+<tr><td><code>KnockSensorSignalMinRpm</code></td><td>$3DAD</td><td>$3DD8</td><td>Minimum filtered knock signal for the sensor check</td></tr>
+</tbody>
+</table>
+<p>See <a href="https://github.com/DDex89/recore-sbec3/blob/4b5e6527dbdee8ca729f9009fa4eb16021d9ef56/docs/en/stock-128k-symbol-review.md#canonical-knock-lookup-and-ram-names-2026-11-26">the A/B knock symbol review</a>.</p>
 <p>
 Several of these readings rest on how the code uses a variable rather than on a document: the
 battery temperature (<code>BatteryTemp</code> ($0A5A,Z), used for the charging target), the generator field duty (<code>FieldDuty</code> ($032E,Z),
@@ -813,24 +825,17 @@ constants were renamed after this (<code>FuelSysTooLean//</code>, <code>FuelSysT
 </p>
 <p>
 <code>ConditionTable</code> ($20B1C) checks such a list: a count, then 4-byte entries of RAM offset, test and
-mask. Test 0 needs the masked bits clear, test 2 needs them all set, test 4 needs the value above
-the mask byte; the check fails at the first entry that does not hold. The 48 lists lie in bank 0
+mask or threshold. Test 0 requires all masked bits clear and test 2 requires them all set.
+Test 4 requires an unsigned value strictly above the threshold and test 6 requires it strictly below.
+The check fails at the first unsatisfied entry. The 48 lists lie in bank 0
 between $33CA and $4015 and are laid out in the source with each entry decoded, for example
 <code>CatBank1Conds1</code>: the catalyst monitor runs only while none of 19 bytes of stored faults (<code>FaultMem*</code>,
 about 70 P-codes) are set. These lists are calibration: changing them changes which faults suspend
 which monitor.
 </p>
-<p>
-Two more data blocks of bank 0 are laid out with their entries decoded. <code>FaultStatusMap</code> ($758C,
-44 rows of 10 bytes) ties a fault table row to a monitor status byte and bit, and for the 22
-two-trip tests (rows 11-32, searched by <code>ObdFaultReport</code>) to a second pair: <code>MonFlags09D-09F</code> hold
-the pending bits (failed once, fault not reported yet) and <code>SwitchMonFlags</code>, <code>O2MonFlags</code>,
-<code>MonFlags65A</code> the result each monitor hands over (set = failed), so their bits now have P-codes (P0740,
-P1899, P0703, P0500, P1294, P0125, P1281, P0551, the O2 and fuel level codes). <code>BitCollectMaps</code>
-($713B, 29 maps of 32 bytes) are the input of <code>CollectBits</code>: eight entries of RAM offset, mask and
-output bit build one byte, for the switch inputs and for the status bytes the SCI and bus messages
-send.
-</p>
+<p>On the 256 KB reference <code>05293190AC</code>, <code>FaultStatusMap</code> starts at $758C. <code>ObdFaultReport</code> searches 22 ten-byte rows within that table, starting at $75FA. <code>FaultTwoTripRows</code> is the count byte ($16) at $7746. The prior-failure bytes are <code>ObdPriorFailSwitch</code>, <code>ObdPriorFailO2</code> and <code>ObdPriorFailMisc</code> (Z+$009D–$009F, historically <code>MonFlags09D</code>–<code>MonFlags09F</code>). The matching result bytes are <code>SwitchMonFlags</code>, <code>O2MonFlags</code> and <code>ObdResultMisc</code> (Z+$0658–$065A, with <code>MonFlags65A</code> the old name for the last byte). A first failure sets the prior flag. A repeat with the result bit set can report the fault, and a pass clears both bits. In modeled warm resets of the audited 256 KB images, prior-failure bytes survived and current-result bytes cleared. Modeled cold resets cleared both groups. Physical standby retention, key timing and the remaining caller conditions are open.</p>
+<p>On stock <code>04887050</code> and <code>05293013AC</code>, the main loop selects <code>FaultPendingAge</code> at <code>MainLoopCounter</code> = $80, once per regular 256-pass rollover. The routine ages the two pending faults and the separate pass-recovery state. The time in seconds depends on ECU main-loop execution. The $75FA qualification table and its symbols above apply to <code>05293190AC</code>. See <a href="https://github.com/DDex89/recore-sbec3/blob/3c9ec577b16936cca95509c808453c6deba3827e/docs/en/fault-obd-qualification.md">Fault qualification and periodic pending-counter service</a>.</p>
+<p><code>BitCollectMaps</code> ($713B, 29 maps of 32 bytes) supplies <code>CollectBits</code> with eight RAM offset, mask and output-bit entries per map. It builds bytes for switch inputs and for status sent by SCI and bus messages.</p>
 <p>
 Lists of RAM addresses in the code banks are laid out with each word named: the EEPROM map
 (<code>EepromShadowMap</code>, $38448: EEPROM word and the RAM copy), the descriptors of the O2, O2 heater,

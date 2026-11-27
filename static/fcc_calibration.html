@@ -99,7 +99,7 @@ Applications and revision letters come from the “Neon Code Families” spreads
 <td class="col0"> B588 </td><td class="col1"> 1 </td><td class="col2"> 1993 </td><td class="col3"> 94½ generation </td>
 </tr>
 <tr class="row2">
-<td class="col0"> B559 </td><td class="col1"> 12 </td><td class="col2"> 1994 </td><td class="col3"> The original 1995 part numbers, SOHC and DOHC, all markets; buildable from this repository (<code>src_b559/</code>) </td>
+<td class="col0"> B559 </td><td class="col1"> 12 </td><td class="col2"> 1994 </td><td class="col3"> Original 1995 SOHC and DOHC part numbers. Eleven of the twelve archived images are rebuildable (<code>src_b559/</code>) </td>
 </tr>
 <tr class="row3">
 <td class="col0"> B4F3 </td><td class="col1"> 3 </td><td class="col2"> 1994 </td><td class="col3"> Later revisions (rev D of 4874154 and 4874156, export automatic); buildable (<code>src_b4f3/</code>) </td>
@@ -562,12 +562,12 @@ Every table with its address, name, type and description is in the generated <a 
 5007033: Mopar Performance 1995 Neon SOHC manual-transmission calibration
 </p>
 <p>
-Both use exactly the same program code; only the calibration area differs. Tables listed below contain at least one different byte.
+Both images use the same program code. In this comparison, each differing calibration byte is grouped under the closest preceding listed item. The counts show grouped differences. See the <a href="https://github.com/DDex89/neon-fcc-firmware/blob/05cde9ad7fdc0e8b6c10276a91e4eedd8e08ceec/docs/en/calibration_variants.md">source comparison</a>.
 </p>
 <div class="table sectionedit17"><table class="inline">
 <thead>
 <tr class="row0">
-<th class="col0"> Address </th><th class="col1"> Table </th><th class="col2"> Bytes changed </th><th class="col3"> Description </th>
+<th class="col0"> Address </th><th class="col1"> Table </th><th class="col2"> Attributed changed bytes </th><th class="col3"> Description </th>
 </tr>
 </thead>
 <tr class="row1">
@@ -724,7 +724,7 @@ Both use exactly the same program code; only the calibration area differs. Table
 <td class="col0"> <code>$BD6A</code> </td><td class="col1"> <code>RETSPD</code> </td><td class="col2"> 1 </td><td class="col3"> Retard from Speed. </td>
 </tr>
 <tr class="row52">
-<td class="col0"> <code>$BDBC</code> </td><td class="col1"> <code>STRTFL</code> </td><td class="col2"> 10 </td><td class="col3"> Start fuel uSec = [ STRTFL // STRTFL // (1 - STFBAR - STFTMP) // EPPMUL + (BATOFF // 4) ] * 4 </td>
+<td class="col0"> <code>$BDBC</code> </td><td class="col1"> <code>STRTFL</code> </td><td class="col2"> 10 </td><td class="col3"> Start pulse (µs) = [STRTFL² × (1 − STFBAR − STFTMP) × EPPMUL + BATOFF × 4] × 4 </td>
 </tr>
 <tr class="row53">
 <td class="col0"> <code>$BDE3</code> </td><td class="col1"> <code>STRLMT</code> </td><td class="col2"> 1 </td><td class="col3"> Coldest temperature accepted as input to STRTFL table - anything below this value will be replaced with this value </td>
@@ -736,10 +736,10 @@ Both use exactly the same program code; only the calibration area differs. Table
 <td class="col0"> <code>$BE0B</code> </td><td class="col1"> <code>STFLID</code> </td><td class="col2"> 6 </td><td class="col3"> StartFuelIdleFactor fromRPM </td>
 </tr>
 <tr class="row56">
-<td class="col0"> <code>$BE41</code> </td><td class="col1"> <code>EPPMUL</code> </td><td class="col2"> 5 </td><td class="col3"> Start fuel uSec = [ STRTFL // STRTFL // (1 - STFBAR - STFTMP) // EPPMUL + (BATOFF // 4) ] * 4. This table decreases fuel for each engine rotation while starting </td>
+<td class="col0"> <code>$BE41</code> </td><td class="col1"> <code>EPPMUL</code> </td><td class="col2"> 5 </td><td class="col3"> Start pulse (µs) = [STRTFL² × (1 − STFBAR − STFTMP) × EPPMUL + BATOFF × 4] × 4. This table decreases fuel for each engine rotation while starting </td>
 </tr>
 <tr class="row57">
-<td class="col0"> <code>$BE96</code> </td><td class="col1"> <code>SFDCAY</code> </td><td class="col2"> 3 </td><td class="col3"> Start fuel uSec = [ STRTFL // STRTFL // (1 - STFBAR - STFTMP) // EPPMUL + (BATOFF // 4) ] * 4. This allows fuel to decay gradually after the start-run transition. </td>
+<td class="col0"> <code>$BE96</code> </td><td class="col1"> <code>SFDCAY</code> </td><td class="col2"> 3 </td><td class="col3"> Start pulse (µs) = [STRTFL² × (1 − STFBAR − STFTMP) × EPPMUL + BATOFF × 4] × 4. This allows fuel to decay gradually after the start-run transition. </td>
 </tr>
 <tr class="row58">
 <td class="col0"> <code>$BEA5</code> </td><td class="col1"> <code>BATOFF</code> </td><td class="col2"> 12 </td><td class="col3"> Compensates for slower opening times of injectors with lower voltage. </td>
@@ -979,31 +979,34 @@ Both use exactly the same program code; only the calibration area differs. Table
 <td class="col0"> <code>$CB35</code> </td><td class="col1"> <code>EGR27</code> </td><td class="col2"> 7 </td><td class="col3"> ExhGasRecircConstFromCoolantTemp </td>
 </tr>
 <tr class="row137">
-<td class="col0"> <code>$CB46</code> </td><td class="col1"> <code>EGR18</code> </td><td class="col2"> 2 </td><td class="col3"> ExhGasRecircConstLoLimit18 </td>
+<td class="col0"> <code>$CB46</code> </td><td class="col1"> <code>EGR18</code> </td><td class="col2"> 2 </td><td class="col3"> EGR flow monitor, first-phase MAP window lower limit ($CB47 is the upper limit). </td>
 </tr>
 <tr class="row138">
-<td class="col0"> <code>$CB48</code> </td><td class="col1"> <code>EGR15</code> </td><td class="col2"> 2 </td><td class="col3"> ExhGasRecircConstFromRPMLoLimit15 </td>
+<td class="col0"> <code>$CB48</code> </td><td class="col1"> <code>EGR15</code> </td><td class="col2"> 2 </td><td class="col3"> EGR flow monitor, first-phase RPM window lower limit ($CB49 is the upper limit). </td>
 </tr>
 <tr class="row139">
-<td class="col0"> <code>$CB4A</code> </td><td class="col1"> <code>EGR9</code> </td><td class="col2"> 3 </td><td class="col3"> ExhGasRecircConstFromTimeEngRunning9 </td>
+<td class="col0"> <code>$CB4A</code> </td><td class="col1"> <code>EGR9</code> </td><td class="col2"> 3 </td><td class="col3"> EGR flow monitor, first-phase throttle-above-MINTHR window lower limit ($CB4B is the upper limit). </td>
 </tr>
 <tr class="row140">
-<td class="col0"> <code>$CB50</code> </td><td class="col1"> <code>EGR16</code> </td><td class="col2"> 1 </td><td class="col3"> ExhGasRecircConstLoLimit16 </td>
+<td class="col0"> <code>$CB50</code> </td><td class="col1"> <code>EGR16</code> </td><td class="col2"> 1 </td><td class="col3"> EGR flow monitor, second-phase MAP window lower limit. </td>
 </tr>
 <tr class="row141">
-<td class="col0"> <code>$CB51</code> </td><td class="col1"> <code>EGR16A</code> </td><td class="col2"> 1 </td><td class="col3"> ExhGasRecircConstHiLimit16a </td>
+<td class="col0"> <code>$CB51</code> </td><td class="col1"> <code>EGR16A</code> </td><td class="col2"> 1 </td><td class="col3"> EGR flow monitor, second-phase MAP window upper limit. </td>
 </tr>
 <tr class="row142">
-<td class="col0"> <code>$CB52</code> </td><td class="col1"> <code>EGR17A</code> </td><td class="col2"> 1 </td><td class="col3"> ExhGasRecircConstHiLimit17a </td>
+<td class="col0"> <code>$CB52</code> </td><td class="col1"> <code>EGR17A</code> </td><td class="col2"> 1 </td><td class="col3"> EGR flow monitor, second-phase RPM window lower limit. </td>
 </tr>
 <tr class="row143">
-<td class="col0"> <code>$CB53</code> </td><td class="col1"> <code>EGR19</code> </td><td class="col2"> 1 </td><td class="col3"> ExhGasRecircConstLoLimit19 </td>
+<td class="col0"> <code>$CB53</code> </td><td class="col1"> <code>EGR19</code> </td><td class="col2"> 1 </td><td class="col3"> EGR flow monitor, second-phase RPM window upper limit. </td>
 </tr>
 <tr class="row144">
-<td class="col0"> <code>$CB55</code> </td><td class="col1"> <code>EGR6</code> </td><td class="col2"> 1 </td><td class="col3"> ExhGasRecircConst6 </td>
+<td class="col0"> <code>$CB55</code> </td><td class="col1"> <code>EGR6</code> </td><td class="col2"> 1 </td><td class="col3"> EGR flow monitor, second-phase throttle-above-MINTHR window upper limit. </td>
+</tr>
+<tr class="row_egr15a">
+<td class="col0"> <code>$CB56</code> </td><td class="col1"> <code>EGR15A</code> </td><td class="col2"> 1 </td><td class="col3"> EGR flow monitor, word-sized sample count before judging the second phase. </td>
 </tr>
 <tr class="row145">
-<td class="col0"> <code>$CB58</code> </td><td class="col1"> <code>SCRMP1</code> </td><td class="col2"> 110 </td><td class="col3"> SecondaryRampSubtractor1. The B4CC code subtracts the byte at $CB58 from the O2 toggle time. The historical MP Tune table lists $CB57. <a href="https://github.com/DDex89/neon-fcc-firmware/commit/8cbd82d462ebe87cbca3aa8f4954d30349365a66">FCC source review</a> </td>
+<td class="col0"> <code>$CB58</code> </td><td class="col1"> <code>SCRMP1</code> </td><td class="col2"> 109 </td><td class="col3"> SecondaryRampSubtractor1. The B4CC code subtracts the byte at $CB58 from the O2 toggle time. The historical MP Tune table lists $CB57. <a href="https://github.com/DDex89/neon-fcc-firmware/commit/8cbd82d462ebe87cbca3aa8f4954d30349365a66">FCC source review</a> </td>
 </tr>
 <tr class="row146">
 <td class="col0"> <code>$CDA8</code> </td><td class="col1"> <code>COILHI</code> </td><td class="col2"> 49 </td><td class="col3"> HiLimitBatteryVoltsForCoilVerify </td>

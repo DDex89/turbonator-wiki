@@ -153,38 +153,12 @@ simply enabling VCP in Windows. Do not assume that an ordinary USB-TTL cable is 
 </div>
 <h3 class="sectionedit6" id="backgroundwhat_the_fcc_expects_from_a_flash">Background: what the FCC expects from a flash</h3>
 <div class="level3">
-<p>
-This section is reverse-engineered from the firmware itself (see <a class="wikilink1" data-wiki-id="fcc_overview" href="fcc_overview.html" title="fcc_overview">FCC overview</a> and
-<a class="wikilink1" data-wiki-id="fcc_calibration" href="fcc_calibration.html" title="fcc_calibration">calibration</a>), not from the FCCFlash tool's own documentation, so treat it as
-“how to tell whether a download is sane” rather than tool instructions.
-</p>
+<p>This section describes the FCC firmware. For the controller layout and code bases, see <a href="fcc_overview.html">FCC overview</a> and <a href="fcc_calibration.html">calibration</a>.</p>
 <ul>
-<li class="level1"><div class="li"> <strong>Checksum.</strong> The controller sums every byte of the EPROM image, 8-bit, wrapping; the result</div>
-</li>
+<li class="level1"><div class="li"><strong>Checksum.</strong> FCC adds ROM bytes $1200–$B5FF and $B800–$FFFF in an 8-bit sum and compares it with $B805. A mismatch sets code 53 on the reviewed factory B559, B4F3 and B4C2 images. The descriptor is disabled on B4CC images 5269718 and 5007033. The firmware project found MP Tune-edited images with a mismatched sum. See <a href="https://github.com/DDex89/neon-fcc-firmware/blob/05cde9ad7fdc0e8b6c10276a91e4eedd8e08ceec/docs/en/architecture.md#rom-checksum">FCC checksum documentation</a>.</div></li>
+<li class="level1"><div class="li"><strong>Code-base compatibility.</strong> Fixed calibration addresses depend on the code base. See <a href="fcc_calibration#all_images">the code-base table</a> for the firmware families.</div></li>
+<li class="level1"><div class="li"><strong>Firmware mechanisms and file span.</strong> The stock diagnostic firmware has a byte-mode download handler. The $1200–$FFFF window describes a 60,928-byte full dump. The historical FCCFlash instructions describe a calibration flash and leave its wire protocol and accepted payload length unspecified.</div></li>
 </ul>
-<p>
-must equal the byte at <code>$B805</code> (the last byte of the BCD part number). If it doesn't, the FCC
-</p>
-<pre class="code">  won't run on it. Any chip burner or MP Tune-compatible tool fixes this automatically when it
-  writes a calibration change, but if you build or edit a ''.bin'' by hand, re-check or re-sum it
-  before burning.
-* **Code base must match.** The calibration (roughly ''$B800''-''$E228'') can be swapped freely
-  between two images **only if they share the same code base** — the program code outside the
-  calibration area has to be byte-identical, because the fixed addresses the code reads
-  (''LDX #table'', ''CMPA $xxxx'') assume the calibration layout of that one code base. See
-  [[fcc_calibration#all_images|the code base table]] for which part numbers go together (B559,
-  B4F3, B4C2, B4CC, ...). Flashing a calibration from one code base onto a chip built for another
-  will boot into garbage at best.
-* **Byte-mode download over the diagnostic line.** The FCC's own DRB-protocol serial link (pins 9
-  RX / 30 TX, see [[fcc_sci|diagnostics and communication]]) has a command, ''$1B''
-  (''InitByteModeDownload''), that puts the controller into a byte-mode code download over that
-  same line. This is the path a DRB-class tool (and, most likely, FCCFlash) uses to get bytes
-  into the chip without pulling it from the socket; it's a different mechanism from EPROM
-  chip burning (see [[chip_burning_basics|chip burning basics]]) and from [[ecu_socketing|ECU
-  socketing]] for in-circuit reprogramming.
-* **EPROM size.** The program fills the full ''$1200-$FFFF'' window (60,928 bytes) of a 27C512 or
-  equivalent; make sure whatever you flash is exactly that size and not truncated or padded
-  wrong.</pre>
 <p>
 For cable driver screenshots and non-BoostButton adapter notes, see <a class="wikilink1" data-wiki-id="cable_setup" href="cable_setup.html" title="cable_setup">USB-to-SCI setup</a> and <a class="wikilink1" data-wiki-id="manual_ftdi_setup" href="manual_ftdi_setup.html" title="manual_ftdi_setup">manual FTDI setup</a>.
 </p>

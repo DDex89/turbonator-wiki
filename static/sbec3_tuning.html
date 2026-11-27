@@ -179,10 +179,10 @@ the constants the port carries over (239 in family A to 1,404 in family E).
 table or constant of the same name, table sizes must match the table headers, flag masks must be
 bits the code tests, no two elements may share bytes, and the unit formulas must give plausible
 values (rpm, deg C, kPa, volts, degrees) for the values stored in the image. It needs the image
-files, which are not in the repository, so it runs locally; on all eleven XDFs it reports no
-errors. The only remaining warnings are three unnamed 2D tables in the ported images whose x
-values are not in order (<code>Tab2D_04FB</code> in family A, <code>Tab2D_050D</code>, <code>Tab2D_2C31</code>), which may not be
-real tables.
+files, which are not in the repository, so it runs locally.
+</p>
+<p>
+The exact-ROM audit found zero XDF errors across all eleven definitions and five non-monotonic-axis warnings in stock data. <code>ExpectedMapThrottleScale</code> has x values [10, 61, 77, 0, 0] in <code>04887050</code>, <code>04887051</code>, <code>05293013AC</code> and <code>05293014AC</code>. The stock <code>Lookup2D</code> returned zero for every unsigned-byte input on those four images. <code>05293148AA</code> accounts for the fifth warning with <code>LimpRpmThrottle</code> [0, 10, 26, 13]. TunerPro GUI behavior and the purpose of the original calibration were outside the test. See <a href="https://github.com/DDex89/recore-sbec3/blob/4b5e6527dbdee8ca729f9009fa4eb16021d9ef56/docs/en/tunerpro.md#exact-rom-validation-follow-up">exact-ROM XDF validation</a>.
 </p>
 <p>
 <code>tools/edittest.py</code> (run in CI, no image needed) edits a copy of the source: a cell of
@@ -333,13 +333,13 @@ One image per family has its source in <code>src/</code> and is checked by the b
 </tr>
 </thead>
 <tr class="row1">
-<td class="col0"> A </td><td class="col1"> 04887050 </td><td class="col2"> copyright 1995, probably 1996 model year </td>
+<td class="col0"> A </td><td class="col1"> 04887050 </td><td class="col2"> 1996 FJ 2.0 DOHC automatic (FCA service listing) </td>
 </tr>
 <tr class="row2">
 <td class="col0"> B </td><td class="col1"> 05293013AC </td><td class="col2"> 1997 Eagle Talon, manual </td>
 </tr>
 <tr class="row3">
-<td class="col0"> C </td><td class="col1"> 05007038 </td><td class="col2"> probably a Mopar Performance calibration </td>
+<td class="col0"> C </td><td class="col1"> 05007038 </td><td class="col2"> Part-number match to Mopar Performance P5007038 for the 1997–99 Neon DOHC manual </td>
 </tr>
 <tr class="row4">
 <td class="col0"> D </td><td class="col1"> 05269833AH </td><td class="col2"> probably Neon </td>
@@ -354,6 +354,7 @@ One image per family has its source in <code>src/</code> and is checked by the b
 <td class="col0"> G </td><td class="col1"> 05032017AA </td><td class="col2"> copyright 1998 </td>
 </tr>
 </table></div>
+<p>Application references and limits are listed in the <a href="https://github.com/DDex89/recore-sbec3/blob/4b5e6527dbdee8ca729f9009fa4eb16021d9ef56/docs/en/emissions-calibrations.md">stock emissions calibration audit</a>.</p>
 <p>
 Each has its catalogue in docs/catalogue/. The second image of a family differs
 from the first only in calibration bytes (no code byte differs); <code>tools/caldiff.py</code> lists those
@@ -387,7 +388,7 @@ program.
 <h2 class="sectionedit14" id="open_questions">Open questions</h2>
 <div class="level2">
 <p>
-The uncertain readings ($032x$-$033x$ option bits still marked “probably”, data blocks not decoded yet, bit positions with no text) are tracked in the repository and updated as they are settled; see <a class="urlextern" href="https://github.com/DDex89/neon-sbec3-firmware/blob/main/docs/en/open-questions.md" rel="ugc nofollow noopener" target="_blank" title="https://github.com/DDex89/neon-sbec3-firmware/blob/main/docs/en/open-questions.md">open-questions.md</a> for the current list. Two settled this round, as examples: `MonFlags09D`-`09F` are the two-trip pending bits (not “test not passed yet”), and the curve formerly called `FlexSensorCurve` is the catalyst temperature sensor curve, shared with the flex-fuel input.
+The firmware repository tracks unresolved option bits, data blocks and other labels in <a href="https://github.com/DDex89/neon-sbec3-firmware/blob/main/docs/en/open-questions.md">open questions</a>. On the 256 KB reference <code>05293190AC</code>, <code>ObdPriorFailSwitch</code>, <code>ObdPriorFailO2</code> and <code>ObdPriorFailMisc</code> name the prior-failure bytes used by <code>ObdFaultReport</code>. The curve historically called <code>FlexSensorCurve</code> is the catalyst temperature sensor curve, shared with the flex-fuel input.
 </p>
 </div>
 
